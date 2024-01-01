@@ -10,6 +10,20 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
+# Carpeta específica para Firebase
+Assets/GoogleService-Info.plist
+Assets/google-services.json
+
+# Carpeta de caché de Firebase
+Library/Firebase/
+
+# Carpeta generada por Unity para las definiciones de Firebase
+Assets/Firebase/
+Assets/Editor Default Resources/
+Assets/ExternalDependencyManager/
+Assets/Plugins/
+
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
@@ -70,3 +84,6 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Ignorar el archivo google-services.json en la carpeta Assets
+Assets/google-services.json
