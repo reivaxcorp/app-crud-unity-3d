@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ExceptionManager : MonoBehaviour
+public class ExceptionManager 
 {
     /// <summary>
     /// Manage firebase Exception

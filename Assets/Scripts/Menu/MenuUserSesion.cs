@@ -27,30 +27,18 @@ public class MenuUserSesion : Menu
         {
             if (!resultPut && FirebaseSDK.GetInstance().auth.CurrentUser != null)
             {
-                SetMenuResult("Logeado con mail: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email);
+                SetMsjResult("Logeado con mail: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email, Color.green);
                 resultPut = true;
             }
         }
     }
 
-    public override void SetMenuResult(string name)
-    {
-        if (resultMsj != null)
-        {
-            resultMsj.text = name;
-        }
-        else
-        {
-            Debug.LogWarning("msj result menu is null");
-        }
-    }
- 
 
     public void LogOut()
     {
         FirebaseSDK.GetInstance().LogOut();
         HideButtonSessionOn();
-        SetMenuResult("Iniciar sesión");
+        SetMsjResult("Iniciar sesión", Color.white);
     }
 
     private void HideButtonSessionOn()

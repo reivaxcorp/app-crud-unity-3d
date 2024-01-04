@@ -10,26 +10,18 @@ public class MenuCreateAccount : Menu
     [SerializeField] private TMP_InputField inputMail;
     [SerializeField] private TMP_InputField inputPassword;
     [SerializeField] private TMP_InputField inputRePassword;
+    private FirebaseAuthManage firebaseAuthManage;
     private ValidateInputs validateInputs;
-    private ExceptionManager exceptionManager;
 
 
     private void Awake()
     {
         validateInputs = gameObject.AddComponent<ValidateInputs>();
-        exceptionManager = gameObject.AddComponent<ExceptionManager>();
     }
 
-    public override void SetMenuResult(string name)
+    private void Start()
     {
-        if (resultMsj != null)
-        {
-            resultMsj.text = name;
-        }
-        else
-        {
-            Debug.LogWarning("msj result menu is null");
-        }
+         firebaseAuthManage = new FirebaseAuthManage();
     }
 
     public void CreateAccountWithMailAndPassword()
@@ -40,35 +32,14 @@ public class MenuCreateAccount : Menu
             {
                 if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputRePassword, resultMsj))
                 {
-                    FirebaseSDK.GetInstance().auth.CreateUserWithEmailAndPasswordAsync(inputMail.text, inputPassword.text).ContinueWith(task =>
-                    {
-                        if (task.IsCanceled)
-                        {
-                            Debug.LogError("Was canceled.");
-                            SetMessageResult("Fue cancelado!", Color.red);
-                            return;
-                        }
-                        if (task.IsFaulted)
-                        {
-                            SetMessageResult(exceptionManager.ManageExceptionForm(task), Color.red);
-                            return;
-                        }
-
-                        // Firebase user has been created.
-                        Firebase.Auth.AuthResult result = task.Result;
-                        Debug.LogFormat("Firebase user created successfully: {0} ({1})",
-                            result.User.DisplayName, result.User.UserId);
-
-                        resultMsj.SetText("Cuenta creada"); // we need TaskScheduler.FromCurrentSync.... to set text
-                    },
-                      TaskScheduler.FromCurrentSynchronizationContext() // Execute in main thread of Unity. ('case we need to update text "cuenta creada")
-                    );
+                    firebaseAuthManage.CreateAccountWithMailAndPassword(inputMail.text, inputPassword.text);
+                    firebaseAuthManage.OnAccountCreated += SetMsjResult;
                 }
 
             }
             else
             {
-                SetMessageResult("Formato de email no valido!", Color.red);
+                SetMsjResult("Formato de email no valido!", Color.red);
             }
         }
         else
@@ -77,9 +48,25 @@ public class MenuCreateAccount : Menu
         }
     }
 
-    private void SetMessageResult(string msj, Color color)
+    // desuscribe to prevent memory leak
+    private void DesuscribeEvent()
     {
-        resultMsj.SetText(msj);
-        resultMsj.color = color;
+        if (firebaseAuthManage != null)
+        {
+            // Desuscripción del evento OnAccountCreated
+            firebaseAuthManage.OnAccountCreated -= SetMsjResult;
+        }
     }
+
+    // call it when we use SetActive "false"
+    private void OnDisable()
+    {
+        DesuscribeEvent();
+    }
+
+    private void OnDestroy()
+    {
+        DesuscribeEvent();
+    }
+
 }
