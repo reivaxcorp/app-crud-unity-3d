@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public interface IRepository 
+public interface IRepositoryLocal
 {
     Task<List<ItemLocal>> GetItems();
     ItemLocal GetItemById(string id);
