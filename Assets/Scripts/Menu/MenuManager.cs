@@ -8,7 +8,11 @@ public class MenuManager : MonoBehaviour
 
     private bool menuSet = false;
     [SerializeField] private Menu [] menus;
-    
+
+    private void Start()
+    {
+        menuSet = false;
+    }
 
     private void Update()
     {

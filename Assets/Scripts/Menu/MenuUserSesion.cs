@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.Networking.UnityWebRequest;
 
 public class MenuUserSesion : Menu
 {
@@ -11,13 +12,8 @@ public class MenuUserSesion : Menu
     // Start is called before the first frame update
     void Start()
     {
-        if(loginBtn != null)
-        {
-            loginBtn.SetActive(false);
-        } else
-        {
-            Debug.LogWarning("Please put Loginbtn on inspector");
-        }
+        ShowLoginButton(false);
+        resultPut = false;
     }
 
     // Update is called once per frame
@@ -27,8 +23,9 @@ public class MenuUserSesion : Menu
         {
             if (!resultPut && FirebaseSDK.GetInstance().auth.CurrentUser != null)
             {
-                SetMsjResult("Logeado con mail: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email, Color.green);
                 resultPut = true;
+                AccountAuthResult result = new AccountAuthResult("Logeado con mail: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email, Color.green, false);
+                SetResult(result);
             }
         }
     }
@@ -38,7 +35,8 @@ public class MenuUserSesion : Menu
     {
         FirebaseSDK.GetInstance().LogOut();
         HideButtonSessionOn();
-        SetMsjResult("Iniciar sesión", Color.white);
+        AccountAuthResult result = new AccountAuthResult("", Color.white, false);
+        SetResult(result);
     }
 
     private void HideButtonSessionOn()
@@ -46,11 +44,23 @@ public class MenuUserSesion : Menu
         if(enterBtn != null && logOutBtn != null) {
             enterBtn.SetActive(false);
             logOutBtn.SetActive(false);
-            loginBtn.SetActive(true);
+            ShowLoginButton(true);
         } else
         {
             Debug.LogWarning("Please put btn on inspector EnterBtn and LogOutbtn");
         }
-
     }
+
+    private void ShowLoginButton(bool isVisible)
+    {
+        if (loginBtn != null)
+        {
+            loginBtn.SetActive(isVisible);
+        }
+        else
+        {
+            Debug.LogWarning("Please put Loginbtn on inspector");
+        }
+    }
+ 
 }

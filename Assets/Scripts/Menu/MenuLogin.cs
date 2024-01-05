@@ -5,5 +5,36 @@ using UnityEngine;
 
 public class MenuLogin : Menu
 {
+    [SerializeField] private TMP_InputField inputMail;
+    [SerializeField] private TMP_InputField inputPassword;
 
+    public void LoginWithExistingAccount()
+    {
+        if(IsInputsSetted())
+        {
+            if (validateInputs.IsValidEmail(inputMail.text, resultMsj))
+            {
+                if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputPassword, resultMsj))
+                {
+                    firebaseAuthManage.LoginWithExistingAccount(inputMail.text, inputPassword.text);
+                    firebaseAuthManage.OnAccountAuthResult += SetResult;
+                }
+            }
+        }
+    }
+
+    private bool IsInputsSetted()
+    {
+        if (inputMail == null)
+        {
+            Debug.LogWarning("Please put inputMail on inspector");
+            return false;
+        }
+        if (inputPassword == null)
+        {
+            Debug.LogWarning("Please put inputPassword on inspector");
+            return false;
+        }
+        return true;
+    }
 }

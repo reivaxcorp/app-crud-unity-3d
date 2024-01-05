@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
-public class ValidateInputs : MonoBehaviour
+public class ValidateMenuInputs : MonoBehaviour
 {
 
-    public bool IsValidEmail(string email)
+    public bool IsValidEmail(string email, TextMeshProUGUI msjLoginResult)
     {
 
         // Define una expresión regular para validar correos electrónicos.
@@ -20,6 +18,7 @@ public class ValidateInputs : MonoBehaviour
         }
         else
         {
+            msjLoginResult.SetText("Formato de email no valido!");
             return false;
         }
     }

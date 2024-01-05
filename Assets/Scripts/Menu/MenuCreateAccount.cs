@@ -1,72 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using System;
-using System.Threading.Tasks;
 
 public class MenuCreateAccount : Menu
 {
     [SerializeField] private TMP_InputField inputMail;
     [SerializeField] private TMP_InputField inputPassword;
     [SerializeField] private TMP_InputField inputRePassword;
-    private FirebaseAuthManage firebaseAuthManage;
-    private ValidateInputs validateInputs;
-
-
-    private void Awake()
-    {
-        validateInputs = gameObject.AddComponent<ValidateInputs>();
-    }
-
-    private void Start()
-    {
-         firebaseAuthManage = new FirebaseAuthManage();
-    }
 
     public void CreateAccountWithMailAndPassword()
     {
-        if (FirebaseSDK.GetInstance().isFirebaseReady)
+        if (IsInputsSetted())
         {
-            if (validateInputs.IsValidEmail(inputMail.text))
+            if (validateInputs.IsValidEmail(inputMail.text, resultMsj))
             {
                 if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputRePassword, resultMsj))
                 {
                     firebaseAuthManage.CreateAccountWithMailAndPassword(inputMail.text, inputPassword.text);
-                    firebaseAuthManage.OnAccountCreated += SetMsjResult;
+                    firebaseAuthManage.OnAccountAuthResult += SetResult;
                 }
-
-            }
-            else
-            {
-                SetMsjResult("Formato de email no valido!", Color.red);
             }
         }
-        else
+    }
+
+    private bool IsInputsSetted()
+    {
+        if (inputMail == null)
         {
-            Debug.LogWarning("Firebase isn't running!");
+            Debug.LogWarning("Please put inputMail on inspector");
+            return false;
         }
-    }
-
-    // desuscribe to prevent memory leak
-    private void DesuscribeEvent()
-    {
-        if (firebaseAuthManage != null)
+        if (inputPassword == null)
         {
-            // Desuscripción del evento OnAccountCreated
-            firebaseAuthManage.OnAccountCreated -= SetMsjResult;
+            Debug.LogWarning("Please put inputPassword on inspector");
+            return false;
         }
+        if (inputRePassword == null)
+        {
+            Debug.LogWarning("Please put inputRePassword on inspector");
+            return false;
+        }
+        return true;
     }
-
-    // call it when we use SetActive "false"
-    private void OnDisable()
-    {
-        DesuscribeEvent();
-    }
-
-    private void OnDestroy()
-    {
-        DesuscribeEvent();
-    }
-
 }
+
