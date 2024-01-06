@@ -42,6 +42,11 @@ public class ExceptionManager
                     Debug.LogError("User mis match.");
                     return "Usuario no coincidente";
                 }
+                if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.UserDisabled)
+                {
+                    Debug.LogError("User mis disable.");
+                    return "Usuario deshabilitado!";
+                }
             }
         }
 

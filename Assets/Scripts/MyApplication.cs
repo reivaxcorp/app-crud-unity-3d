@@ -4,19 +4,24 @@ using UnityEngine;
 
 public class MyApplication : MonoBehaviour
 {
-
-    private static MyRepository _repository;
     public static MyRepository repository
     {
         private set { _repository = value; }
         get { return _repository; }
+    }
+    private static MyRepository _repository;
+   
+
+    private async void Start()
+    {
+        await GetRepositoryAsync();
     }
 
     public async Task<MyRepository> GetRepositoryAsync()
     {
         if (repository == null)
         {
-            await CreateRepositoryAsync();
+            return await CreateRepositoryAsync();
         }
         return repository;
     }
@@ -24,22 +29,22 @@ public class MyApplication : MonoBehaviour
     private async Task<MyRepository> CreateRepositoryAsync()
     {
         // FIRST wait to initialize Sdk Firebase
-        FirebaseSDK firebaseSDK = await InicializeFirebaseSdk();
+        await InicializeFirebase();
 
-        RemoteDb remoteDb = new RemoteDb(firebaseSDK);
+        RemoteDb remoteDb = new RemoteDb();
         LocalDb localDb = new LocalDb();
         repository = new MyRepository(localDb, remoteDb);
         return repository;
     }
 
     // we wait firebase start
-    private async Task<FirebaseSDK> InicializeFirebaseSdk()
+    private async Task<FirebaseSDK> InicializeFirebase()
     {
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
 
         try
         {
-            bool firebaseInitialized = await firebaseSdk.InitFirebaseAsync();
+            bool firebaseInitialized = await firebaseSdk.InitFirebaseDependenciesAsync();
 
             if (firebaseInitialized)
             {
@@ -62,8 +67,4 @@ public class MyApplication : MonoBehaviour
 
     }
 
-    private async void Start()
-    {
-        await GetRepositoryAsync();
-    }
 }

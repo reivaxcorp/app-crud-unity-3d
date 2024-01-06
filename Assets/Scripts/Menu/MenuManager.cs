@@ -4,7 +4,7 @@ using UnityEngine;
 public class MenuManager : MonoBehaviour
 {
     private const string MENU_LOGIN_NAME = "MenuLogin";
-    private const string MENU_USER_SESION = "MenuUserSesion";
+    private const string MENU_USER_SESION = "MenuUserAccount";
 
     private bool menuSet = false;
     [SerializeField] private Menu [] menus;

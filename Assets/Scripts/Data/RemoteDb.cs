@@ -4,20 +4,6 @@ using System.Threading.Tasks;
 
 public class RemoteDb : IRepositoryRemote
 {
-    private FirebaseSDK _firebaseSdk;
-    public FirebaseSDK firebaseSdk
-    {
-        private set { _firebaseSdk = value; }
-        get { return _firebaseSdk; }
-    }
-
-    public RemoteDb(FirebaseSDK firebaseSdk)
-    {
-        if (firebaseSdk != null)
-        {
-            this.firebaseSdk = firebaseSdk;
-        }
-    }
 
     public void DeleteItemRemoteById(ItemRemote itemLocal)
     {

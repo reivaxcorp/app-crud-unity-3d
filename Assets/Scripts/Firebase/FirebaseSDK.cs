@@ -7,51 +7,51 @@ using UnityEngine;
 
 public class FirebaseSDK
 {
-    private static FirebaseSDK instance;
-
-    private FirebaseApp _app;
     public FirebaseApp app
     {
         private set { _app = value; }
         get { return _app; }
     }
-
-    private FirebaseDatabase _db;
     public FirebaseDatabase db
     {
         private set { _db = value; }
         get { return _db; }
     }
-
-    private FirebaseStorage _firebaseStorage;
     public FirebaseStorage firebaseStorage
     {
         private set { _firebaseStorage = value; }
         get { return _firebaseStorage; }
     }
-
-    private FirebaseAuth _auth;
     public FirebaseAuth auth
     {
         private set { _auth = value; }
         get { return _auth; }
     }
-
-    private FirebaseUser _user;
     public FirebaseUser user
     {
         private set { _user = value; }
         get { return _user; }
     }
-
-    private bool _isFirebaseReady;
     public bool isFirebaseReady
     {
         private set { _isFirebaseReady = value; }
         get { return _isFirebaseReady; }
     }
 
-    public async Task<bool> InitFirebaseAsync()
+    private static FirebaseSDK instance;
+    private FirebaseApp _app;
+    private FirebaseDatabase _db;
+    private FirebaseStorage _firebaseStorage;
+    private FirebaseAuth _auth;
+    private FirebaseUser _user;
+    private bool _isFirebaseReady;
+
+
+    /// <summary>
+    /// Initialize firebase dependencies. 
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> InitFirebaseDependenciesAsync()
     {
 
         await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
@@ -62,7 +62,11 @@ public class FirebaseSDK
             {
                 // Create and hold a reference to your FirebaseApp,
                 // where app is a Firebase.FirebaseApp property of your application class.
-                this.app = FirebaseApp.DefaultInstance;
+
+
+                this.app = FirebaseApp.DefaultInstance; // PRODUCTION MODE
+                // this.app = FirebaseApp.Create(); // DEVELOPER MODE
+
                 // Set a flag here to indicate whether Firebase is ready to use by your app.
 
                 this.db = FirebaseDatabase.GetInstance(app);
@@ -74,9 +78,8 @@ public class FirebaseSDK
                 AuthStateChanged(this, null);
                 this.user = auth.CurrentUser;
 
-                // Accede luego a una colección y lee documentos
+                // Now you can get access to collection docs.
                 // ....
-                // Debug.Log("Firebase initialized");
                 isFirebaseReady = true;
             }
             else
@@ -96,7 +99,7 @@ public class FirebaseSDK
         if (auth.CurrentUser != user)
         {
             bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null
-                && auth.CurrentUser.IsValid(); 
+                && auth.CurrentUser.IsValid();
 
             if (!signedIn && user != null)
             {
@@ -108,9 +111,6 @@ public class FirebaseSDK
             if (signedIn)
             {
                 Debug.Log("Signed in " + user.UserId);
-                /* displayName = user.DisplayName ?? "";
-                 emailAddress = user.Email ?? "";
-                 photoUrl = user.PhotoUrl ?? "";*/
             }
         }
     }
@@ -129,7 +129,6 @@ public class FirebaseSDK
         if (auth != null)
         {
             auth.SignOut();
-            //  Debug.Log("Firebase SignOut");
         }
     }
 

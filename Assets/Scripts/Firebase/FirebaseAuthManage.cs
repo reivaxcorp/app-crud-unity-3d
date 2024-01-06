@@ -97,4 +97,11 @@ public class FirebaseAuthManage
             );
         }
     }
+
+    public void LogOut()
+    {
+        FirebaseSDK.GetInstance().LogOut();
+        AccountAuthResult result = new AccountAuthResult("", Color.white, false);
+        OnAccountAuthResult?.Invoke(result);
+    }
 }
