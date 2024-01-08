@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuUserAccount : Menu
 {
     [SerializeField] private GameObject loginBtn;
-    [SerializeField] private GameObject enterBtn;
+    [SerializeField] private GameObject misItemsBtn;
     [SerializeField] private GameObject logOutBtn;
 
     private bool getUserStatus;
@@ -35,6 +36,12 @@ public class MenuUserAccount : Menu
         firebaseAuthManage.LogOut();
     }
 
+    public void LoadSceneMyItems()
+    {
+        // Reemplaza "NombreDeTuEscena" con el nombre de la escena que deseas cargar
+        SceneManager.LoadScene("AppScene");
+    }
+
     private void ReadUserStatus()
     {
         if (FirebaseSDK.GetInstance().isFirebaseReady)
@@ -50,8 +57,8 @@ public class MenuUserAccount : Menu
 
     private void HideButtonsSessionOn()
     {
-        if(enterBtn != null && logOutBtn != null) {
-            enterBtn.SetActive(false);
+        if(misItemsBtn != null && logOutBtn != null) {
+            misItemsBtn.SetActive(false);
             logOutBtn.SetActive(false);
             ShowLoginButton(true);
             ClearMsjResult();
@@ -63,9 +70,9 @@ public class MenuUserAccount : Menu
 
     private void ShowButtonsSessionOn()
     {
-        if (enterBtn != null && logOutBtn != null)
+        if (misItemsBtn != null && logOutBtn != null)
         {
-            enterBtn.SetActive(true);
+            misItemsBtn.SetActive(true);
             logOutBtn.SetActive(true);
             ShowLoginButton(false);
         }
