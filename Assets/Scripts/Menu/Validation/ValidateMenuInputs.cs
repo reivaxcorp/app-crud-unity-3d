@@ -7,11 +7,10 @@ public class ValidateMenuInputs : MonoBehaviour
 
     public bool IsValidEmail(string email, TextMeshProUGUI msjLoginResult)
     {
-
-        // Define una expresión regular para validar correos electrónicos.
+        // Defines a regular expression to validate emails.
         string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
 
-        // Comprueba si la entrada del usuario coincide con el patrón.
+        // Checks if the user input matches the pattern.
         if (Regex.IsMatch(email, emailPattern))
         {
             return true;
@@ -25,22 +24,8 @@ public class ValidateMenuInputs : MonoBehaviour
 
     public bool IsValidPassword(TMP_InputField password, TextMeshProUGUI msjLoginResult)
     {
-        // Comprueba si la entrada del usuario coincide con el patrón.
-        if (password.text.Length > 5)
-        {
-            return true;
-        }
-        else
-        {
-            msjLoginResult.SetText("La contraseña debe ser mayor que cinco caracteres");
-            return false;
-        }
-    }
 
-    public bool IsFormatPasswordCorrect(TMP_InputField rePassword, TextMeshProUGUI msjLoginResult)
-    {
-        // Comprueba si la entrada del usuario coincide con el patrón.
-        if (rePassword.text.Length > 5)
+        if (password.text.Length > 5)
         {
             return true;
         }

@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ExceptionManager 
+public class ExceptionManager
 {
     /// <summary>
     /// Manage firebase Exception
@@ -46,6 +46,21 @@ public class ExceptionManager
                 {
                     Debug.LogError("User mis disable.");
                     return "Usuario deshabilitado!";
+                }
+                if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.InvalidCredential)
+                {
+                    Debug.LogError("credentials invalidas.");
+                    return "Credenciales invalidas!";
+                }
+                if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.InvalidAppCredential)
+                {
+                    Debug.LogError("credentials app invalid.");
+                    return "Credenciales de aplicación invalidas!";
+                }
+                if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.RejectedCredential)
+                {
+                    Debug.LogError("Rejected credential.");
+                    return "Credencial rechazada!";
                 }
             }
         }

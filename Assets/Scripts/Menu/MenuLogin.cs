@@ -14,7 +14,7 @@ public class MenuLogin : Menu
         {
             if (validateInputs.IsValidEmail(inputMail.text, resultMsj))
             {
-                if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputPassword, resultMsj))
+                if (validateInputs.IsValidPassword(inputPassword, resultMsj))
                 {
                     firebaseAuthManage.OnAccountAuthResult += SetResult;
                     firebaseAuthManage.LoginWithExistingAccount(inputMail.text, inputPassword.text);

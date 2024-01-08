@@ -63,18 +63,7 @@ public class FirebaseSDK
                 // Create and hold a reference to your FirebaseApp,
                 // where app is a Firebase.FirebaseApp property of your application class.
 
-
-               /* Firebase.AppOptions options = new Firebase.AppOptions();
-                options.ApiKey = "XXXXXXXXXXX";
-                options.AppId = "XXXXXXXXXXXX";
-                options.MessageSenderId = "XXXXXXXXXXXXX";
-                options.ProjectId = "my-app";
-                options.StorageBucket = "my-app.appspot.com";
-                this.app = Firebase.FirebaseApp.Create(options);*/
-
                 this.app = Firebase.FirebaseApp.DefaultInstance; // PRODUCTION MODE
-
-                // this.app = FirebaseApp.Create(); // DEVELOPER MODE
 
                 // Set a flag here to indicate whether Firebase is ready to use by your app.
 
