@@ -32,8 +32,8 @@ public class MenuUserAccount : Menu
 
     public void LogOut()
     {
-        firebaseAuthManage.OnAccountAuthResult += SetResult;
-        firebaseAuthManage.LogOut();
+        firebaseAuthManager.OnAccountAuthResult += SetResult;
+        firebaseAuthManager.LogOut();
     }
 
     public void LoadSceneMyItems()
@@ -97,7 +97,7 @@ public class MenuUserAccount : Menu
     // when we disable, reset variable for next time reload menu
     private void OnDisable()
     {
-        firebaseAuthManage.OnAccountAuthResult -= SetResult; // desuscribe event in this class. 
+        firebaseAuthManager.OnAccountAuthResult -= SetResult; // desuscribe event in this class. 
         ClearMsjResult();
         getUserStatus = false;
     }

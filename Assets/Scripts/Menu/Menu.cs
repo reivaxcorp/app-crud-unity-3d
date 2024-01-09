@@ -5,7 +5,7 @@ using UnityEngine;
 public class Menu : MonoBehaviour
 {
     public TextMeshProUGUI resultMsj;
-    protected FirebaseAuthManage firebaseAuthManage;
+    protected FirebaseAuthManager firebaseAuthManager;
     protected ValidateMenuInputs validateInputs;
 
     private void Awake()
@@ -15,7 +15,7 @@ public class Menu : MonoBehaviour
 
     private void Start()
     {
-        firebaseAuthManage = new FirebaseAuthManage();
+        firebaseAuthManager = new FirebaseAuthManager();
     }
 
     /// <summary>
@@ -42,10 +42,10 @@ public class Menu : MonoBehaviour
     // desuscribe to prevent memory leak
     public void DesuscribeEvent()
     {
-        if (firebaseAuthManage != null)
+        if (firebaseAuthManager != null)
         {
             // Desuscripción del evento OnAccountCreated
-            firebaseAuthManage.OnAccountAuthResult -= SetResult;
+            firebaseAuthManager.OnAccountAuthResult -= SetResult;
         }
     }
 

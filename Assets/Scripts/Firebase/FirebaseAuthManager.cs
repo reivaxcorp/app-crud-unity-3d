@@ -6,14 +6,14 @@ using Color = UnityEngine.Color;
 /// <summary>
 /// Manage account actions.
 /// </summary>
-public class FirebaseAuthManage
+public class FirebaseAuthManager
 {
     
     public delegate void AuthCallback(AccountAuthResult result);
     public event AuthCallback OnAccountAuthResult;
     private ExceptionManager exceptionManager;
 
-    public FirebaseAuthManage()
+    public FirebaseAuthManager()
     {
         this.exceptionManager = new ExceptionManager();
     }
@@ -104,4 +104,5 @@ public class FirebaseAuthManage
         AccountAuthResult result = new AccountAuthResult("", Color.white, false);
         OnAccountAuthResult?.Invoke(result);
     }
+
 }

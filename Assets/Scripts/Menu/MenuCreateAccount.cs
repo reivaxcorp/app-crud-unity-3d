@@ -15,8 +15,8 @@ public class MenuCreateAccount : Menu
             {
                 if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputRePassword, resultMsj))
                 {
-                    firebaseAuthManage.OnAccountAuthResult += SetResult;
-                    firebaseAuthManage.CreateAccountWithMailAndPassword(inputMail.text, inputPassword.text);
+                    firebaseAuthManager.OnAccountAuthResult += SetResult;
+                    firebaseAuthManager.CreateAccountWithMailAndPassword(inputMail.text, inputPassword.text);
                 }
             }
         }
