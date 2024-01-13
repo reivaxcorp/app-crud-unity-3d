@@ -44,7 +44,7 @@ public class Menu : MonoBehaviour
     {
         if (firebaseAuthManager != null)
         {
-            // Desuscripción del evento OnAccountCreated
+            // desuscribe event OnAccountCreated
             firebaseAuthManager.OnAccountAuthResult -= SetResult;
         }
     }
