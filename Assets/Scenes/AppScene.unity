@@ -553,7 +553,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 344578185}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1421400313}
+        m_TargetAssemblyTypeName: MenuAddItem, Assembly-CSharp
+        m_MethodName: OpenImage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
 --- !u!114 &344578185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2785,6 +2797,7 @@ GameObject:
   - component: {fileID: 1421400310}
   - component: {fileID: 1421400312}
   - component: {fileID: 1421400311}
+  - component: {fileID: 1421400313}
   m_Layer: 5
   m_Name: MenuAddItem
   m_TagString: Untagged
@@ -2853,6 +2866,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421400309}
   m_CullTransparentMesh: 1
+--- !u!114 &1421400313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421400309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4540396cd1157cc4e958037a06aef8cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  androidPermission: {fileID: 1651622792}
+  imagePreview: {fileID: 1429457105}
 --- !u!1 &1429457103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,7 +2892,7 @@ GameObject:
   - component: {fileID: 1429457106}
   - component: {fileID: 1429457105}
   m_Layer: 5
-  m_Name: ItemImage
+  m_Name: ImagePreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3196,6 +3223,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1553131677}
   m_CullTransparentMesh: 1
+--- !u!1 &1651622791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1651622793}
+  - component: {fileID: 1651622792}
+  m_Layer: 0
+  m_Name: Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1651622792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651622791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb64c8b7ac8fd61459b42be0fbd72d9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1651622793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651622791}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 439.01196, y: 217.0405, z: -20.906775}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1669579671
 GameObject:
   m_ObjectHideFlags: 0

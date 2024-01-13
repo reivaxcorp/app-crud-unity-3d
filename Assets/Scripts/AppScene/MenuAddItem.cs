@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,8 +5,9 @@ using UnityEngine.UI;
 public class MenuAddItem : MonoBehaviour, IMyImage
 {
     [SerializeField] AndroidPermission androidPermission;
-    [SerializeField] Image image;
+    [SerializeField] Image imagePreview;
     private FileManager fileManager;
+    private string currentImagePath = "";
 
     private void Start()
     {
@@ -19,28 +18,44 @@ public class MenuAddItem : MonoBehaviour, IMyImage
     {
         if (Application.isMobilePlatform)
         {
-            if (androidPermission != null)
-            {
-                androidPermission.OnPermissionResult += HandlePermissionResult;
-                androidPermission.RequestStoragePermission();
-            }
-            else
-            {
-                Debug.LogWarning("Please put AndroidPermission on GameManager");
-            }
+            OpenImageAndroid();
+        }
+        else if (Application.isEditor)
+        {
+            OpenImageEditor();
         }
         else
         {
-            fileManager?.OpenFile();
+            Debug.LogWarning("Platform not supported");
         }
+    }
+
+    private void OpenImageAndroid()
+    {
+        if (androidPermission != null)
+        {
+            androidPermission.OnPermissionResult += HandlePermissionResult;
+            androidPermission.RequestStoragePermission();
+        }
+        else
+        {
+            Debug.LogWarning("Please put AndroidPermission on GameManager");
+        }
+    }
+
+    private void OpenImageEditor()
+    {
+        fileManager?.OpenFile();
     }
 
     public void HandleSelectedFile(string filePath)
     {
+        this.currentImagePath = filePath;
+
         Texture2D texture = LoadTextureFromFile(filePath);
         if (texture != null)
         {
-            ApplyTextureToImage(texture);
+            SetImagePreview(texture);
         }
     }
 
@@ -58,15 +73,15 @@ public class MenuAddItem : MonoBehaviour, IMyImage
         }
     }
 
-    private void ApplyTextureToImage(Texture2D texture)
+    private void SetImagePreview(Texture2D texture)
     {
         // Crea un sprite con la textura cargada
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
         // Asigna el sprite al componente Image
-        if (image != null)
+        if (imagePreview != null)
         {
-            image.sprite = sprite;
+            imagePreview.sprite = sprite;
         }
         else
         {
