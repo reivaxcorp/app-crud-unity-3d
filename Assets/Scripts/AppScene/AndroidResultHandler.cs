@@ -6,7 +6,7 @@ using UnityEngine;
 public class AndroidResultHandler : AndroidJavaProxy
 {
 
-    public AndroidResultHandler() : base("com.unity3d.player.CrudUnityPlayerActivity") {}
+    public AndroidResultHandler() : base("com.reivaxcorp.unityappcrud.CrudUnityPlayerActivity") {}
 
     public void onActivityResult(int requestCode, int resultCode, AndroidJavaObject resultIntent)
     {

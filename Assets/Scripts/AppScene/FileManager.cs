@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class FileManager :  IMyImage
+public class FileManager : IMyImage, IMyCustomActivityListener
 {
     private IMyImage iImage;
 
@@ -16,6 +16,16 @@ public class FileManager :  IMyImage
     public void HandleSelectedFile(string filePath)
     {
         iImage.HandleSelectedFile(filePath);
+    }
+
+    public void OnActivityResult(int requestCode, int resultCode, string resultData)
+    {
+        Debug.Log($"Received result from custom activity. RequestCode: {requestCode}, ResultCode: {resultCode}, Data: {resultData}");
+    }
+
+    public void OnDataReceived(string data)
+    {
+        throw new System.NotImplementedException();
     }
 
     public void OpenFile()
@@ -37,24 +47,28 @@ public class FileManager :  IMyImage
     private void OpenFileAndroid()
     {
 
-        AndroidJavaObject unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+       // Llamar a tu actividad de Android
+       AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject unityPlayer = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
 
-
+        // Crear el intent para obtener contenido
         AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent");
         intent.Call<AndroidJavaObject>("setAction", "android.intent.action.GET_CONTENT");
         intent.Call<AndroidJavaObject>("setType", "image/*");  // Filtra por archivos de imagen
 
-        // Utilizando AndroidJavaRunnable para ejecutar en el hilo principal
-        activity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
-        {
-            // currentActivity.Call("startActivityForResult", intent, 0, resultHandler);
-            activity.Call("startActivityForResult", intent, 0, new AndroidResultHandler());
-            Debug.Log("startActivityForResult dasfafadsf");
-        }));
+        // Inicia la actividad personalizada con startActivityForResult
+        int requestCode = 123; // Puedes cambiar este código a tu preferencia
+        unityPlayer.Call("startActivityForResult", intent, requestCode, null);
+
     }
 
-        private void OpenFileEditor()
+    public void ReceiveData(string fileUri)
+    {
+        // Lógica para manejar la URI del archivo en Unity
+        Debug.Log("Received file URI in Unity: " + fileUri);
+    }
+
+    private void OpenFileEditor()
     {
 #if UNITY_EDITOR 
         string path = EditorUtility.OpenFilePanel("Select Image", "", "png,jpg,jpeg,gif,bmp");
