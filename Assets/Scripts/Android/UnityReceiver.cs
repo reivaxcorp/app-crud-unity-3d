@@ -31,7 +31,7 @@ public class UnityReceiver : MonoBehaviour
 
     private IEnumerator SetImageFromPathFromUriCoroutine(string selectedFileUri)
     {
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(2.0f); // wait to return in our program.
 
         // Convierte la cadena de URI de Android a un objeto AndroidJavaObject en C#
         AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
@@ -54,12 +54,19 @@ public class UnityReceiver : MonoBehaviour
         Texture2D texture = new Texture2D(1, 1);
         texture.LoadImage(bytes);
 
+        SetImagePreview(texture);
+
+       // SaveFileInternalExtorage(uriObject, texture);
+    }
+
+    private void SetImagePreview(Texture2D texture)
+    {
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         image.sprite = sprite;
+    }
 
-        yield return null;
-
-
+    private void SaveFileInternalExtorage(AndroidJavaObject uriObject, Texture2D texture)
+    {
         byte[] bytesImage = texture.EncodeToPNG(); // Convierte la textura en formato PNG
 
         // Obtener información sobre la URI para obtener el nombre del archivo
@@ -84,7 +91,6 @@ public class UnityReceiver : MonoBehaviour
             Debug.Log("Imagen guardada con éxito en el almacenamiento interno de la aplicación");
         }
     }
-
 
     private IEnumerator ReadInputStreamAsync(AndroidJavaObject inputStream)
     {
