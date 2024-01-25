@@ -56,7 +56,7 @@ public class UnityReceiver : MonoBehaviour
 
         SetImagePreview(texture);
 
-       // SaveFileInternalExtorage(uriObject, texture);
+        SaveFileInternalExtorage(uriObject, texture);
     }
 
     private void SetImagePreview(Texture2D texture)
@@ -67,7 +67,11 @@ public class UnityReceiver : MonoBehaviour
 
     private void SaveFileInternalExtorage(AndroidJavaObject uriObject, Texture2D texture)
     {
-        byte[] bytesImage = texture.EncodeToPNG(); // Convierte la textura en formato PNG
+        // Redimensionar la textura a 512x512
+        Texture2D resizedTexture = TextureScaler.ScaleTexture(texture, 512, 512);
+
+        // Convertir la textura redimensionada a bytes
+        byte[] bytesImage = resizedTexture.EncodeToPNG(); // Convierte la textura en formato PNG
 
         // Obtener información sobre la URI para obtener el nombre del archivo
         string[] projection = { "_display_name" };
