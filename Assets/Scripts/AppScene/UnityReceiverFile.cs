@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UnityReceiverFile : MonoBehaviour
 {
+    public AndroidJavaObject currentActivity;
+
     [SerializeField] TMP_InputField menuImageNameInput;
     [SerializeField] Image menuImagePreview;
 
+    
     public void LoadTextureFromFile(string filePath)
     {
         byte[] fileData = File.ReadAllBytes(filePath);
@@ -33,5 +37,4 @@ public class UnityReceiverFile : MonoBehaviour
             Debug.LogError("Image component not assigned in the Inspector");
         }
     }
-
 }
