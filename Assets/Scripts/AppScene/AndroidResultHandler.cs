@@ -11,7 +11,6 @@ public class AndroidResultHandler : AndroidJavaProxy
     public void onActivityResult(int requestCode, int resultCode, AndroidJavaObject resultIntent)
     {
 
-        Debug.Log("dddddddddddddddfffffffffffffffffffddddddddddddddddddddd");
         // Verifica que el resultado sea exitoso
         if (resultCode == -1 && resultIntent != null)
         {

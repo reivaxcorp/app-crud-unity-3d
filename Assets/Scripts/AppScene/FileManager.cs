@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class FileManager : IMyImage, IMyCustomActivityListener
+public class FileManager : IMyImage
 {
     private IMyImage iImage;
 
@@ -16,16 +13,6 @@ public class FileManager : IMyImage, IMyCustomActivityListener
     public void HandleSelectedFile(string filePath)
     {
         iImage.HandleSelectedFile(filePath);
-    }
-
-    public void OnActivityResult(int requestCode, int resultCode, string resultData)
-    {
-        Debug.Log($"Received result from custom activity. RequestCode: {requestCode}, ResultCode: {resultCode}, Data: {resultData}");
-    }
-
-    public void OnDataReceived(string data)
-    {
-        throw new System.NotImplementedException();
     }
 
     public void OpenFile()
@@ -48,7 +35,7 @@ public class FileManager : IMyImage, IMyCustomActivityListener
     {
 
        // Llamar a tu actividad de Android
-       AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject unityPlayer = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
 
         // Crear el intent para obtener contenido
