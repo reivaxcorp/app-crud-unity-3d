@@ -1,18 +1,13 @@
 using UnityEditor;
 using UnityEngine;
 
-public class FileManager : IMyImage
+public class FileManager
 {
-    private IMyImage iImage;
+    private IFileSelected fileSelected;
 
-    public FileManager(IMyImage iImage)
+    public FileManager(IFileSelected fileSelected)
     {
-        this.iImage = iImage;
-    }
-
-    public void HandleSelectedFile(string filePath)
-    {
-        iImage.HandleSelectedFile(filePath);
+        this.fileSelected = fileSelected;
     }
 
     public void OpenFile()
@@ -33,7 +28,6 @@ public class FileManager : IMyImage
 
     private void OpenFileAndroid()
     {
-
        // Llamar a tu actividad de Android
         AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject unityPlayer = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
@@ -46,13 +40,6 @@ public class FileManager : IMyImage
         // Inicia la actividad personalizada con startActivityForResult
         int requestCode = 123; // Puedes cambiar este código a tu preferencia
         unityPlayer.Call("startActivityForResult", intent, requestCode, null);
-
-    }
-
-    public void ReceiveData(string fileUri)
-    {
-        // Lógica para manejar la URI del archivo en Unity
-        Debug.Log("Received file URI in Unity: " + fileUri);
     }
 
     private void OpenFileEditor()
@@ -61,7 +48,7 @@ public class FileManager : IMyImage
         string path = EditorUtility.OpenFilePanel("Select Image", "", "png,jpg,jpeg,gif,bmp");
         if (!string.IsNullOrEmpty(path))
         {
-            iImage.HandleSelectedFile(path);
+            fileSelected.FileSelectedResultEditor(path);
         }
 #endif
     }

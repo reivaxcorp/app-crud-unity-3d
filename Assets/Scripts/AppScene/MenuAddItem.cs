@@ -2,16 +2,16 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MenuAddItem : MonoBehaviour, IMyImage
+public class MenuAddItem : MonoBehaviour, IFileSelected
 {
     [SerializeField] AndroidPermission androidPermission;
-    [SerializeField] Image imagePreview;
+    [SerializeField] UnityReceiverFile unityReceiverFile;
+
     private FileManager fileManager;
-    private string currentImagePath = "";
 
     private void Start()
     {
-        fileManager = new FileManager(iImage: this);
+        fileManager = new FileManager(this);
     }
 
     public void OpenImage()
@@ -48,17 +48,6 @@ public class MenuAddItem : MonoBehaviour, IMyImage
         fileManager?.OpenFile();
     }
 
-    public void HandleSelectedFile(string filePath)
-    {
-        this.currentImagePath = filePath;
-
-        Texture2D texture = LoadTextureFromFile(filePath);
-        if (texture != null)
-        {
-            SetImagePreview(texture);
-        }
-    }
-
     private void HandlePermissionResult(PermissionStatus status)
     {
         switch (status)
@@ -71,31 +60,6 @@ public class MenuAddItem : MonoBehaviour, IMyImage
                 Debug.LogWarning("Permission denied by user.");
                 break;
         }
-    }
-
-    private void SetImagePreview(Texture2D texture)
-    {
-        // Crea un sprite con la textura cargada
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-
-        // Asigna el sprite al componente Image
-        if (imagePreview != null)
-        {
-            imagePreview.sprite = sprite;
-        }
-        else
-        {
-            Debug.LogError("Image component not assigned in the Inspector");
-        }
-    }
-
-
-    private Texture2D LoadTextureFromFile(string filePath)
-    {
-        byte[] fileData = File.ReadAllBytes(filePath);
-        Texture2D texture = new Texture2D(2, 2);
-        texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
-        return texture;
     }
 
     // desuscribe to prevent memory leak
@@ -118,4 +82,16 @@ public class MenuAddItem : MonoBehaviour, IMyImage
         DesuscribeEvent();
     }
 
+    public void FileSelectedResultEditor(string path)
+    {
+ 
+        if(unityReceiverFile != null)
+        {
+            unityReceiverFile.LoadTextureFromFile(path);
+        }
+        else
+        {
+            Debug.LogWarning("Please put UnityReceiverFile on inspector!");
+        }
+    }
 }

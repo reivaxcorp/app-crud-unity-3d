@@ -55,7 +55,7 @@ public class CrudUnityPlayerActivity extends UnityPlayerActivity {
                   // Primer argumento "GameObject".
                   // Segundo Argumento "Nombre del Método".
                   // Tercer Argumento el valor a enviar. 
-                  com.unity3d.player.UnityPlayer.UnitySendMessage("Menu", "ReceiveData", selectedFileUri);
+                  com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid", selectedFileUri);
 
               }
           } else {

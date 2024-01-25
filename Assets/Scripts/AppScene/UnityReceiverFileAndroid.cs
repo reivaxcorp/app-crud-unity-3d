@@ -1,27 +1,19 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
 using System.IO;
-using UnityEngine.UI;
-using System;
-using UnityEngine.Android;
 using System.Collections.Generic;
 
-public class UnityReceiver : MonoBehaviour
+public class UnityReceiverFileAndroid : UnityReceiverFile
 {
-    [SerializeField] TMP_InputField inputName;
-    [SerializeField] Image image;
     private object inputStreamResult;
     private AndroidJavaObject currentActivity;
 
     private void Start()
     {
-        // Obtener la actividad actual de Unity
-        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        SetCurrentActivity();
     }
 
-    public void ReceiveData(string selectedFileUri)
+    public void ReceiveDataFromAndroid(string selectedFileUri)
     {
         if (!string.IsNullOrEmpty(selectedFileUri))
         {
@@ -57,12 +49,6 @@ public class UnityReceiver : MonoBehaviour
         SetImagePreview(texture);
 
         SaveFileInternalExtorage(uriObject, texture);
-    }
-
-    private void SetImagePreview(Texture2D texture)
-    {
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        image.sprite = sprite;
     }
 
     private void SaveFileInternalExtorage(AndroidJavaObject uriObject, Texture2D texture)
@@ -115,47 +101,13 @@ public class UnityReceiver : MonoBehaviour
         yield return null; // Esperar un frame antes de continuar
     }
 
-    IEnumerator LoadImage(string filePath)
+    private void SetCurrentActivity()
     {
-        // Lee los bytes de la imagen desde la URI local
-        byte[] imageBytes = File.ReadAllBytes(filePath);
-
-        // Crea una textura y carga los bytes de la imagen
-        Texture2D texture = new Texture2D(2, 2);
-        texture.LoadImage(imageBytes);
-
-        // Crea un sprite con la textura
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-
-        // Asigna el sprite al componente de imagen
-        if(image != null)
+        if (Application.isMobilePlatform)
         {
-            image.sprite = sprite;
-            inputName.text = image.name;
-        } else
-        {
-            Debug.LogWarning("Please put image ref on inspector");
-        }
-
-        yield return null;
-    }
-
-
-    public Texture2D LoadTextureAsPNG(string imageName)
-    {
-        string path = Path.Combine(Application.persistentDataPath, imageName + ".png");
-
-        if (File.Exists(path))
-        {
-            byte[] bytes = File.ReadAllBytes(path);
-            Texture2D loadedTexture = new Texture2D(2, 2); // Crea una textura vacía
-            loadedTexture.LoadImage(bytes); // Carga los bytes como textura PNG
-            return loadedTexture;
-        }
-        else
-        {
-            //Debug.LogError("No se encontró la imagen en: " + path);
-            return null;
+            // Obtener la actividad actual de Unity
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
         }
     }
 }
