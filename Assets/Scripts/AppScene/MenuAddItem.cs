@@ -5,13 +5,44 @@ using UnityEngine.UI;
 public class MenuAddItem : MonoBehaviour, IFileSelected
 {
     [SerializeField] AndroidPermission androidPermission;
-    [SerializeField] UnityReceiverFile unityReceiverFile;
+     [SerializeField] Image menuImagePreview;
 
-    private FileManager fileManager;
+    private FileManager _fileManager;
+    public FileManager fileManager
+    {
+        private set { _fileManager = value;  }
+        get { return _fileManager; }
+    }
 
+    
     private void Start()
     {
         fileManager = new FileManager(this);
+        fileManager.SetFolderUidName();
+    }
+
+    public void FileSelectedResultEditor(string path)
+    {
+        byte[] fileData = File.ReadAllBytes(path);
+        Texture2D texture = new Texture2D(2, 2);
+        texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
+        SetImagePreview(texture);
+    }
+
+    public void SetImagePreview(Texture2D texture)
+    {
+        // Crea un sprite con la textura cargada
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+        // Asigna el sprite al componente Image
+        if (menuImagePreview != null)
+        {
+            menuImagePreview.sprite = sprite;
+        }
+        else
+        {
+            Debug.LogError("Image component not assigned in the Inspector");
+        }
     }
 
     public void OpenImage()
@@ -82,16 +113,4 @@ public class MenuAddItem : MonoBehaviour, IFileSelected
         DesuscribeEvent();
     }
 
-    public void FileSelectedResultEditor(string path)
-    {
- 
-        if(unityReceiverFile != null)
-        {
-            unityReceiverFile.LoadTextureFromFile(path);
-        }
-        else
-        {
-            Debug.LogWarning("Please put UnityReceiverFile on inspector!");
-        }
-    }
 }

@@ -54,7 +54,7 @@
                    // First argument is "GameObject".
                    // Second Argument is "Method Name".
                    // Third Argument is the value to send.
-                   com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid", selectedFileUri);
+                   com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiverMessagesFromAndroid", selectedFileUri);
  
                }
            } else {
@@ -62,5 +62,12 @@
            }
        }
    }
+
+   @Override
+  protected void onDestroy() {
+      super.onDestroy();
+      // you can implement this, to delete temp image when the activity is destroy or other things.
+     // for example: com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "DeleteTempImage");
+  }
  }
  

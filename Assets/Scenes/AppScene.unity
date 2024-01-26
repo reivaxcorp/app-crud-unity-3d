@@ -2097,11 +2097,11 @@ RectTransform:
   m_Children:
   - {fileID: 1331564507}
   m_Father: {fileID: 1421400310}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7, y: -207}
+  m_AnchoredPosition: {x: -7, y: -181.31}
   m_SizeDelta: {x: 276.85, y: 67.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1127525664
@@ -2817,16 +2817,16 @@ RectTransform:
   m_LocalScale: {x: 0.46, y: 0.95, z: 1}
   m_Children:
   - {fileID: 344578183}
-  - {fileID: 1127525663}
   - {fileID: 1429457104}
   - {fileID: 1669579672}
+  - {fileID: 1127525663}
   m_Father: {fileID: 387217535}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 4, y: 9}
-  m_SizeDelta: {x: 36, y: 0}
+  m_AnchoredPosition: {x: 18.681213, y: -0.9125366}
+  m_SizeDelta: {x: 99.8315, y: 20.763}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1421400311
 MonoBehaviour:
@@ -2879,7 +2879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   androidPermission: {fileID: 1651622792}
-  unityReceiverFile: {fileID: 1651622794}
+  menuImagePreview: {fileID: 1429457105}
 --- !u!1 &1429457103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2910,12 +2910,12 @@ RectTransform:
   m_LocalScale: {x: 1.2608695, y: 0.8947369, z: 0.1}
   m_Children: []
   m_Father: {fileID: 1421400310}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.695652, y: 20.052612}
-  m_SizeDelta: {x: 256, y: 256}
+  m_AnchoredPosition: {x: -8.695652, y: 35}
+  m_SizeDelta: {x: 256, y: 176.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1429457105
 MonoBehaviour:
@@ -2937,7 +2937,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3280,8 +3280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587d36696564799419dee8a1a5032d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menuImageNameInput: {fileID: 1669579673}
-  menuImagePreview: {fileID: 1429457105}
+  menuAddItem: {fileID: 1421400313}
 --- !u!114 &1651622795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3326,11 +3325,11 @@ RectTransform:
   m_Children:
   - {fileID: 1290390866}
   m_Father: {fileID: 1421400310}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6, y: -139.76}
+  m_AnchoredPosition: {x: -6, y: -104.4}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1669579673
