@@ -1,24 +1,77 @@
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class MenuAddItem : MonoBehaviour, IFileSelected
+public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
 {
     [SerializeField] AndroidPermission androidPermission;
-     [SerializeField] Image menuImagePreview;
+    [SerializeField] Image menuImagePreview;
+    [SerializeField] TextMeshProUGUI resultMsj;
+    private bool waitForFirebaseSdk;
+
 
     private FileManager _fileManager;
     public FileManager fileManager
     {
-        private set { _fileManager = value;  }
+        private set { _fileManager = value; }
         get { return _fileManager; }
     }
 
-    
     private void Start()
     {
+        waitForFirebaseSdk = true;
         fileManager = new FileManager(this);
-        fileManager.SetFolderUidName();
+    }
+
+    private void Update()
+    {
+        if (waitForFirebaseSdk)
+        {
+            if(FirebaseSDK.GetInstance().isFirebaseReady)
+            {
+                fileManager.SetFolderUidName();
+                waitForFirebaseSdk = false;
+            }
+        }
+    }
+    // btn action "Crear item"
+    public void OnUploadItem()
+    {
+        ClearResultCrud();
+
+        try
+        {
+            Debug.Log("Uploading item starting..");
+            byte [] fileBytes = _fileManager.GetBytesImageSelected();
+            UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, _fileManager.currentImageName, iResult: this);
+        }
+        catch (Exception exeption)
+        {
+            SetResultCrud(false, "Datos necesarios - " + exeption.Message);
+        }
+    }
+
+    public void SetResultCrud(bool successful, string msj)
+    {
+        if (resultMsj != null)
+        {
+            if (successful)
+            {
+                resultMsj.text = msj;
+                resultMsj.color = Color.green;
+            }
+            else
+            {
+                resultMsj.text = msj;
+                resultMsj.color = Color.red;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Please put resultMsj on inspector");
+        }
     }
 
     public void FileSelectedResultEditor(string path)
@@ -100,6 +153,17 @@ public class MenuAddItem : MonoBehaviour, IFileSelected
         {
             // desuscribe event OnAccountCreated
             androidPermission.OnPermissionResult -= HandlePermissionResult;
+        }
+    }
+
+    private void ClearResultCrud()
+    {
+        if (resultMsj != null)
+        {
+            resultMsj.text = string.Empty;
+        } else
+        {
+            Debug.LogWarning("ResultMsj insn't put in ispector");
         }
     }
 

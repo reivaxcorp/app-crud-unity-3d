@@ -20,25 +20,14 @@ public class RemoteDb : IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public void SaveItemRemote(ItemRemote itemLocal)
+    public void SaveItemRemote(ItemRemote itemRemote)
     {
         throw new System.NotImplementedException();
     }
 
-    public void UpdateItemRemoteById(ItemRemote itemLocal)
+    public void UpdateItemRemoteById(ItemRemote itemRemote)
     {
         throw new System.NotImplementedException();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

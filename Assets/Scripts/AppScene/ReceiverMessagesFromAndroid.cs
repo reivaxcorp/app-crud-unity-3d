@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 public class ReceiverMessagesFromAndroid : MonoBehaviour
 {
@@ -13,70 +15,77 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
         SetCurrentActivity();
     }
 
-    public void ReceiveDataFromAndroid(string selectedFileUri)
+    // The name must be equals to personalize activity in
+    //  com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid", selectedFileUri);
+    public void ReceiveDataFromAndroid(string fileNameWithBase64)
     {
-        if (!string.IsNullOrEmpty(selectedFileUri))
+        if (!string.IsNullOrEmpty(fileNameWithBase64))
         {
-            StartCoroutine(SetImageFromPathFromUriCoroutine(selectedFileUri));
+            StartCoroutine(SetImageFromPathFromUriCoroutine(fileNameWithBase64));
         }
     }
 
-    private IEnumerator SetImageFromPathFromUriCoroutine(string selectedFileUri)
+    private IEnumerator SetImageFromPathFromUriCoroutine(string fileNameWithBase64)
     {
-        yield return new WaitForSeconds(2.0f); // wait to return in our program.
+        yield return new WaitForSeconds(1.0f); // wait to return in our program.
 
-        // Convierte la cadena de URI de Android a un objeto AndroidJavaObject en C#
-        AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-        AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("parse", selectedFileUri);
+        // Separar el nombre del archivo y los datos en Base64
+        string[] parts = fileNameWithBase64.Split('|');
 
-        // Puedes usar uriObject según tus necesidades en C#
-        Debug.Log("Received Android Uri in C#: " + uriObject.ToString());
-
-        // Obtener un InputStream desde la URI
-        AndroidJavaObject inputStream = currentActivity.Call<AndroidJavaObject>("getContentResolver")
-            .Call<AndroidJavaObject>("openInputStream", uriObject);
-
-        // Esperar hasta que la operación de lectura se complete
-        yield return StartCoroutine(ReadInputStreamAsync(inputStream));
-
-        // Obtener los bytes del resultado de la operación de lectura
-        byte[] bytes = (byte[])inputStreamResult;
-
-        // Crear una textura en Unity a partir del array de bytes
-        Texture2D texture = new Texture2D(1, 1);
-        texture.LoadImage(bytes);
-
-        if(menuAddItem != null)
+        if (parts.Length == 2)
         {
-            menuAddItem.SetImagePreview(texture);
-            menuAddItem.fileManager.DeletePreviousCopyImage();
-            menuAddItem.fileManager.SaveFileInternalExtorage(uriObject, texture, currentActivity);
-        } else
-        {
-            Debug.LogWarning("Please put MenuAddItem on inspector");
+            string fileName = parts[0];
+            string base64Data = parts[1];
+
+            // Convertir la cadena Base64 a bytes
+            byte[] imageData = System.Convert.FromBase64String(base64Data);
+
+            // Hacer algo con los bytes de la imagen (por ejemplo, convertirlos a una textura)
+            Texture2D texture = new Texture2D(1, 1);
+            texture.LoadImage(imageData);
+
+            Debug.Log("Carga terminada");
+
+            if (menuAddItem != null)
+            {
+                menuAddItem.SetImagePreview(texture);
+                menuAddItem.fileManager.DeletePreviousCopyImage();
+                menuAddItem.fileManager.SaveFileInternalExtorage(texture, fileName);
+            }
+            else
+            {
+                Debug.LogWarning("Please put MenuAddItem on inspector");
+            }
+            // Ahora puedes usar 'fileName' y 'base64Data' según tus necesidades
         }
-    }
-
-  
-    private IEnumerator ReadInputStreamAsync(AndroidJavaObject inputStream)
-    {
-        // Convertir el InputStream a un array de bytes en una corrutina
-        List<byte> bytes = new List<byte>();
-        int nextByte = inputStream.Call<int>("read");
-        while (nextByte != -1)
+        else
         {
-            bytes.Add((byte)nextByte);
-            nextByte = inputStream.Call<int>("read");
+            Debug.LogError("Invalid format for fileNameWithBase64");
         }
 
-        inputStream.Call("close");
-
-        // Almacenar el resultado en la variable para que sea accesible fuera de esta corrutina
-        inputStreamResult = bytes.ToArray();
-
-        yield return null; // Esperar un frame antes de continuar
+     
     }
 
+
+     private IEnumerator ReadInputStreamAsync(AndroidJavaObject inputStream)
+     {
+         // Convertir el InputStream a un array de bytes en una corrutina
+         List<byte> bytes = new List<byte>();
+         int nextByte = inputStream.Call<int>("read");
+         while (nextByte != -1)
+         {
+             bytes.Add((byte)nextByte);
+             nextByte = inputStream.Call<int>("read");
+         }
+
+         inputStream.Call("close");
+
+         // Almacenar el resultado en la variable para que sea accesible fuera de esta corrutina
+         inputStreamResult = bytes.ToArray();
+
+         yield return null; // Esperar un frame antes de continuar
+     } 
+     
     private void SetCurrentActivity()
     {
         if (Application.isMobilePlatform)

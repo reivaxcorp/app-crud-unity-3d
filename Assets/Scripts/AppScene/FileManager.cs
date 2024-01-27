@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -5,102 +6,38 @@ using UnityEngine;
 public class FileManager
 {
     private IFileSelected fileSelected;
-    private string currentImageName;
-    private string folderUidName;
+
+    public string currentImageName
+    {
+        private set { _currentImageName = value; }
+        get { return _currentImageName; }
+    }
+    public string folderUidName
+    {
+        private set { _folderUidName = value; }
+        get { return _folderUidName; }
+    }
+    public string filePath
+    {
+        private set { _filePath = value; }
+        get { return _filePath; }
+    }
+
+
+    private string _currentImageName;
+    private string _folderUidName;
+    private string _filePath;
 
     public FileManager(IFileSelected fileSelected)
     {
         this.fileSelected = fileSelected;
     }
 
-    /// <summary>
-    /// We're going to use the user Id to create a folder with uid's name then we put all images there.
-    /// </summary>
-    public void SetFolderUidName()
-    {
-        if (FirebaseSDK.GetInstance() != null && FirebaseSDK.GetInstance().isFirebaseReady)
-        {
-            this.folderUidName = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
-        }
-    }
-
-    public void SetCurrentImageName(string imageName)
-    {
-        this.currentImageName = imageName;
-    }
-
-    /// <summary>
-    /// We're deleting previous image copy of app device.
-    /// </summary>
-    /// <param name="ImageName"></param>
-    public void DeletePreviousCopyImage()
-    {
-        if (Application.isMobilePlatform)
-        {
-            if (currentImageName != null && folderUidName != null)
-            {
-                string filePath = Path.Combine(Application.persistentDataPath, folderUidName, currentImageName);
-
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    Debug.Log("Archivo eliminado con éxito: " + currentImageName);
-                }
-            }
-        }
-    }
-
-    public void SaveFileInternalExtorage(AndroidJavaObject uriObject, Texture2D texture, AndroidJavaObject currentActivity)
-    {
-        if (folderUidName != null && folderUidName.Length > 0)
-        {
-            // Redimensionar la textura a 512x512
-            Texture2D resizedTexture = TextureScaler.ScaleTexture(texture, 512, 512);
-
-            // Convertir la textura redimensionada a bytes
-            byte[] bytesImage = resizedTexture.EncodeToPNG(); // Convierte la textura en formato PNG
-
-            // Obtener información sobre la URI para obtener el nombre del archivo
-            string[] projection = { "_display_name" };
-            AndroidJavaObject cursor = currentActivity.Call<AndroidJavaObject>("getContentResolver")
-                .Call<AndroidJavaObject>("query", uriObject, projection, null, null, null);
-
-            if (cursor != null)
-            {
-                cursor.Call<bool>("moveToFirst");
-                int columnIndex = cursor.Call<int>("getColumnIndex", "_display_name");
-                string fileNameWithExtension = cursor.Call<string>("getString", columnIndex);
-                cursor.Call("close");
-
-                // Separar el nombre del archivo y la extensión
-                string fileName = Path.GetFileNameWithoutExtension(fileNameWithExtension);
-
-                // Crear la carpeta con el UID del usuario si no existe
-                string userFolderPath = Path.Combine(Application.persistentDataPath, folderUidName);
-                Directory.CreateDirectory(userFolderPath);
-
-                string path = Path.Combine(userFolderPath, fileName + ".png"); // Ruta de destino del archivo PNG
-
-                // Escribe los bytes en un archivo PNG
-                File.WriteAllBytes(path, bytesImage); // Escribe los bytes en un archivo PNG
-
-                SetCurrentImageName(fileName + ".png");
-
-                // Puedes mostrar un mensaje de éxito o realizar otras acciones después de guardar la imagen
-                Debug.Log("Imagen guardada con éxito en el almacenamiento interno de la aplicación");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("User uid doesn't exist");
-        }
-    }
-
     public void OpenFile()
     {
         if (Application.isMobilePlatform)
         {
-            OpenFileAndroid();
+            CreateIntentFileAndroid();
         }
         else if (Application.isEditor)
         {
@@ -112,9 +49,128 @@ public class FileManager
         }
     }
 
-    private void OpenFileAndroid()
+    public byte[] GetBytesImageSelected()
     {
-       // Llamar a tu actividad de Android
+        if (Application.isMobilePlatform)
+        {
+            if (_currentImageName != null && _folderUidName != null)
+            {
+                string filePath = Path.Combine(Application.persistentDataPath, _folderUidName, _currentImageName);
+
+                if (File.Exists(filePath))
+                {
+                    // Leer todos los bytes del archivo en filePath
+                    byte[] imageBytes = File.ReadAllBytes(filePath);
+
+                    // Ahora 'imageBytes' contiene los bytes de la imagen que puedes usar para subir a Firebase Storage.
+
+                    Debug.Log("Archivo leído con éxito: " + _currentImageName);
+
+                    return imageBytes;
+                }
+            }
+        }
+        else
+        {
+            if (_filePath != null)
+            {
+                return File.ReadAllBytes(_filePath);
+            }
+        }
+        throw new Exception("File path no found");
+    }
+
+    public string GetCurrentFilePath()
+    {
+        if (_currentImageName != null && _currentImageName.Length > 0 && _folderUidName != null)
+        {
+            return filePath;
+        }
+        else
+        {
+            if(_currentImageName == null || _currentImageName.Length == 0)
+            {
+                throw new Exception("Invalid image file");
+            } else if(_folderUidName == null) 
+            {
+                throw new Exception("Folder user uid error");
+            } else
+            {
+                throw new Exception("Data invalid");
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// We're going to use the user Id to create a folder with uid's name then we put all images there.
+    /// </summary>
+    public void SetFolderUidName()
+    {
+        if (FirebaseSDK.GetInstance() != null && FirebaseSDK.GetInstance().isFirebaseReady)
+        {
+            this._folderUidName = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
+        }
+    }
+
+    public void SetCurrentImageName(string imageName)
+    {
+        this._currentImageName = imageName;
+    }
+
+    /// <summary>
+    /// We're deleting previous image copy of app device.
+    /// </summary>
+    /// <param name="ImageName"></param>
+    public void DeletePreviousCopyImage()
+    {
+        if (Application.isMobilePlatform)
+        {
+            if (_currentImageName != null && _folderUidName != null)
+            {
+                string filePath = Path.Combine(Application.persistentDataPath, _folderUidName, _currentImageName);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    Debug.Log("Archivo eliminado con éxito: " + _currentImageName);
+                }
+            }
+        }
+    }
+
+    public void SaveFileInternalExtorage(Texture2D texture, string fileName)
+    {
+        if (_folderUidName != null && _folderUidName.Length > 0)
+        {
+            // Redimensionar la textura a 512x512 (si es necesario)
+             Texture2D resizedTexture = TextureScaler.ScaleTexture(texture, 512, 512);
+
+            // Crear la carpeta con el UID del usuario si no existe
+            string userFolderPath = Path.Combine(Application.persistentDataPath, _folderUidName);
+            Directory.CreateDirectory(userFolderPath);
+
+            string path = Path.Combine(userFolderPath, fileName); // Ruta de destino del archivo
+            SetPathFile(path);
+
+            // Escribir los bytes de la textura en un archivo PNG
+            byte[] bytesImage = resizedTexture.EncodeToPNG();
+            File.WriteAllBytes(path, bytesImage);
+
+            SetCurrentImageName(fileName);
+
+            // Puedes mostrar un mensaje de éxito o realizar otras acciones después de guardar la imagen
+            Debug.Log("Imagen guardada con éxito en el almacenamiento interno de la aplicación");
+        }
+        else
+        {
+            Debug.LogWarning("User uid doesn't exist");
+        }
+    }
+
+    private void CreateIntentFileAndroid()
+    {
+        // Llamar a tu actividad de Android
         AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject unityPlayer = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
 
@@ -128,12 +184,20 @@ public class FileManager
         unityPlayer.Call("startActivityForResult", intent, requestCode, null);
     }
 
+    private void SetPathFile(string path)
+    {
+        this._filePath = path;
+    }
+
     private void OpenFileEditor()
     {
 #if UNITY_EDITOR 
         string path = EditorUtility.OpenFilePanel("Select Image", "", "png,jpg,jpeg,gif,bmp");
         if (!string.IsNullOrEmpty(path))
         {
+            SetPathFile(path);
+            string fileName = Path.GetFileName(path);
+            SetCurrentImageName(fileName);
             fileSelected.FileSelectedResultEditor(path);
         }
 #endif
