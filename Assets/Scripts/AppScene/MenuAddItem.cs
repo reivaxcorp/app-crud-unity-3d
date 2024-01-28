@@ -53,11 +53,11 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
         catch (Exception exeption)
         {
-            SetResultCrud(false, "Datos necesarios - " + exeption.Message);
+            SetResultCrudUi(false, "Datos necesarios - " + exeption.Message);
         }
     }
 
-    public void SetResultCrud(bool successful, string msj)
+    public void SetResultCrudUi(bool successful, string msj)
     {
         progressText?.StopProgressTextAnimation();
 
@@ -183,4 +183,8 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         DesuscribeEvent();
     }
 
+    public void ResultPathReference(string pathReference)
+    {
+        Debug.Log(pathReference);
+    }
 }

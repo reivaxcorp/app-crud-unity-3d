@@ -1,8 +1,6 @@
 using Firebase.Extensions;
 using Firebase.Storage;
-using System.Threading;
 using System.Threading.Tasks;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class UploadFileRemote
@@ -10,7 +8,7 @@ public class UploadFileRemote
  
     public UploadFileRemote(byte[] fileBytes, string folderUserUid, string fileName, IResultCrud iResult)
     {
-        //string FAKE_UI = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
+        //string FAKE_UID = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
         // Debug.Log("file name " + fileName + " folderUserUid " + folderUserUid);
         FirebaseStorage firebaseStorage = FirebaseSDK.GetInstance().firebaseStorage;
 
@@ -27,7 +25,7 @@ public class UploadFileRemote
                     if (task.IsFaulted || task.IsCanceled)
                     {
                         Debug.Log(task.Exception.ToString());
-                        iResult.SetResultCrud(false, "task.IsFaulted or task.IsCanceled");
+                        iResult.SetResultCrudUi(false, "task.IsFaulted or task.IsCanceled");
                         // Uh-oh, an error occurred!
                     }
                     else
@@ -35,16 +33,18 @@ public class UploadFileRemote
                         // Metadata contains file metadata such as size, content-type, and md5hash.
                         StorageMetadata metadata = task.Result;
                         string md5Hash = metadata.Md5Hash;
-                        Debug.Log("Finished uploading...");
+                        Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
-                        iResult.SetResultCrud(true, "Finished uploading...");
+                        iResult.SetResultCrudUi(true, "Finished uploading...");
+                        iResult.ResultPathReference(metadata.Path);
                     }
                 });
         }
         else
         {
             Debug.LogWarning("FirebaseStorage is null");
-            iResult.SetResultCrud(false, "FirebaseStorage no exists");
+            iResult.SetResultCrudUi(false, "FirebaseStorage no exists");
         }
     }
+
 }
