@@ -3,21 +3,26 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Firebase.Database;
+using System.Runtime.InteropServices.ComTypes;
 
 public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
 {
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] Image menuImagePreview;
     [SerializeField] TextMeshProUGUI resultMsj;
-    private bool waitForFirebaseSdk;
-    private ProgressText progressText;
+    [SerializeField] TMP_InputField inputFieldName;
 
-    private FileManager _fileManager;
     public FileManager fileManager
     {
         private set { _fileManager = value; }
         get { return _fileManager; }
     }
+
+    private bool waitForFirebaseSdk;
+    private ProgressText progressText;
+    private FileManager _fileManager;
+
     private void Awake()
     {
         progressText = gameObject.AddComponent<ProgressText>();
@@ -33,37 +38,39 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
     {
         if (waitForFirebaseSdk)
         {
-            if(FirebaseSDK.GetInstance().isFirebaseReady)
+            if (FirebaseSDK.GetInstance().isFirebaseReady)
             {
                 fileManager.SetFolderUidName();
                 waitForFirebaseSdk = false;
             }
         }
     }
-    // btn action "Crear item"
+
+    // Acción del botón "Crear item"
     public void OnUploadItem()
     {
-        ClearResultCrud();
-
-        try
+        if (IsDataSetted())
         {
-            progressText?.StartProgressTextAnimation("Uploading", resultMsj);
-            byte [] fileBytes = _fileManager.GetBytesImageSelected();
-            UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, _fileManager.currentImageName, iResult: this);
-        }
-        catch (Exception exeption)
-        {
-            SetResultCrudUi(false, "Datos necesarios - " + exeption.Message);
+            try
+            {
+                progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
+                byte[] fileBytes = _fileManager.GetBytesImageSelected();
+                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, _fileManager.currentImageName, iResult: this);
+            }
+            catch (Exception excepcion)
+            {
+                SetResultCrudUi(false, "Error - " + excepcion.Message);
+            }
         }
     }
 
-    public void SetResultCrudUi(bool successful, string msj)
+    public void SetResultCrudUi(bool exitoso, string msj)
     {
         progressText?.StopProgressTextAnimation();
 
         if (resultMsj != null)
         {
-            if (successful)
+            if (exitoso)
             {
                 resultMsj.text = msj;
                 resultMsj.color = Color.green;
@@ -76,7 +83,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
         else
         {
-            Debug.LogWarning("Please put resultMsj on inspector");
+            Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
         }
     }
 
@@ -100,7 +107,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
         else
         {
-            Debug.LogError("Image component not assigned in the Inspector");
+            Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
         }
     }
 
@@ -116,7 +123,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
         else
         {
-            Debug.LogWarning("Platform not supported");
+            Debug.LogWarning("Plataforma no soportada");
         }
     }
 
@@ -129,7 +136,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
         else
         {
-            Debug.LogWarning("Please put AndroidPermission on GameManager");
+            Debug.LogWarning("Por favor, coloca AndroidPermission en el GameManager");
         }
     }
 
@@ -143,21 +150,21 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         switch (status)
         {
             case PermissionStatus.Granted:
-                Debug.Log("Permission granted!");
+                Debug.Log("¡Permiso concedido!");
                 fileManager?.OpenFile();
                 break;
             case PermissionStatus.Denied:
-                Debug.LogWarning("Permission denied by user.");
+                Debug.LogWarning("Permiso denegado por el usuario.");
                 break;
         }
     }
 
-    // desuscribe to prevent memory leak
+    // Desuscribirse para evitar pérdida de memoria
     private void DesuscribeEvent()
     {
         if (androidPermission != null)
         {
-            // desuscribe event OnAccountCreated
+            // Desuscribir el evento OnPermissionResult
             androidPermission.OnPermissionResult -= HandlePermissionResult;
         }
     }
@@ -167,9 +174,10 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         if (resultMsj != null)
         {
             resultMsj.text = string.Empty;
-        } else
+        }
+        else
         {
-            Debug.LogWarning("ResultMsj insn't put in ispector");
+            Debug.LogWarning("ResultMsj no está colocado en el inspector");
         }
     }
 
@@ -183,8 +191,52 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         DesuscribeEvent();
     }
 
-    public void ResultPathReference(string pathReference)
+    private bool IsDataSetted()
     {
-        Debug.Log(pathReference);
+        ClearResultCrud();
+
+        if (inputFieldName == null)
+        {
+            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
+            return false;
+        }
+
+        // Sanitizar el nombre de la imagen utilizando la expresión regular
+        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
+        if (string.IsNullOrEmpty(sanitizedFileName))
+        {
+            LogWarningAndSetResult("Ingrese el nombre de la imagen");
+            return false;
+        }
+
+        if (menuImagePreview == null)
+        {
+            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
+            return false;
+        }
+
+        if (menuImagePreview.sprite == null)
+        {
+            LogWarningAndSetResult("Seleccione una imagen");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void LogWarningAndSetResult(string mensajeAdvertencia)
+    {
+        Debug.LogWarning(mensajeAdvertencia);
+        SetResultCrudUi(false, mensajeAdvertencia);
+    }
+
+    public void ResultPathReference(string referenciaRuta)
+    {
+        // string id, string name, string path, string timestamp
+        Debug.Log(referenciaRuta);
+        String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
+        DatabaseReference referenciaBaseDatos = FirebaseSDK.GetInstance().db.RootReference;
+        string clave = referenciaBaseDatos.Child("users").Child("items").Child(userUid).Push().Key;
+        ItemRemote itemRemoto = new ItemRemote();
     }
 }

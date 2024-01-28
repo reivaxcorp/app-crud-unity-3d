@@ -1,22 +1,11 @@
 using System.Collections;
 using UnityEngine;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 public class ReceiverMessagesFromAndroid : MonoBehaviour
 {
     [SerializeField] MenuAddItem menuAddItem;
-    private AndroidJavaObject currentActivity;
-    private object inputStreamResult;
 
-    private void Start()
-    {
-        SetCurrentActivity();
-    }
-
-    // The name must be equals to personalize activity in
-    //  com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid", selectedFileUri);
+    // El nombre de la función debe ser la misma que se llama desde la activity personalizada
     public void ReceiveDataFromAndroid(string fileNameWithBase64)
     {
         if (!string.IsNullOrEmpty(fileNameWithBase64))
@@ -27,7 +16,7 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
 
     private IEnumerator SetImageFromPathFromUriCoroutine(string fileNameWithBase64)
     {
-        yield return new WaitForSeconds(1.0f); // wait to return in our program.
+        yield return new WaitForSeconds(1.0f); // Esperar que volvamos del selector de archivos.
 
         // Separar el nombre del archivo y los datos en Base64
         string[] parts = fileNameWithBase64.Split('|');
@@ -54,45 +43,12 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Please put MenuAddItem on inspector");
+                Debug.LogWarning("Por favor pon MenuAddItem en el inspector");
             }
-            // Ahora puedes usar 'fileName' y 'base64Data' según tus necesidades
         }
         else
         {
-            Debug.LogError("Invalid format for fileNameWithBase64");
-        }
-
-     
-    }
-
-
-     private IEnumerator ReadInputStreamAsync(AndroidJavaObject inputStream)
-     {
-         // Convertir el InputStream a un array de bytes en una corrutina
-         List<byte> bytes = new List<byte>();
-         int nextByte = inputStream.Call<int>("read");
-         while (nextByte != -1)
-         {
-             bytes.Add((byte)nextByte);
-             nextByte = inputStream.Call<int>("read");
-         }
-
-         inputStream.Call("close");
-
-         // Almacenar el resultado en la variable para que sea accesible fuera de esta corrutina
-         inputStreamResult = bytes.ToArray();
-
-         yield return null; // Esperar un frame antes de continuar
-     } 
-     
-    private void SetCurrentActivity()
-    {
-        if (Application.isMobilePlatform)
-        {
-            // Obtener la actividad actual de Unity
-            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            Debug.LogError("Datos invalidos para fileNameWithBase64");
         }
     }
 }

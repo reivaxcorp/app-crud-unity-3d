@@ -8,8 +8,8 @@ public class UploadFileRemote
  
     public UploadFileRemote(byte[] fileBytes, string folderUserUid, string fileName, IResultCrud iResult)
     {
-        //string FAKE_UID = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
-        // Debug.Log("file name " + fileName + " folderUserUid " + folderUserUid);
+        // string FAKE_UID = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
+
         FirebaseStorage firebaseStorage = FirebaseSDK.GetInstance().firebaseStorage;
 
         if (firebaseStorage != null)
@@ -18,8 +18,8 @@ public class UploadFileRemote
                 firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
             StorageReference userRef = storageRef.Child("users").Child("images").Child(folderUserUid).Child(fileName);
 
-            // Upload the file to the path "images/rivers.jpg"
-            // we need call ContinueWithOnMainThread because need update Ui with our callback.
+            // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
+            // ContinueWithOnMainThread.
             userRef.PutBytesAsync(fileBytes)
                 .ContinueWithOnMainThread((Task<StorageMetadata> task) => {
                     if (task.IsFaulted || task.IsCanceled)
@@ -35,15 +35,15 @@ public class UploadFileRemote
                         string md5Hash = metadata.Md5Hash;
                         Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
-                        iResult.SetResultCrudUi(true, "Finished uploading...");
+                        iResult.SetResultCrudUi(true, "Archivo subido!");
                         iResult.ResultPathReference(metadata.Path);
                     }
                 });
         }
         else
         {
-            Debug.LogWarning("FirebaseStorage is null");
-            iResult.SetResultCrudUi(false, "FirebaseStorage no exists");
+            Debug.LogWarning("FirebaseStorage es null");
+            iResult.SetResultCrudUi(false, "FirebaseStorage no existe");
         }
     }
 

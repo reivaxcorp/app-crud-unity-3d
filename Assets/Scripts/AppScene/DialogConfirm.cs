@@ -11,7 +11,7 @@ public class DialogConfirm : MonoBehaviour
 
     private void Awake()
     {
-        if (textMeshTitle == null) Debug.LogWarning("Please put ref title on inspector");
+        if (textMeshTitle == null) Debug.LogWarning("Pon la referencia TextMeshTitle en el inspector");
     }
 
     public void SetTitle(string title)

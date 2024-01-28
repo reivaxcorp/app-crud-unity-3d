@@ -27,7 +27,7 @@ public class AndroidPermission : MonoBehaviour
             Permission.RequestUserPermission(StoragePermission);
 
             float elapsedTime = 0f;
-            float timeout = 10f; // Adjust the waiting time according to your needs
+            float timeout = 10f; // Ajusta el tiempo de espera según tus necesidades
 
             while (!Permission.HasUserAuthorizedPermission(StoragePermission) && elapsedTime < timeout)
             {

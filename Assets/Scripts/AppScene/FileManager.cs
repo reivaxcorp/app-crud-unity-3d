@@ -45,7 +45,7 @@ public class FileManager
         }
         else
         {
-            Debug.LogWarning("Platform not supported");
+            Debug.LogWarning("Plataforma no soportada");
         }
     }
 
@@ -77,7 +77,7 @@ public class FileManager
                 return File.ReadAllBytes(_filePath);
             }
         }
-        throw new Exception("File path no found");
+        throw new Exception("Ruta de archivo no encontrada");
     }
 
     public string GetCurrentFilePath()
@@ -90,13 +90,13 @@ public class FileManager
         {
             if(_currentImageName == null || _currentImageName.Length == 0)
             {
-                throw new Exception("Invalid image file");
+                throw new Exception("Archivo de imagen invalido");
             } else if(_folderUidName == null) 
             {
-                throw new Exception("Folder user uid error");
+                throw new Exception("Error en la carpeta");
             } else
             {
-                throw new Exception("Data invalid");
+                throw new Exception("Dato invalido");
             }
         }
     }
