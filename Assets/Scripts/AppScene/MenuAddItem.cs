@@ -10,13 +10,17 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
     [SerializeField] Image menuImagePreview;
     [SerializeField] TextMeshProUGUI resultMsj;
     private bool waitForFirebaseSdk;
-
+    private ProgressText progressText;
 
     private FileManager _fileManager;
     public FileManager fileManager
     {
         private set { _fileManager = value; }
         get { return _fileManager; }
+    }
+    private void Awake()
+    {
+        progressText = gameObject.AddComponent<ProgressText>();
     }
 
     private void Start()
@@ -43,7 +47,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
 
         try
         {
-            Debug.Log("Uploading item starting..");
+            progressText?.StartProgressTextAnimation("Uploading", resultMsj);
             byte [] fileBytes = _fileManager.GetBytesImageSelected();
             UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, _fileManager.currentImageName, iResult: this);
         }
@@ -55,6 +59,8 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
 
     public void SetResultCrud(bool successful, string msj)
     {
+        progressText?.StopProgressTextAnimation();
+
         if (resultMsj != null)
         {
             if (successful)
