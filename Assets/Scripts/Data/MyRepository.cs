@@ -47,7 +47,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public void SaveItemRemote(ItemRemote itemLocal)
+    public void SaveItemRemote(string itemName, string remoteFilePath)
     {
         throw new System.NotImplementedException();
     }

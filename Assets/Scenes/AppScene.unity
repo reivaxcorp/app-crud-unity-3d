@@ -3028,6 +3028,7 @@ MonoBehaviour:
   androidPermission: {fileID: 1651622792}
   menuImagePreview: {fileID: 1429457105}
   resultMsj: {fileID: 732092310}
+  inputFieldName: {fileID: 1669579673}
 --- !u!1 &1429457103
 GameObject:
   m_ObjectHideFlags: 0

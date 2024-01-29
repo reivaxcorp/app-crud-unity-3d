@@ -38,6 +38,7 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             if (menuAddItem != null)
             {
                 menuAddItem.SetImagePreview(texture);
+                menuAddItem.SetImageName(fileName);
                 menuAddItem.fileManager.DeletePreviousCopyImage();
                 menuAddItem.fileManager.SaveFileInternalExtorage(texture, fileName);
             }

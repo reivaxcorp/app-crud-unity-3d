@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Firebase.Database;
-using System.Runtime.InteropServices.ComTypes;
+using System.Collections.Generic;
 
 public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
 {
@@ -55,7 +55,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
             {
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = _fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, _fileManager.currentImageName, iResult: this);
+                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, inputFieldName.text, iResult: this);
             }
             catch (Exception excepcion)
             {
@@ -92,6 +92,8 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         byte[] fileData = File.ReadAllBytes(path);
         Texture2D texture = new Texture2D(2, 2);
         texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
+        string fileName = Path.GetFileName(path);
+        SetImageName(fileName);
         SetImagePreview(texture);
     }
 
@@ -108,6 +110,19 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         else
         {
             Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
+        }
+    }
+
+    public void SetImageName(string imageName)
+    {
+
+        if (inputFieldName != null)
+        {
+            inputFieldName.text = imageName;
+        }
+        else
+        {
+            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
         }
     }
 
@@ -233,10 +248,30 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
     public void ResultPathReference(string referenciaRuta)
     {
         // string id, string name, string path, string timestamp
-        Debug.Log(referenciaRuta);
+        // Debug.Log(referenciaRuta);
         String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
         DatabaseReference referenciaBaseDatos = FirebaseSDK.GetInstance().db.RootReference;
         string clave = referenciaBaseDatos.Child("users").Child("items").Child(userUid).Push().Key;
-        ItemRemote itemRemoto = new ItemRemote();
+
+        // Obtener la marca de tiempo del servidor en formato Unix
+        long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+  
+        ItemRemote entry =
+            new ItemRemote(clave, inputFieldName.text, referenciaRuta, timestampUnix);
+        Dictionary<string, System.Object> entryValues = entry.ToDictionary();
+
+        referenciaBaseDatos.Child("users").Child("items").Child(userUid).Child(clave).SetValueAsync(entryValues).ContinueWith(task =>
+        {
+            if (task.IsFaulted || task.IsCanceled)
+            {
+                // Manejar error
+                Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
+            }
+            else
+            {
+                // Operación exitosa
+                Debug.Log("Datos escritos exitosamente en la base de datos");
+            }
+        }); ;
     }
 }
