@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuUserAccount : Menu
+public class MenuUserAccount : MenuAuth
 {
     [SerializeField] private GameObject loginBtn;
     [SerializeField] private GameObject misItemsBtn;

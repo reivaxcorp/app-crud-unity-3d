@@ -6,7 +6,7 @@ using UnityEngine;
 public class UploadFileRemote
 {
  
-    public UploadFileRemote(byte[] fileBytes, string folderUserUid, string fileName, IResultCrud iResult)
+    public UploadFileRemote(byte[] fileBytes, string folderUserUid, string fileName, IResultUi iResultUi, IResultFile iFileResult)
     {
         // string FAKE_UID = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
 
@@ -25,7 +25,7 @@ public class UploadFileRemote
                     if (task.IsFaulted || task.IsCanceled)
                     {
                         Debug.Log(task.Exception.ToString());
-                        iResult.SetResultCrudUi(false, "task.IsFaulted or task.IsCanceled");
+                        iResultUi.SetResultCrudUi(false, "Tarea fallida ó cancelada");
                         // Uh-oh, an error occurred!
                     }
                     else
@@ -35,15 +35,15 @@ public class UploadFileRemote
                         string md5Hash = metadata.Md5Hash;
                         Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
-                        iResult.SetResultCrudUi(true, "Archivo subido!");
-                        iResult.ResultPathReference(metadata.Path);
+                        iResultUi.SetResultCrudUi(true, "Archivo subido!");
+                        iFileResult.FileUploaded(true, metadata.Path);
                     }
                 });
         }
         else
         {
             Debug.LogWarning("FirebaseStorage es null");
-            iResult.SetResultCrudUi(false, "FirebaseStorage no existe");
+            iResultUi.SetResultCrudUi(false, "FirebaseStorage no existe");
         }
     }
 }

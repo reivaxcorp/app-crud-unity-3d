@@ -3,7 +3,12 @@ using UnityEngine;
 
 public class ReceiverMessagesFromAndroid : MonoBehaviour
 {
-    [SerializeField] MenuAddItem menuAddItem;
+    private MenuCrud currentMenu;
+
+    public void SetCurrentMenu(MenuCrud menu)
+    {
+        this.currentMenu = menu;    
+    }
 
     // El nombre de la función debe ser la misma que se llama desde la activity personalizada
     public void ReceiveDataFromAndroid(string fileNameWithBase64)
@@ -35,16 +40,16 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
 
             Debug.Log("Carga terminada");
 
-            if (menuAddItem != null)
+            if (currentMenu != null)
             {
-                menuAddItem.SetImagePreview(texture);
-                menuAddItem.SetImageName(fileName);
-                menuAddItem.fileManager.DeletePreviousCopyImage();
-                menuAddItem.fileManager.SaveFileInternalExtorage(texture, fileName);
+                currentMenu.SetImagePreview(texture);
+                currentMenu.SetImageName(fileName);
+                currentMenu.fileManager.DeletePreviousCopyImage();
+                currentMenu.fileManager.SaveFileInternalExtorage(texture, fileName);
             }
             else
             {
-                Debug.LogWarning("Por favor pon MenuAddItem en el inspector");
+                Debug.LogWarning("CurrentMenu es nulo");
             }
         }
         else
@@ -52,4 +57,5 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             Debug.LogError("Datos invalidos para fileNameWithBase64");
         }
     }
+
 }

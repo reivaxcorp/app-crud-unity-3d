@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class MenuLogin : Menu
+public class MenuLogin : MenuAuth
 {
     [SerializeField] private TMP_InputField inputMail;
     [SerializeField] private TMP_InputField inputPassword;

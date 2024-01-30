@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class MenuCreateAccount : Menu
+public class MenuCreateAccount : MenuAuth
 {
     [SerializeField] private TMP_InputField inputMail;
     [SerializeField] private TMP_InputField inputPassword;

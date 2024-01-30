@@ -47,9 +47,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public void SaveItemRemote(string itemName, string remoteFilePath)
+    public void SaveItemRemote(string itemName, string remoteFilePath, IResultUi resultUi)
     {
-        throw new System.NotImplementedException();
+        remoteDb.SaveItemRemote(itemName, remoteFilePath, resultUi);
     }
 
     public void UpdateItemById(ItemLocal itemLocal)

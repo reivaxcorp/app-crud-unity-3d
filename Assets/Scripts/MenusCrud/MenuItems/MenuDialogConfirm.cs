@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class DialogConfirm : MonoBehaviour
+public class MenuDialogConfirm : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textMeshTitle;
     public delegate void OnAccionSelected(bool acceptAction);

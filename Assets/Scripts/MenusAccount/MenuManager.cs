@@ -7,7 +7,7 @@ public class MenuManager : MonoBehaviour
     private const string MENU_USER_SESION = "MenuUserAccount";
 
     private bool menuSet = false;
-    [SerializeField] private Menu [] menus;
+    [SerializeField] private MenuAuth [] menus;
 
     private void Start()
     {

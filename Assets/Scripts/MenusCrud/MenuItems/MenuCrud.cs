@@ -1,17 +1,16 @@
-using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Firebase.Database;
-using System.Collections.Generic;
 
-public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
+public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
 {
     [SerializeField] AndroidPermission androidPermission;
+    [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
     [SerializeField] Image menuImagePreview;
-    [SerializeField] TextMeshProUGUI resultMsj;
-    [SerializeField] TMP_InputField inputFieldName;
+    [SerializeField] protected TextMeshProUGUI resultMsj;
+    [SerializeField] protected TMP_InputField inputFieldName;
+    protected ProgressText progressText;
 
     public FileManager fileManager
     {
@@ -20,49 +19,7 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
     }
 
     private bool waitForFirebaseSdk;
-    private ProgressText progressText;
     private FileManager _fileManager;
-
-    private void Awake()
-    {
-        progressText = gameObject.AddComponent<ProgressText>();
-    }
-
-    private void Start()
-    {
-        waitForFirebaseSdk = true;
-        fileManager = new FileManager(this);
-    }
-
-    private void Update()
-    {
-        if (waitForFirebaseSdk)
-        {
-            if (FirebaseSDK.GetInstance().isFirebaseReady)
-            {
-                fileManager.SetFolderUidName();
-                waitForFirebaseSdk = false;
-            }
-        }
-    }
-
-    // Acción del botón "Crear item"
-    public void OnUploadItem()
-    {
-        if (IsDataSetted())
-        {
-            try
-            {
-                progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
-                byte[] fileBytes = _fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, _fileManager.folderUidName, inputFieldName.text, iResult: this);
-            }
-            catch (Exception excepcion)
-            {
-                SetResultCrudUi(false, "Error - " + excepcion.Message);
-            }
-        }
-    }
 
     public void SetResultCrudUi(bool exitoso, string msj)
     {
@@ -142,6 +99,40 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
     }
 
+
+    public bool IsDataSetted()
+    {
+        ClearResultCrud();
+
+        if (inputFieldName == null)
+        {
+            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
+            return false;
+        }
+
+        // Sanitizar el nombre de la imagen utilizando la expresión regular
+        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
+        if (string.IsNullOrEmpty(sanitizedFileName))
+        {
+            LogWarningAndSetResult("Ingrese el nombre de la imagen");
+            return false;
+        }
+
+        if (menuImagePreview == null)
+        {
+            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
+            return false;
+        }
+
+        if (menuImagePreview.sprite == null)
+        {
+            LogWarningAndSetResult("Seleccione una imagen");
+            return false;
+        }
+
+        return true;
+    }
+
     private void OpenImageAndroid()
     {
         if (androidPermission != null)
@@ -196,8 +187,14 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         }
     }
 
+    private void OnEnable()
+    {
+        SetCurrentMenu(this);
+    }
+
     private void OnDisable()
     {
+        ResetMenu();
         DesuscribeEvent();
     }
 
@@ -206,72 +203,50 @@ public class MenuAddItem : MonoBehaviour, IFileSelected, IResultCrud
         DesuscribeEvent();
     }
 
-    private bool IsDataSetted()
-    {
-        ClearResultCrud();
-
-        if (inputFieldName == null)
-        {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-            return false;
-        }
-
-        // Sanitizar el nombre de la imagen utilizando la expresión regular
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        if (string.IsNullOrEmpty(sanitizedFileName))
-        {
-            LogWarningAndSetResult("Ingrese el nombre de la imagen");
-            return false;
-        }
-
-        if (menuImagePreview == null)
-        {
-            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
-            return false;
-        }
-
-        if (menuImagePreview.sprite == null)
-        {
-            LogWarningAndSetResult("Seleccione una imagen");
-            return false;
-        }
-
-        return true;
-    }
-
     private void LogWarningAndSetResult(string mensajeAdvertencia)
     {
         Debug.LogWarning(mensajeAdvertencia);
         SetResultCrudUi(false, mensajeAdvertencia);
     }
 
-    public void ResultPathReference(string referenciaRuta)
+    private void SetCurrentMenu(MenuCrud menu)
     {
-        // string id, string name, string path, string timestamp
-        // Debug.Log(referenciaRuta);
-        String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
-        DatabaseReference referenciaBaseDatos = FirebaseSDK.GetInstance().db.RootReference;
-        string clave = referenciaBaseDatos.Child("users").Child("items").Child(userUid).Push().Key;
-
-        // Obtener la marca de tiempo del servidor en formato Unix
-        long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
-  
-        ItemRemote entry =
-            new ItemRemote(clave, inputFieldName.text, referenciaRuta, timestampUnix);
-        Dictionary<string, System.Object> entryValues = entry.ToDictionary();
-
-        referenciaBaseDatos.Child("users").Child("items").Child(userUid).Child(clave).SetValueAsync(entryValues).ContinueWith(task =>
+        if (receiverMessagesFromAndroid != null)
         {
-            if (task.IsFaulted || task.IsCanceled)
+            receiverMessagesFromAndroid.SetCurrentMenu(menu);
+        }
+        else
+        {
+            Debug.LogWarning("Por favor coloca El ReceiverMeesagesFromAndroid en el inspector");
+        }
+    }
+
+    private void ResetMenu()
+    {
+        SetCurrentMenu(null);
+        this.waitForFirebaseSdk = true;
+    }
+
+    private void Awake()
+    {
+        progressText = gameObject.AddComponent<ProgressText>();
+    }
+
+    private void Start()
+    {
+        waitForFirebaseSdk = true;
+        fileManager = new FileManager(this);
+    }
+
+    private void Update()
+    {
+        if (waitForFirebaseSdk)
+        {
+            if (FirebaseSDK.GetInstance().isFirebaseReady)
             {
-                // Manejar error
-                Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
+                fileManager.SetFolderUidName();
+                waitForFirebaseSdk = false;
             }
-            else
-            {
-                // Operación exitosa
-                Debug.Log("Datos escritos exitosamente en la base de datos");
-            }
-        }); ;
+        }
     }
 }

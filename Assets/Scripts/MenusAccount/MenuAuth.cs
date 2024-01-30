@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class Menu : MonoBehaviour
+public class MenuAuth : MonoBehaviour
 {
     public TextMeshProUGUI resultMsj;
     protected FirebaseAuthManager firebaseAuthManager;
