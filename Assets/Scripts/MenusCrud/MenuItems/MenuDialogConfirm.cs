@@ -5,32 +5,59 @@ using UnityEngine;
 
 public class MenuDialogConfirm : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI textMeshTitle;
-    public delegate void OnAccionSelected(bool acceptAction);
-    public event OnAccionSelected onAccionSelected;
+    [SerializeField] TextMeshProUGUI textTitle;
+    [SerializeField] TextMeshProUGUI textBody;
+    [SerializeField] MenuManagerApp menuManager;
 
     private void Awake()
     {
-        if (textMeshTitle == null) Debug.LogWarning("Pon la referencia TextMeshTitle en el inspector");
+        CheckReferences();
+    }
+
+    public void ShowDialog(string title, string message)
+    {
+        SetTitle(title);
+        SetBodyText(message);
+        ShowDialog();
+    }
+
+    public void HideDialog()
+    {
+        gameObject.SetActive(false);
+        menuManager.ButtonAddItemSetActive(true);
+    }
+
+    public void ShowDialog()
+    {
+        gameObject.SetActive(true);
     }
 
     public void SetTitle(string title)
     {
-        this.textMeshTitle.text = title;
+        this.textTitle.text = title;
     }
 
-    public void OnAccept()
+    public void SetBodyText(string bodyText)
     {
-        onAccionSelected?.Invoke(true);
-    }
-
-    public void OnCancel()
-    {
-        onAccionSelected?.Invoke(false);
+        this.textBody.text = bodyText;
     }
 
     private void OnDisable()
     {
-        textMeshTitle.text = "";
+        ClearDialog();
     }
+
+    private void ClearDialog()
+    {
+        textTitle.text = "";
+        textBody.text = "";
+    }
+
+    private void CheckReferences()
+    {
+        if (textTitle == null) Debug.LogWarning("Pon la referencia Title en el inspector");
+        if (textBody == null) Debug.LogWarning("Pon la referencia Msj en el inspector");
+        if (menuManager == null) Debug.LogWarning("Pon la reference de MenuManager en el inspector");
+    }
+
 }

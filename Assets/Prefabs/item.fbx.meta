@@ -3,12 +3,7 @@ guid: d2f5617ec2318d64c9e1be70882d8237
 ModelImporter:
   serializedVersion: 20300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: blender
-    second: {fileID: 2800000, guid: c06644ed8d414a040b2624bed514ff93, type: 3}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

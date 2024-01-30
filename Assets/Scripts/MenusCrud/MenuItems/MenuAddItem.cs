@@ -12,7 +12,6 @@ public class MenuAddItem : MenuCrud, IResultFile
         {
             WriteDocument(pathReference);
         }
-       
     }
 
     // Acción del botón "Crear item"
@@ -24,7 +23,7 @@ public class MenuAddItem : MenuCrud, IResultFile
             {
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResultUi: this, iFileResult: this); ;
+                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResult: this, iFileResult: this);
             }
             catch (Exception excepcion)
             {

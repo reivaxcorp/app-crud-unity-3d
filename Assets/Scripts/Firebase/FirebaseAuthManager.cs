@@ -1,4 +1,5 @@
 using Firebase.Auth;
+using Firebase.Extensions;
 using System.Threading.Tasks;
 using UnityEngine;
 using Color = UnityEngine.Color;
@@ -8,7 +9,7 @@ using Color = UnityEngine.Color;
 /// </summary>
 public class FirebaseAuthManager
 {
-    
+
     public delegate void AuthCallback(AccountAuthResult result);
     public event AuthCallback OnAccountAuthResult;
     private ExceptionManager exceptionManager;
@@ -22,7 +23,8 @@ public class FirebaseAuthManager
     {
         if (FirebaseSDK.GetInstance().isFirebaseReady)
         {
-            FirebaseSDK.GetInstance().auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
+            FirebaseSDK.GetInstance().auth.CreateUserWithEmailAndPasswordAsync(email, password)
+                .ContinueWithOnMainThread(task =>
             {
                 AccountAuthResult authResult;
 
@@ -47,9 +49,7 @@ public class FirebaseAuthManager
 
                 authResult = new AccountAuthResult("Cuenta creada", Color.green, true);
                 OnAccountAuthResult?.Invoke(authResult); // we need TaskScheduler.FromCurrentSync.... to set text
-            },
-              TaskScheduler.FromCurrentSynchronizationContext() // Execute in main thread of Unity. ('case we need to update text "cuenta creada")
-            );
+            });
 
         }
         else
@@ -68,7 +68,7 @@ public class FirebaseAuthManager
                 .SignInWithEmailAndPasswordAsync(
                 email,
                 password)
-                .ContinueWith(task =>
+                .ContinueWithOnMainThread(task =>
                 {
                     AccountAuthResult authResult;
 
@@ -92,9 +92,7 @@ public class FirebaseAuthManager
 
                     authResult = new AccountAuthResult("Logeado como: \n" + result.User.Email, Color.green, true); // we need TaskScheduler.FromCurrentSync.... to set text
                     OnAccountAuthResult?.Invoke(authResult);
-                },
-              TaskScheduler.FromCurrentSynchronizationContext() // Execute in main thread of Unity. ('case we need to update text "cuenta creada")
-            );
+                });
         }
     }
 

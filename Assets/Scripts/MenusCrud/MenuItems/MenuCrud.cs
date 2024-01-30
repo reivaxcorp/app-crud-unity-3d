@@ -3,8 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
+public class MenuCrud : MonoBehaviour, IFileSelected, IResult
 {
+    [SerializeField] MenuManagerApp menuManagerApp;
+    [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
     [SerializeField] Image menuImagePreview;
@@ -44,6 +46,15 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
         }
     }
 
+    public void SetResultWriteDocument(bool successful, string title, string body)
+    {
+        if(successful)
+        {
+            dialogMsj.ShowDialog(title, body);
+            menuManagerApp.HideMenu();
+        }
+    }
+
     public void FileSelectedResultEditor(string path)
     {
         byte[] fileData = File.ReadAllBytes(path);
@@ -58,29 +69,13 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
     {
         // Crea un sprite con la textura cargada
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-
         // Asigna el sprite al componente Image
-        if (menuImagePreview != null)
-        {
-            menuImagePreview.sprite = sprite;
-        }
-        else
-        {
-            Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
-        }
+        menuImagePreview.sprite = sprite;
     }
 
     public void SetImageName(string imageName)
     {
-
-        if (inputFieldName != null)
-        {
-            inputFieldName.text = imageName;
-        }
-        else
-        {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-        }
+        inputFieldName.text = imageName;
     }
 
     public void OpenImage()
@@ -99,6 +94,10 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
         }
     }
 
+    public void HideMenu()
+    {
+        menuManagerApp.HideMenu();
+    }
 
     public bool IsDataSetted()
     {
@@ -135,15 +134,8 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
 
     private void OpenImageAndroid()
     {
-        if (androidPermission != null)
-        {
-            androidPermission.OnPermissionResult += HandlePermissionResult;
-            androidPermission.RequestStoragePermission();
-        }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca AndroidPermission en el GameManager");
-        }
+        androidPermission.OnPermissionResult += HandlePermissionResult;
+        androidPermission.RequestStoragePermission();
     }
 
     private void OpenImageEditor()
@@ -177,14 +169,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
 
     private void ClearResultCrud()
     {
-        if (resultMsj != null)
-        {
-            resultMsj.text = string.Empty;
-        }
-        else
-        {
-            Debug.LogWarning("ResultMsj no está colocado en el inspector");
-        }
+        resultMsj.text = string.Empty;
     }
 
     private void OnEnable()
@@ -211,18 +196,15 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
 
     private void SetCurrentMenu(MenuCrud menu)
     {
-        if (receiverMessagesFromAndroid != null)
-        {
-            receiverMessagesFromAndroid.SetCurrentMenu(menu);
-        }
-        else
-        {
-            Debug.LogWarning("Por favor coloca El ReceiverMeesagesFromAndroid en el inspector");
-        }
+        receiverMessagesFromAndroid.SetCurrentMenu(menu);
+        menuManagerApp.SetCurrentMenu(menu);
     }
 
     private void ResetMenu()
     {
+        menuImagePreview.sprite = null;
+        ClearResultCrud();
+        inputFieldName.text = "";
         SetCurrentMenu(null);
         this.waitForFirebaseSdk = true;
     }
@@ -230,6 +212,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
     private void Awake()
     {
         progressText = gameObject.AddComponent<ProgressText>();
+        CheckReferences();
     }
 
     private void Start()
@@ -249,4 +232,16 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResultUi
             }
         }
     }
+
+    private void CheckReferences()
+    {
+        if (menuManagerApp == null) Debug.LogWarning("Coloca el script desde el MenuApp (gameObject) el script MenuManagerApp en el Inspector");
+        if (dialogMsj == null) Debug.LogWarning("Coloca el script DialogMsj desde el DialogMsj gameObject en MenuApp -> Canvas -> DialogMsj en el inspector");
+        if (inputFieldName == null) Debug.LogWarning("InputFieldName no asignado en el Inspector");
+        if (menuImagePreview == null) Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
+        if (receiverMessagesFromAndroid == null) Debug.LogWarning("Por favor coloca el script ReceiverMeesagesFromAndroid desde el Manager (gameObject) en el inspector");
+        if (resultMsj == null) Debug.LogWarning("ResultMsj no está colocado en el inspector");
+        if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
+    }
+
 }

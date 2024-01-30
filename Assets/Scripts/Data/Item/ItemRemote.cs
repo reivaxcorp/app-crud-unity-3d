@@ -23,6 +23,7 @@ public class ItemRemote
         Path = path;
         Timestamp = timestamp;
     }
+
     public Dictionary<string, Object> ToDictionary()
     {
         Dictionary<string, Object> result = new Dictionary<string, Object>();
