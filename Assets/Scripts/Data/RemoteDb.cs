@@ -18,9 +18,52 @@ public class RemoteDb : IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public Task<List<ItemRemote>> GetProductsRemoteAsync()
+    public async Task<List<ItemRemote>> GetProductsRemoteAsync()
     {
-        throw new System.NotImplementedException();
+        // Obtén el ID del usuario actual
+        string userUid = FirebaseSDK.GetInstance().user.UserId;
+
+        // Obtén la referencia a la ubicación de los items para el usuario actual
+        DatabaseReference userItemsReference = FirebaseSDK.GetInstance().db.RootReference
+            .Child("users").Child("items").Child(userUid);
+
+        try
+        {
+            // Realiza la operación de obtención de datos de Firebase
+            DataSnapshot snapshot = await userItemsReference.GetValueAsync();
+
+            if (snapshot.Exists)
+            {
+                // Procesa los datos del snapshot según sea necesario
+                List<ItemRemote> itemsList = new List<ItemRemote>();
+
+                foreach (DataSnapshot itemSnapshot in snapshot.Children)
+                {
+                    // Convierte los datos del snapshot en una instancia de ItemRemote
+                    ItemRemote item = new ItemRemote
+                    {
+                        Id = itemSnapshot.Child("id").GetValue(true).ToString(),
+                        Name = itemSnapshot.Child("name").GetValue(true).ToString(),
+                        Path = itemSnapshot.Child("path").GetValue(true).ToString(),
+                        Timestamp = long.Parse(itemSnapshot.Child("timestamp").GetValue(true).ToString())
+                    };
+
+                    itemsList.Add(item);
+                }
+
+                return itemsList;
+            }
+            else
+            {
+                Debug.Log("No hay datos en la ubicación especificada.");
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error al obtener items: " + e.Message);
+            return null;
+        }
     }
 
     public void SaveItemRemote(string itemName, string remoteFilePath, IResult resultUi)

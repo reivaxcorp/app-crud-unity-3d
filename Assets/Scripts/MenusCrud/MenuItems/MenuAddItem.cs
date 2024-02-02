@@ -34,6 +34,12 @@ public class MenuAddItem : MenuCrud, IResultFile
 
     private void WriteDocument(string pathReference)
     {
-        MyApplication.repository.SaveItemRemote(itemName: inputFieldName.text, remoteFilePath: pathReference, resultUi: this);
+        if(MyApplication.repository != null)
+        {
+            MyApplication.repository.SaveItemRemote(itemName: inputFieldName.text, remoteFilePath: pathReference, resultUi: this);
+        } else
+        {
+            Debug.LogWarning("El repositorio es Null");
+        }
     }
 }

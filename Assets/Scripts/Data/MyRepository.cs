@@ -37,9 +37,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public Task<List<ItemRemote>> GetProductsRemoteAsync()
+    public async Task<List<ItemRemote>> GetProductsRemoteAsync()
     {
-        throw new System.NotImplementedException();
+       return await remoteDb.GetProductsRemoteAsync();
     }
 
     public void SaveItem(ItemLocal itemLocal)
