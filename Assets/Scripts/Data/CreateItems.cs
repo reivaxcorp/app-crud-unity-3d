@@ -1,10 +1,18 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CreateItems : MonoBehaviour
 {
     private bool readDataFirebase;
+    [SerializeField]
+    private GameObject item;
+    private BuildItem buildItem;
+
+    private void Awake()
+    {
+         buildItem = gameObject.AddComponent<BuildItem>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -15,32 +23,88 @@ public class CreateItems : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(readDataFirebase)
+        if (readDataFirebase)
         {
-            if(FirebaseSDK.GetInstance().isFirebaseReady && MyApplication.repository != null)
+            if (FirebaseSDK.GetInstance().isFirebaseReady && MyApplication.repository != null)
             {
                 readDataFirebase = false;
-                RetrieveAndLogItems();
+                VerifyUpdates();
             }
         }
     }
 
-    private async void RetrieveAndLogItems()
+    private async void VerifyUpdates()
     {
-       
-            List<ItemRemote> items = await MyApplication.repository.GetProductsRemoteAsync();
 
-            if (items != null)
+        List<ItemLocal> itemsLocalList = MyApplication.repository.GetItems();
+        List<ItemRemote> itemsRemoteList = await MyApplication.repository.GetProductsRemoteAsync();
+
+        List<ItemLocal> itemsUplodated = new List<ItemLocal>();
+
+        if(itemsLocalList == null && itemsRemoteList == null) { return; }
+
+        if (itemsLocalList != null)
+        {
+            Tuple<List<ItemLocal>, List<ItemLocal>, List<ItemLocal>> crudList =
+                CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
+
+            List<ItemLocal> itemsToAdd = crudList.Item1;
+            List<ItemLocal> itemsToUpdate = crudList.Item2;
+            List<ItemLocal> itemsToDelete = crudList.Item3;
+
+            if(itemsToAdd.Count > 0)
             {
-                foreach (var item in items)
+                itemsUplodated.AddRange(itemsToAdd);
+            }
+
+            // si hay algun item que se actualizó, removemos la textura
+            // no importa si solo se cambio el nombre.
+            foreach (ItemLocal itemToUpdate in itemsToUpdate)
+            {
+                ItemLocal oldItemToUpdate =
+                     itemsLocalList.Find(i => i.Id.Equals(itemToUpdate.Id));
+
+                if (oldItemToUpdate != null)
                 {
-                    Debug.Log($"Item ID: {item.Id}, Name: {item.Name}, Path: {item.Path}, Timestamp: {item.Timestamp}");
+                    MyApplication.repository.RemoveTexture(oldItemToUpdate.Id);
+                    itemsUplodated.Add(itemToUpdate);
                 }
             }
-            else
+
+            foreach (ItemLocal itemToDelete in itemsToDelete)
             {
-                Debug.Log("No se obtuvieron items de la base de datos remota.");
+
+                ItemLocal oldItemToDelete =
+                    itemsLocalList.Find(i => i.Id.Equals(itemToDelete.Id));
+                if(oldItemToDelete != null)
+                {
+                    MyApplication.repository.RemoveTexture(oldItemToDelete.Id);
+                }
             }
 
+            CreateItem(itemsUplodated);
+            MyApplication.repository.SaveItemsLocal(itemsUplodated);
+        }
+        else
+        {
+
+        }
+    }
+
+    private async void CreateItem(List<ItemLocal> items)
+    {
+        if (item !=  null)
+        {
+            foreach (ItemLocal itemLocal in items)
+            {
+                GameObject itemToCreate = Instantiate(item);
+                itemToCreate.name = itemLocal.Name;
+                await buildItem.AsignMaterialAsync(itemLocal.Id, itemToCreate, itemLocal.Path);
+            }
+        } else
+        {
+            Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
+        }
+        
     }
 }

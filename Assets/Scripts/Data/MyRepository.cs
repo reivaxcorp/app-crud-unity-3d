@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
 
-public class MyRepository : IRepositoryLocal, IRepositoryRemote
+public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLocalSaved
 {
     private readonly IRepositoryLocal localDb;
     private readonly IRepositoryRemote remoteDb;
-
+    private 
     public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb)
     {
         this.localDb = localDb;
@@ -32,19 +33,22 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public Task<List<ItemLocal>> GetItems()
+    public List<ItemLocal> GetItems()
     {
-        throw new System.NotImplementedException();
+        return localDb.GetItems();
     }
 
     public async Task<List<ItemRemote>> GetProductsRemoteAsync()
     {
-       return await remoteDb.GetProductsRemoteAsync();
+        List<ItemRemote>  itemsRemote = await remoteDb.GetProductsRemoteAsync();
+      //  List<ItemLocal> itemsLocal = itemsRemote.ItemsRemoteToItemLocal();
+       // SaveItemsLocal(itemsLocal);
+        return await remoteDb.GetProductsRemoteAsync();
     }
 
-    public void SaveItem(ItemLocal itemLocal)
+    public void SaveItemsLocal(List<ItemLocal> listItemsLocal)
     {
-        throw new System.NotImplementedException();
+        localDb.SaveItemsLocal(listItemsLocal);
     }
 
     public void SaveItemRemote(string itemName, string remoteFilePath, IResult resultUi)
@@ -58,6 +62,21 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
     }
 
     public void UpdateItemRemoteById(ItemRemote itemLocal)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void SaveTextureAsPNG(Texture2D textureToSave, string imageId)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RemoveTexture(string imageId)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Texture2D LoadTextureAsPNG(string imageId)
     {
         throw new System.NotImplementedException();
     }
