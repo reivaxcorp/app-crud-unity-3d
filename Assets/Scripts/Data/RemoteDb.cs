@@ -45,7 +45,7 @@ public class RemoteDb : IRepositoryRemote
                         Id = itemSnapshot.Child("id").GetValue(true).ToString(),
                         Name = itemSnapshot.Child("name").GetValue(true).ToString(),
                         Path = itemSnapshot.Child("path").GetValue(true).ToString(),
-                        Timestamp = long.Parse(itemSnapshot.Child("timestamp").GetValue(true).ToString())
+                        CreationDate = long.Parse(itemSnapshot.Child("timestamp").GetValue(true).ToString())
                     };
 
                     itemsList.Add(item);
@@ -66,7 +66,7 @@ public class RemoteDb : IRepositoryRemote
         }
     }
 
-    public void SaveItemRemote(string itemName, string remoteFilePath, IResult resultUi)
+    public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
         // string id, string name, string path, string timestamp
         // Debug.Log(referenciaRuta);
@@ -80,7 +80,7 @@ public class RemoteDb : IRepositoryRemote
         long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
 
         ItemRemote entry =
-            new ItemRemote(key, itemName, remoteFilePath, timestampUnix);
+            new ItemRemote(key, itemRemote.Name, itemRemote.Path, itemRemote.ImageIdMetadata, timestampUnix);
 
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 

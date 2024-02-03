@@ -6,11 +6,12 @@ using UnityEngine;
 public class MenuAddItem : MenuCrud, IResultFile
 {
 
-    public void FileUploaded(bool isFileUploaded, string pathReference)
+    public void FileUploaded(bool isFileUploaded, string pathReference, string imagenIdMetadata)
     {
         if(isFileUploaded)
         {
-            WriteDocument(pathReference);
+            ItemRemote itemRemote = new ItemRemote();
+            WriteDocument(pathReference, imagenIdMetadata);
         }
     }
 
@@ -32,11 +33,12 @@ public class MenuAddItem : MenuCrud, IResultFile
         }
     }
 
-    private void WriteDocument(string pathReference)
+    private void WriteDocument(string pathReference, string imagenIdMetadata)
     {
         if(MyApplication.repository != null)
         {
-            MyApplication.repository.SaveItemRemote(itemName: inputFieldName.text, remoteFilePath: pathReference, resultUi: this);
+            ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, path: pathReference, imageIdMetadata: imagenIdMetadata);
+            MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
         } else
         {
             Debug.LogWarning("El repositorio es Null");

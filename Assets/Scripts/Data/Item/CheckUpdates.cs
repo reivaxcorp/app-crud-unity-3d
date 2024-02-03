@@ -1,7 +1,7 @@
-using System;
+
 using System.Collections.Generic;
 using UnityEngine;
-
+ 
 public class CheckUpdates : MonoBehaviour
 {
 
@@ -11,38 +11,65 @@ public class CheckUpdates : MonoBehaviour
     /// <param name="itemsRemoteList">Lista de realtime database</param>
     /// <param name="itemsLocalList">Lista previamente guardada</param>
     /// <returns>
-    /// Primera lista de la tupa: Items a añadir 
-    /// Segunda lista de la tupla: Items a actualizar,
-    /// Tercera lista de la tupla: Items a eliminar
+    /// Lista, con los items a actualizar, eliminar o crear.
     /// </returns>
-    public static Tuple<List<ItemLocal>, List<ItemLocal>, List<ItemLocal>> CheckUpdatesItems(
+    public static List<ItemManager> CheckUpdatesItems(
        List<ItemRemote> itemsRemoteList,
        List<ItemLocal> itemsLocalList
        )
     {
-        List<ItemLocal> itemToAdd = new List<ItemLocal>();
-        List<ItemLocal> itemToUpdate = new List<ItemLocal>();
-        List<ItemLocal> itemToRemove = new List<ItemLocal>();
+        List<ItemManager> itemUpdates = new List<ItemManager>();
 
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
-            // si no esta en el remoto, debemos removerlo
-            ItemRemote itemRemote =
+
+            ItemRemote itemSavedLocal =
                 itemsRemoteList.Find(p => p.Id.Equals(itemLocal.Id));
 
-            if (itemRemote == null)
+            // Se a removido un item de la base de datos
+            if (itemSavedLocal == null)
             {
-                // lo agregamos a items para remover ya que no estan en el remoto
-                itemToRemove.Add(itemLocal);
+                itemUpdates.Add(new ItemManager(
+                    id: itemLocal.Id,
+                    isImageUpdated: false,
+                    isFieldsUpdated: false,
+                    isRemove: true,
+                    isAdd: false));
             }
-            // si ha cambiado debemos actualizarlo
-            else if (!IsItemUpdated(itemRemote, itemLocal))
+            // Se ha cambiado los campos y la imagén
+            else if (IsFielsUpdate(itemSavedLocal, itemLocal) && IsImageUpdated(itemSavedLocal, itemLocal))
             {
-                itemToUpdate.Add(itemRemote.ItemRemoteToItemLocal());
+                itemUpdates.Add(new ItemManager(
+                  id: itemLocal.Id,
+                  isImageUpdated: true,
+                  isFieldsUpdated: true,
+                  isRemove: false,
+                  isAdd: false));
             }
+            // Solo se han cambiado los campos
+            else if (IsFielsUpdate(itemSavedLocal, itemLocal))
+            {
+                itemUpdates.Add(new ItemManager(
+                 id: itemLocal.Id,
+                 isImageUpdated: false,
+                 isFieldsUpdated: true,
+                 isRemove: false,
+                 isAdd: false));
+            }
+            // Se ha cambiado la imagén
+            else if (IsImageUpdated(itemSavedLocal, itemLocal))
+            {
+
+               itemUpdates.Add(new ItemManager(
+               id: itemLocal.Id,
+               isImageUpdated: true,
+               isFieldsUpdated: false,
+               isRemove: false,
+               isAdd: false));
+            } 
         }
 
-        // agregamos los productos que faltan
+        // Nuevos items a añadir
         foreach (ItemRemote itemRemote in itemsRemoteList)
         {
             ItemLocal itemToSaveLocal =
@@ -50,16 +77,16 @@ public class CheckUpdates : MonoBehaviour
 
             if (itemToSaveLocal == null)
             {
-                itemToAdd.Add(itemRemote.ItemRemoteToItemLocal());
+                itemUpdates.Add(new ItemManager(
+                id: itemRemote.Id,
+                isImageUpdated: false,
+                isFieldsUpdated: false,
+                isRemove: false,
+                isAdd: true));
             }
         }
 
-        return new Tuple<List<ItemLocal>,
-                         List<ItemLocal>,
-                         List<ItemLocal>>(
-                         itemToUpdate,
-                         itemToRemove,
-                         itemToAdd);
+        return itemUpdates;
     }
 
 
@@ -70,9 +97,17 @@ public class CheckUpdates : MonoBehaviour
     /// <param name="itemRemote"></param>
     /// <param name="itemLocal"></param>
     /// <returns></returns>
-    private static bool IsItemUpdated(ItemRemote productRemote, ItemLocal itemLocal)
+    private static bool IsFielsUpdate(ItemRemote productRemote, ItemLocal itemLocal)
     {
-        return productRemote.Timestamp == itemLocal.Timestamp;
+        return !productRemote.Name.Equals(itemLocal.Name);
+    }
+
+    // si cambia el el image_id_metadata, es probrable que cambie el nombre de la imagen, 
+    // y si cambia a otra imagen cambia tambien el path.
+    private static bool IsImageUpdated(ItemRemote productRemote, ItemLocal itemLocal)
+    {
+        return !productRemote.ImageIdMetadata.Equals(itemLocal.ImageIdMetadata) ||
+               !productRemote.Path.Equals(itemLocal.Path);
     }
 
 }

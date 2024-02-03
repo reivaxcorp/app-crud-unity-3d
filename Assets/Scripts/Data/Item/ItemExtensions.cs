@@ -12,7 +12,8 @@ public static class ItemExtensions
             Id = itemRemote.Id,
             Name = itemRemote.Name, 
             Path = itemRemote.Path,
-            Timestamp = itemRemote.Timestamp
+            ImageIdMetadata = itemRemote.ImageIdMetadata,
+            CreationDate = itemRemote.CreationDate
         };
     }
 
@@ -28,7 +29,8 @@ public static class ItemExtensions
                 Id = remoteItem.Id,
                 Name = remoteItem.Name, 
                 Path = remoteItem.Path,
-                Timestamp = remoteItem.Timestamp
+                ImageIdMetadata = remoteItem.ImageIdMetadata,
+                CreationDate = remoteItem.CreationDate
             };
 
             itemsLocal.Add(localItem);

@@ -6,7 +6,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
 {
     private readonly IRepositoryLocal localDb;
     private readonly IRepositoryRemote remoteDb;
-    private 
+
     public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb)
     {
         this.localDb = localDb;
@@ -51,9 +51,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         localDb.SaveItemsLocal(listItemsLocal);
     }
 
-    public void SaveItemRemote(string itemName, string remoteFilePath, IResult resultUi)
+    public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        remoteDb.SaveItemRemote(itemName, remoteFilePath, resultUi);
+        remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
 
     public void UpdateItemById(ItemLocal itemLocal)

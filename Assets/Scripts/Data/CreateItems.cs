@@ -6,12 +6,12 @@ public class CreateItems : MonoBehaviour
 {
     private bool readDataFirebase;
     [SerializeField]
-    private GameObject item;
+    private GameObject itemPrefab;
     private BuildItem buildItem;
 
     private void Awake()
     {
-         buildItem = gameObject.AddComponent<BuildItem>();
+        buildItem = gameObject.AddComponent<BuildItem>();
     }
 
     // Start is called before the first frame update
@@ -41,48 +41,48 @@ public class CreateItems : MonoBehaviour
 
         List<ItemLocal> itemsUplodated = new List<ItemLocal>();
 
-        if(itemsLocalList == null && itemsRemoteList == null) { return; }
+        if (itemsLocalList == null && itemsRemoteList == null) { return; }
 
         if (itemsLocalList != null)
         {
-            Tuple<List<ItemLocal>, List<ItemLocal>, List<ItemLocal>> crudList =
+            List<ItemManager> itemUpdates =
                 CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-            List<ItemLocal> itemsToAdd = crudList.Item1;
-            List<ItemLocal> itemsToUpdate = crudList.Item2;
-            List<ItemLocal> itemsToDelete = crudList.Item3;
+            List<ItemLocal> itemsUpdated = new List<ItemLocal>();
 
-            if(itemsToAdd.Count > 0)
+            foreach (ItemManager itemToUpdate in itemUpdates)
             {
-                itemsUplodated.AddRange(itemsToAdd);
-            }
 
-            // si hay algun item que se actualizó, removemos la textura
-            // no importa si solo se cambio el nombre.
-            foreach (ItemLocal itemToUpdate in itemsToUpdate)
-            {
-                ItemLocal oldItemToUpdate =
-                     itemsLocalList.Find(i => i.Id.Equals(itemToUpdate.Id));
-
-                if (oldItemToUpdate != null)
+                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
                 {
-                    MyApplication.repository.RemoveTexture(oldItemToUpdate.Id);
-                    itemsUplodated.Add(itemToUpdate);
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    itemsUpdated.Add(itemLocal);
+                    CreateItem(itemLocal);
+                }
+                else if (itemToUpdate.IsFieldsUpdated)
+                {
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsUpdated.Add(itemLocal);
+                    CreateItem(itemLocal);
+                }
+                else if (itemToUpdate.IsImageUpdated)
+                {
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    itemsUpdated.Add(itemLocal);
+                    CreateItem(itemLocal);
+                }
+                else
+                {
+
+                    // Nuevo item añadido
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsUpdated.Add(itemLocal);
+                    CreateItem(itemLocal);
                 }
             }
 
-            foreach (ItemLocal itemToDelete in itemsToDelete)
-            {
-
-                ItemLocal oldItemToDelete =
-                    itemsLocalList.Find(i => i.Id.Equals(itemToDelete.Id));
-                if(oldItemToDelete != null)
-                {
-                    MyApplication.repository.RemoveTexture(oldItemToDelete.Id);
-                }
-            }
-
-            CreateItem(itemsUplodated);
             MyApplication.repository.SaveItemsLocal(itemsUplodated);
         }
         else
@@ -91,20 +91,17 @@ public class CreateItems : MonoBehaviour
         }
     }
 
-    private async void CreateItem(List<ItemLocal> items)
+    private async void CreateItem(ItemLocal item)
     {
-        if (item !=  null)
+        if (itemPrefab != null)
         {
-            foreach (ItemLocal itemLocal in items)
-            {
-                GameObject itemToCreate = Instantiate(item);
-                itemToCreate.name = itemLocal.Name;
-                await buildItem.AsignMaterialAsync(itemLocal.Id, itemToCreate, itemLocal.Path);
-            }
-        } else
+            GameObject itemToCreate = Instantiate(itemPrefab);
+            itemToCreate.name = item.Name;
+            await buildItem.AsignMaterialAsync(item.Id, itemToCreate, item.Path);
+        }
+        else
         {
             Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
         }
-        
     }
 }

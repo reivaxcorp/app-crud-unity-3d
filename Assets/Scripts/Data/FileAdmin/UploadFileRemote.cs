@@ -2,6 +2,7 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -20,18 +21,19 @@ public class UploadFileRemote
                 firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
             StorageReference userRef = storageRef.Child("users").Child("images").Child(folderUserUid).Child(fileName);
 
-            string imageId = Guid.NewGuid().ToString();
+            string imagenIdMetadata = Guid.NewGuid().ToString();
 
             var newMetadata = new MetadataChange
             {
                 CustomMetadata = new Dictionary<string, string> {
-                    {"id_image", imageId},
-                }
-            };
+                    {"id_image", imagenIdMetadata},
+                },
+                ContentType = "image/png"
+            };  
 
             // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
             // ContinueWithOnMainThread.
-            userRef.PutBytesAsync(fileBytes)
+            userRef.PutBytesAsync(fileBytes, newMetadata, null, CancellationToken.None)
                 .ContinueWithOnMainThread((Task<StorageMetadata> task) =>
                 {
                     if (task.IsFaulted || task.IsCanceled)
@@ -48,7 +50,7 @@ public class UploadFileRemote
                         Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
                         iResult.SetResultCrudUi(true, "Archivo subido correctamente!");
-                        iFileResult.FileUploaded(true, metadata.Path);
+                        iFileResult.FileUploaded(true, metadata.Path, imagenIdMetadata);
                     }
                 });
         }
