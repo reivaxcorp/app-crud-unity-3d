@@ -13,7 +13,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         this.remoteDb = remoteDb;
     }
 
-    public void DeleteItemById(ItemLocal itemLocal)
+    public void DeleteLocalItemById(ItemLocal itemLocal)
     {
         throw new System.NotImplementedException();
     }
@@ -33,22 +33,19 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         throw new System.NotImplementedException();
     }
 
-    public List<ItemLocal> GetItems()
+    public List<ItemLocal> GetLocalItems()
     {
-        return localDb.GetItems();
+        return localDb.GetLocalItems();
     }
 
-    public async Task<List<ItemRemote>> GetProductsRemoteAsync()
+    public async Task<List<ItemRemote>> GetItemsRemote()
     {
-        List<ItemRemote>  itemsRemote = await remoteDb.GetProductsRemoteAsync();
-      //  List<ItemLocal> itemsLocal = itemsRemote.ItemsRemoteToItemLocal();
-       // SaveItemsLocal(itemsLocal);
-        return await remoteDb.GetProductsRemoteAsync();
+         return await remoteDb.GetItemsRemote();
     }
 
-    public void SaveItemsLocal(List<ItemLocal> listItemsLocal)
+    public void SaveLocalItems(List<ItemLocal> listItemsLocal)
     {
-        localDb.SaveItemsLocal(listItemsLocal);
+        localDb.SaveLocalItems(listItemsLocal);
     }
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
@@ -56,7 +53,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemById(ItemLocal itemLocal)
+    public void UpdateLocalItemById(ItemLocal itemLocal)
     {
         throw new System.NotImplementedException();
     }
@@ -79,5 +76,15 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     public Texture2D LoadTextureAsPNG(string imageId)
     {
         throw new System.NotImplementedException();
+    }
+
+    public ItemLocal GetLocalItemById(string id)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void SaveLocalItem(ItemLocal itemLocal)
+    {
+        localDb.SaveLocalItem(itemLocal);
     }
 }

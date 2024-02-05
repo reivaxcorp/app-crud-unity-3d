@@ -36,10 +36,9 @@ public class CreateItems : MonoBehaviour
     private async void VerifyUpdates()
     {
 
-        List<ItemLocal> itemsLocalList = MyApplication.repository.GetItems();
-        List<ItemRemote> itemsRemoteList = await MyApplication.repository.GetProductsRemoteAsync();
-
-        List<ItemLocal> itemsUplodated = new List<ItemLocal>();
+        List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
+        List<ItemRemote> itemsRemoteList = await MyApplication.repository.GetItemsRemote();
+        List<ItemLocal> itemsUpdated = new List<ItemLocal>();
 
         if (itemsLocalList == null && itemsRemoteList == null) { return; }
 
@@ -48,7 +47,6 @@ public class CreateItems : MonoBehaviour
             List<ItemManager> itemUpdates =
                 CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-            List<ItemLocal> itemsUpdated = new List<ItemLocal>();
 
             foreach (ItemManager itemToUpdate in itemUpdates)
             {
@@ -82,13 +80,20 @@ public class CreateItems : MonoBehaviour
                     CreateItem(itemLocal);
                 }
             }
-
-            MyApplication.repository.SaveItemsLocal(itemsUplodated);
         }
         else
         {
-
+            // no hay items guardados en la base de datos local, asi que leemos los items remotos
+            foreach (ItemRemote itemRemote in itemsRemoteList)
+            {
+                // Nuevo item añadido
+                ItemLocal itemLocal = itemRemote.ItemRemoteToItemLocal();
+                itemsUpdated.Add(itemLocal);
+                CreateItem(itemLocal);
+            }
         }
+        MyApplication.repository.SaveLocalItems(itemsUpdated);
+
     }
 
     private async void CreateItem(ItemLocal item)

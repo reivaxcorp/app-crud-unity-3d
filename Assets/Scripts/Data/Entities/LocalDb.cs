@@ -8,7 +8,7 @@ public class LocalDb : IRepositoryLocal
 {
     private const string SAVE_FILE_NAME = "items.crud";
 
-    public void DeleteItemById(ItemLocal itemLocal)
+    public void DeleteLocalItemById(ItemLocal itemLocal)
     {
         throw new System.NotImplementedException();
     }
@@ -18,7 +18,12 @@ public class LocalDb : IRepositoryLocal
         throw new System.NotImplementedException();
     }
 
-    public List<ItemLocal> GetItems()
+    public ItemLocal GetLocalItemById(string id)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public List<ItemLocal> GetLocalItems()
     {
         string path = Application.persistentDataPath + "/" + SAVE_FILE_NAME;
 
@@ -33,12 +38,18 @@ public class LocalDb : IRepositoryLocal
         }
         else
         {
-            //  Debug.LogError("Save file not found in " + path);
-            return null;
+            return new List<ItemLocal>();
         }
     }
 
-    public void SaveItemsLocal(List<ItemLocal> listItemsLocal)
+    public void SaveLocalItem(ItemLocal itemLocal)
+    {
+        List<ItemLocal> currentLocalList = GetLocalItems();
+        currentLocalList.Add(itemLocal);
+        SaveLocalItems(currentLocalList);
+    }
+
+    public void SaveLocalItems(List<ItemLocal> listItemsLocal)
     {
         BinaryFormatter formatter = new BinaryFormatter();
         string path = Application.persistentDataPath + "/" + SAVE_FILE_NAME;
@@ -48,7 +59,7 @@ public class LocalDb : IRepositoryLocal
         stream.Close();
     }
 
-    public void UpdateItemById(ItemLocal itemLocal)
+    public void UpdateLocalItemById(ItemLocal itemLocal)
     {
         throw new System.NotImplementedException();
     }

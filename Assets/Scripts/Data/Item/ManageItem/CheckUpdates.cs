@@ -1,8 +1,6 @@
-
 using System.Collections.Generic;
-using UnityEngine;
  
-public class CheckUpdates : MonoBehaviour
+public class CheckUpdates
 {
 
     /// <summary>
@@ -88,8 +86,6 @@ public class CheckUpdates : MonoBehaviour
 
         return itemUpdates;
     }
-
-
 
     /// <summary>
     /// Si el producto cambio, necesitamos bajarlo de nuevo

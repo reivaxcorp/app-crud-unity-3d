@@ -1,30 +1,27 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine.SocialPlatforms.Impl;
-/// <summary>
-/// El item que salvaremos remotamente.
-/// </summary>
-public class ItemRemote 
+using System;
+
+public class ItemRemoteTest 
 {
-    public string Id {  get; set; }
+    public string Id { get; set; }
     public string Name { get; set; }
     public string Path { get; set; }
     public string ImageIdMetadata { get; set; }
     public long CreationDate { get; set; }
 
-    public ItemRemote()
+    public ItemRemoteTest()
     {
 
     }
 
-    public ItemRemote(string name, string path, string imageIdMetadata)
+    public ItemRemoteTest(string name, string path, string imageIdMetadata)
     {
         Name = name;
         Path = path;
         ImageIdMetadata = imageIdMetadata;
     }
 
-    public ItemRemote(string id, string name, string path, string imageIdMetadata, long creationDate)
+    public ItemRemoteTest(string id, string name, string path, string imageIdMetadata, long creationDate)
     {
         Id = id;
         Name = name;
@@ -32,8 +29,6 @@ public class ItemRemote
         ImageIdMetadata = imageIdMetadata;
         CreationDate = creationDate;
     }
-
-   
 
     public Dictionary<string, Object> ToDictionary()
     {

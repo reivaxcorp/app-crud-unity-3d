@@ -18,8 +18,11 @@ public class RemoteDb : IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
-    public async Task<List<ItemRemote>> GetProductsRemoteAsync()
+    public async Task<List<ItemRemote>> GetItemsRemote()
     {
+        // Procesa los datos del snapshot según sea necesario
+        List<ItemRemote> itemsList = new List<ItemRemote>();
+
         // Obtén el ID del usuario actual
         string userUid = FirebaseSDK.GetInstance().user.UserId;
 
@@ -34,9 +37,7 @@ public class RemoteDb : IRepositoryRemote
 
             if (snapshot.Exists)
             {
-                // Procesa los datos del snapshot según sea necesario
-                List<ItemRemote> itemsList = new List<ItemRemote>();
-
+        
                 foreach (DataSnapshot itemSnapshot in snapshot.Children)
                 {
                     // Convierte los datos del snapshot en una instancia de ItemRemote
@@ -56,13 +57,13 @@ public class RemoteDb : IRepositoryRemote
             else
             {
                 Debug.Log("No hay datos en la ubicación especificada.");
-                return null;
+                return itemsList;
             }
         }
         catch (Exception e)
         {
             Debug.LogError("Error al obtener items: " + e.Message);
-            return null;
+            return itemsList;
         }
     }
 

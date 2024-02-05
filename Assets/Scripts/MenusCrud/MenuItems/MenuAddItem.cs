@@ -10,7 +10,6 @@ public class MenuAddItem : MenuCrud, IResultFile
     {
         if(isFileUploaded)
         {
-            ItemRemote itemRemote = new ItemRemote();
             WriteDocument(pathReference, imagenIdMetadata);
         }
     }
