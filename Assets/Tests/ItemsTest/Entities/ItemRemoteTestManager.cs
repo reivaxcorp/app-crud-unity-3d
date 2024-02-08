@@ -11,23 +11,37 @@ public class ItemRemoteTestManager
         itemRemoteList = new List<ItemRemoteTest>();
     }
 
-    public async Task<List<ItemRemoteTest>> GetItemsRemote()
+    public  List<ItemRemoteTest> GetItemsRemote()
     {
-        await Task.Delay(1000); // Espera 1 segundos 
         return itemRemoteList;
     }
 
-    public async void SaveItemRemote(ItemRemoteTest itemRemote)
+    public ItemRemoteTest GetItemRemoteById(string id)
     {
-        await Task.Delay(1000); // fake delay
-        itemRemoteList.Add(itemRemote);
+        return itemRemoteList.Find(item => item.Id.Equals(id));
     }
 
-    public async void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
+    public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
     {
-        await Task.Delay(1000); // fake delay
         itemRemoteList.Add(itemRemote);
         resultUi.SetResultCrudUi(true, "Ítem guardado");
+    }
+
+    public void DeleteItemRemote(ItemRemoteTest itemRemote)
+    {
+        int existingIndex = itemRemoteList.FindIndex(x => x.Id == itemRemote.Id);
+
+        if (existingIndex != -1)
+        {
+            // Si el item existe, eliminarlo de la lista
+            itemRemoteList.RemoveAt(existingIndex);
+        }
+       
+    }
+
+    public void ClearAllData()
+    {
+        itemRemoteList?.Clear();
     }
 
     public static ItemRemoteTestManager GetInstance()
@@ -38,4 +52,5 @@ public class ItemRemoteTestManager
         }
         return instance;
     }
+
 }

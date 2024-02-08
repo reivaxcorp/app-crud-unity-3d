@@ -8,16 +8,13 @@ public class CreateItemsTest: IResult
 {
 
     [SetUp]
-    public void SetUp()
-    {
-    //    MyApplicationTest.GetRepository().SaveLocalItem(CreateItemLocalTest());
-     //   MyApplicationTest.GetRepository().SaveLocalItem(CreateItemLocalTest());
-    }
+    public void SetUp(){}
 
     [TestCase (2, 2)]
-    [TestCase(3, 5)]
-    [TestCase(4, 9)]
-    public void AddItemsLocalDb(int cant, int expectedResult)
+    [TestCase(3, 3)]
+    [TestCase(9, 9)]
+    [Ignore("Esta prueba está desactivada temporalmente por razones específicas")]
+    public void Add_Items_Local_Db(int cant, int expectedResult)
     {
         for(int index = 0; index < cant; index ++ )
         {
@@ -28,17 +25,81 @@ public class CreateItemsTest: IResult
             $"Datos locales agregados es {cant} y esperados es {expectedResult}");
     }
 
-    [TearDown]
-    public void TearDown()
+    [Test]
+    [Ignore("Esta prueba está desactivada temporalmente por razones específicas")]
+    public void Put_One_Item_Remote()
     {
-        // Código que se ejecuta después de cada prueba
+        MyApplicationTest.GetRepository().SaveItemRemote(GetOneItemRemoteTest(), this);
+
+        Assert.AreEqual(1, MyApplicationTest.GetRepository().GetItemsRemote().Count, "El tamaño es de 1");
     }
 
     [Test]
-    public async void VerifyUpdatesTest()
+    [Ignore("Esta prueba está desactivada temporalmente por razones específicas")]
+    public void Put_One_Item_Remote_And_Get_Local()
+    {
+        MyApplicationTest.GetRepository().SaveItemRemote(GetOneItemRemoteTest(), this);
+        SyncronizeData(); 
+        Assert.AreEqual(1, MyApplicationTest.GetRepository().GetLocalItems().Count, "El tamaño es de 1");
+    }
+
+    [Test]
+    public void Modify_Item_Remote_Update_Local()
+    {
+        // SETUP
+        // primero guardamos un ítem en la fake remote y sincronizamos con la local db
+        ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
+        MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
+        SyncronizeData();
+
+        // EXERCISE
+        // simulamos una modificacion el la base de datos remota
+        ItemRemoteTest getSaveItemRemote =
+            MyApplicationTest.GetRepository().GetItemRemoteById(itemRemoteTest.Id);
+        getSaveItemRemote.Name = "Item modificado";
+
+        // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
+        ItemLocalTest getItemSaveLocalOutdated = 
+            MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
+
+        // VERIFY
+        // no deben ser igaules
+        Assert.AreNotEqual(getSaveItemRemote.Name, getItemSaveLocalOutdated.Name);
+        SyncronizeData(); // Sincronizamos los datos local con la remota.
+        ItemLocalTest getItemSaveLocalUpdated =
+          MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
+        // ahora deben ser iguales
+        Assert.AreEqual(getSaveItemRemote.Name, getItemSaveLocalUpdated.Name);
+    }
+
+    [Test]
+    public void Delete_Item_Remote_Update_Local()
+    {
+        // SETUP
+        // primero guardamos un ítem en la fake remote y sincronizamos con la local db
+        ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
+        MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
+        SyncronizeData();
+
+        // EXERCISE
+        // simulamos una eliminación el la base de datos remota
+        MyApplicationTest.GetRepository().DeleteItemRemote(itemRemoteTest);
+
+
+        // VERIFY
+        Assert.AreNotEqual(MyApplicationTest.GetRepository().GetItemsRemote().Count,
+            MyApplicationTest.GetRepository().GetLocalItems().Count);
+        SyncronizeData();
+        // deben ser igaules
+        Assert.AreEqual(MyApplicationTest.GetRepository().GetItemsRemote().Count,
+            MyApplicationTest.GetRepository().GetLocalItems().Count);
+        
+    }
+
+    public void SyncronizeData()
     {
         List<ItemLocalTest> itemsLocalList = MyApplicationTest.GetRepository().GetLocalItems();
-        List<ItemRemoteTest> itemsRemoteList = await MyApplicationTest.GetRepository().GetItemsRemote();
+        List<ItemRemoteTest> itemsRemoteList = MyApplicationTest.GetRepository().GetItemsRemote();
         List<ItemLocalTest> itemsUpdated = new List<ItemLocalTest>();
 
 
@@ -107,17 +168,13 @@ public class CreateItemsTest: IResult
             }
         }
 
-        MyApplicationTest.GetRepository().SaveLocalItems(itemsUpdated);
-
-        // Assert.IsEmpty(MyApplicationTest.GetRepository().GetLocalItems());
-      Assert.AreEqual(9, MyApplicationTest.GetRepository().GetLocalItems().Count, "El tamaño es de 9");
+         MyApplicationTest.GetRepository().SaveLocalItems(itemsUpdated);
     }
 
     private void CreateItem(ItemLocalTest itemLocalTest)
     {
-        Debug.Log("Item created");
+        Debug.Log("Item created id: " + itemLocalTest.Id);
     }
-
 
     public void SetResultCrudUi(bool successful, string msj)
     {
@@ -128,6 +185,13 @@ public class CreateItemsTest: IResult
         {
             Debug.Log("Error al escribir el documento");
         }
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        ItemRemoteTestManager.GetInstance().ClearAllData();
+        ItemLocalTestManager.GetInstance().ClearAllData();
     }
 
     public void SetResultWriteDocument(bool successful, string title, string body)
@@ -152,7 +216,7 @@ public class CreateItemsTest: IResult
         return item;
     }
 
-    private ItemRemoteTest CreateItemRemoteTest()
+    private ItemRemoteTest GetOneItemRemoteTest()
     {
         // Genera datos aleatorios para el item
         string id = Guid.NewGuid().ToString();

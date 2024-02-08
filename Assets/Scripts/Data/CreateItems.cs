@@ -28,12 +28,12 @@ public class CreateItems : MonoBehaviour
             if (FirebaseSDK.GetInstance().isFirebaseReady && MyApplication.repository != null)
             {
                 readDataFirebase = false;
-                VerifyUpdates();
+                SyncronizeData();
             }
         }
     }
 
-    private async void VerifyUpdates()
+    private async void SyncronizeData()
     {
 
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();

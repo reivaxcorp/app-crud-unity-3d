@@ -18,7 +18,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         throw new System.NotImplementedException();
     }
 
-    public void DeleteItemRemoteById(ItemRemote itemLocal)
+    public void DeleteItemRemote(ItemRemote itemLocal)
     {
         throw new System.NotImplementedException();
     }

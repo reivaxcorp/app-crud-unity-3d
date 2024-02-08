@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 public class RemoteDbTest : IRepositoryRemoteTest
 {
 
-    public void DeleteItemRemoteById(ItemRemoteTest itemLocal)
+    public void DeleteItemRemote(ItemRemoteTest itemRemote)
     {
-        throw new System.NotImplementedException();
+        ItemRemoteTestManager.GetInstance().DeleteItemRemote(itemRemote);
     }
 
     public ItemRemoteTest GetItemRemoteById(string id)
     {
-        throw new System.NotImplementedException();
+        return ItemRemoteTestManager.GetInstance().GetItemRemoteById(id);
     }
 
-    public async Task<List<ItemRemoteTest>> GetItemsRemote()
+    public  List<ItemRemoteTest> GetItemsRemote()
     {
-        return await ItemRemoteTestManager.GetInstance().GetItemsRemote();
+        return ItemRemoteTestManager.GetInstance().GetItemsRemote();
     }
 
     public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)

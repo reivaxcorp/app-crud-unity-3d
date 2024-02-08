@@ -19,9 +19,9 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         throw new System.NotImplementedException();
     }
 
-    public void DeleteItemRemoteById(ItemRemoteTest itemRemote)
+    public void DeleteItemRemote(ItemRemoteTest itemRemote)
     {
-        throw new System.NotImplementedException();
+        remoteDb.DeleteItemRemote(itemRemote);
     }
 
     public ItemLocalTest GetLocalItemById(string id)
@@ -31,7 +31,7 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
 
     public ItemRemoteTest GetItemRemoteById(string id)
     {
-        throw new System.NotImplementedException();
+        return remoteDb.GetItemRemoteById(id);
     }
 
     public List<ItemLocalTest> GetLocalItems()
@@ -39,9 +39,9 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         return localDb.GetLocalItems();
     }
 
-    public async Task<List<ItemRemoteTest>> GetItemsRemote()
+    public  List<ItemRemoteTest> GetItemsRemote()
     {
-        return await remoteDb.GetItemsRemote();
+        return remoteDb.GetItemsRemote();
     }
 
     public Texture2D LoadTextureAsPNG(string imageId)
@@ -51,7 +51,7 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
 
     public void RemoveTexture(string imageId)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Texure remove id: " + imageId);
     }
 
     public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)

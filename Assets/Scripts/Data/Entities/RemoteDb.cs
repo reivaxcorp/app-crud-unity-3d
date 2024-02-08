@@ -8,7 +8,7 @@ using UnityEngine;
 public class RemoteDb : IRepositoryRemote
 {
 
-    public void DeleteItemRemoteById(ItemRemote itemLocal)
+    public void DeleteItemRemote(ItemRemote itemLocal)
     {
         throw new System.NotImplementedException();
     }
