@@ -8,7 +8,7 @@ public class LocalDb : IRepositoryLocal
 {
     private const string SAVE_FILE_NAME = "items.crud";
 
-    public void DeleteLocalItemById(ItemLocal itemLocal)
+    public void DeleteLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }
@@ -59,7 +59,7 @@ public class LocalDb : IRepositoryLocal
         stream.Close();
     }
 
-    public void UpdateLocalItemById(ItemLocal itemLocal)
+    public void UpdateLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }

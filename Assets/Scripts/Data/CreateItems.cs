@@ -35,65 +35,57 @@ public class CreateItems : MonoBehaviour
 
     private async void SyncronizeData()
     {
-
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
-        List<ItemRemote> itemsRemoteList = await MyApplication.repository.GetItemsRemote();
+        List<ItemRemote> itemsRemoteList = await  MyApplication.repository.GetItemsRemote();
         List<ItemLocal> itemsUpdated = new List<ItemLocal>();
 
-        if (itemsLocalList == null && itemsRemoteList == null) { return; }
+        List<ItemManager> itemListUpdates =
+            CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-        if (itemsLocalList != null)
+
+        foreach (ItemManager itemToUpdate in itemListUpdates)
         {
-            List<ItemManager> itemUpdates =
-                CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
-
-
-            foreach (ItemManager itemToUpdate in itemUpdates)
+            if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
             {
-
-                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
-                {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else if (itemToUpdate.IsFieldsUpdated)
-                {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else if (itemToUpdate.IsImageUpdated)
-                {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else
-                {
-
-                    // Nuevo item añadido
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
+                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                itemsUpdated.Add(itemLocal);
+                CreateItem(itemLocal);
             }
-        }
-        else
-        {
-            // no hay items guardados en la base de datos local, asi que leemos los items remotos
-            foreach (ItemRemote itemRemote in itemsRemoteList)
+            else if (itemToUpdate.IsFieldsUpdated)
+            {
+                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                itemsUpdated.Add(itemLocal);
+                CreateItem(itemLocal);
+            }
+            else if (itemToUpdate.IsImageUpdated)
+            {
+                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                itemsUpdated.Add(itemLocal);
+                CreateItem(itemLocal);
+            }
+            else if (itemToUpdate.IsRemove)
+            {
+                MyApplication.repository.DeleteLocalItemById(itemToUpdate.Id);
+            }
+            else if (itemToUpdate.IsAdd)
             {
                 // Nuevo item añadido
-                ItemLocal itemLocal = itemRemote.ItemRemoteToItemLocal();
+                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                itemsUpdated.Add(itemLocal);
+                CreateItem(itemLocal);
+            }
+            else
+            {
+                // sin cambios el ítem local con el ítem remoto
+                ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
                 itemsUpdated.Add(itemLocal);
                 CreateItem(itemLocal);
             }
         }
-        MyApplication.repository.SaveLocalItems(itemsUpdated);
 
+        MyApplication.repository.SaveLocalItems(itemsUpdated);
     }
 
     private async void CreateItem(ItemLocal item)

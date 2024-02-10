@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CheckUpdatesTest 
+public class CheckUpdatesTest
 {
     /// <summary>
     /// Verificamos los valores a actualizar y eliminar y aniadir, de la base de datos local
@@ -19,6 +19,7 @@ public class CheckUpdatesTest
     {
         List<ItemManagerTest> itemUpdates = new List<ItemManagerTest>();
 
+        // Comprobar si hay que sincronizar algún ítem local con el ítem remoto.
         foreach (ItemLocalTest itemLocal in itemsLocalList)
         {
 
@@ -66,9 +67,19 @@ public class CheckUpdatesTest
                 isRemove: false,
                 isAdd: false));
             }
+            else
+            {
+                // sin cambios  el ítem como está.
+                itemUpdates.Add(new ItemManagerTest(
+                id: itemLocal.Id,
+                isImageUpdated: false,
+                isFieldsUpdated: false,
+                isRemove: false,
+                isAdd: false));
+            }
         }
 
-        // Nuevos items a añadir
+        // Comprobar si hay nuevos items a añadir.
         foreach (ItemRemoteTest itemRemote in itemsRemoteList)
         {
             ItemLocalTest itemToSaveLocal =

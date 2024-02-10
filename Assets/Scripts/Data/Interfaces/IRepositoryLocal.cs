@@ -6,6 +6,6 @@ public interface IRepositoryLocal
     ItemLocal GetLocalItemById(string id);
     void SaveLocalItem(ItemLocal itemLocal);
     void SaveLocalItems(List<ItemLocal> listItemsLocal);
-    void UpdateLocalItemById(ItemLocal itemLocal);
-    void DeleteLocalItemById(ItemLocal itemLocal);
+    void UpdateLocalItemById(string id);
+    void DeleteLocalItemById(string id);
 }

@@ -13,12 +13,12 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         this.remoteDb = remoteDb;
     }
 
-    public void DeleteLocalItemById(ItemLocal itemLocal)
+    public void DeleteLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }
 
-    public void DeleteItemRemote(ItemRemote itemLocal)
+    public void DeleteItemRemoteById(string id)
     {
         throw new System.NotImplementedException();
     }
@@ -53,12 +53,12 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateLocalItemById(ItemLocal itemLocal)
+    public void UpdateLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }
 
-    public void UpdateItemRemoteById(ItemRemote itemLocal)
+    public void UpdateItemRemoteById(string id)
     {
         throw new System.NotImplementedException();
     }

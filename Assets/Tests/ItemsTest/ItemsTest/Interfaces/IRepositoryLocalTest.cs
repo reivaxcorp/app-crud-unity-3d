@@ -8,6 +8,6 @@ public interface IRepositoryLocalTest
     ItemLocalTest GetLocalItemById(string id);
     void SaveLocalItem(ItemLocalTest itemLocal);
     void SaveLocalItems(List<ItemLocalTest> listItemsLocal);
-    void UpdateLocalItemById(ItemLocalTest itemLocal);
-    void DeleteLocalItemById(ItemLocalTest itemLocal);
+    void UpdateLocalItemById(string id);
+    void DeleteLocalItemById(string id);
 }

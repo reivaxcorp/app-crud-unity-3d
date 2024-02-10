@@ -35,6 +35,18 @@ public class ItemLocalTestManager
         }
     }
 
+    public void DeleteItemLocalById(string id)
+    {
+        // Buscar si el item ya existe en la lista
+        int existingIndex = itemLocalList.FindIndex(x => x.Id == id);
+
+        if (existingIndex != -1)
+        {
+            // Si el item existe, eliminarlo de la lista
+            itemLocalList.RemoveAt(existingIndex);
+        }
+    }
+
     public void SaveItemsLocalList(List<ItemLocalTest> items)
     {
         itemLocalList.Clear(); // En la real, sobreescribimos el archivo.

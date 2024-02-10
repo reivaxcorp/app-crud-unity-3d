@@ -27,16 +27,15 @@ public class ItemRemoteTestManager
         resultUi.SetResultCrudUi(true, "Ítem guardado");
     }
 
-    public void DeleteItemRemote(ItemRemoteTest itemRemote)
+    public void DeleteItemRemoteById(string id)
     {
-        int existingIndex = itemRemoteList.FindIndex(x => x.Id == itemRemote.Id);
+        int existingIndex = itemRemoteList.FindIndex(x => x.Id == id);
 
         if (existingIndex != -1)
         {
             // Si el item existe, eliminarlo de la lista
             itemRemoteList.RemoveAt(existingIndex);
         }
-       
     }
 
     public void ClearAllData()

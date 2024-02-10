@@ -4,9 +4,9 @@ public class LocalDbTest : IRepositoryLocalTest
 {
     private const string SAVE_FILE_NAME = "items.crud";
    
-    public void DeleteLocalItemById(ItemLocalTest itemLocal)
+    public void DeleteLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        ItemLocalTestManager.GetInstance().DeleteItemLocalById(id);
     }
 
     public ItemLocalTest GetLocalItemById(string id)
@@ -29,7 +29,7 @@ public class LocalDbTest : IRepositoryLocalTest
         ItemLocalTestManager.GetInstance().SaveItemsLocalList(listItemsLocal);
     }
 
-    public void UpdateLocalItemById(ItemLocalTest itemLocal)
+    public void UpdateLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 public class RemoteDbTest : IRepositoryRemoteTest
 {
 
-    public void DeleteItemRemote(ItemRemoteTest itemRemote)
+    public void DeleteItemRemoteById(string id)
     {
-        ItemRemoteTestManager.GetInstance().DeleteItemRemote(itemRemote);
+        ItemRemoteTestManager.GetInstance().DeleteItemRemoteById(id);
     }
 
     public ItemRemoteTest GetItemRemoteById(string id)
@@ -24,7 +24,7 @@ public class RemoteDbTest : IRepositoryRemoteTest
          ItemRemoteTestManager.GetInstance().SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemRemoteById(ItemRemoteTest itemRemote)
+    public void UpdateItemRemoteById(string id)
     {
         throw new System.NotImplementedException();
     }

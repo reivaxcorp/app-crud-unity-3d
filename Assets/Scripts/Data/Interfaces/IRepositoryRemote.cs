@@ -5,6 +5,6 @@ public interface IRepositoryRemote {
     Task<List<ItemRemote>> GetItemsRemote();
     ItemRemote GetItemRemoteById(string id);
     void SaveItemRemote(ItemRemote itemRemote, IResult resultUi);
-    void UpdateItemRemoteById(ItemRemote itemRemote);
-    void DeleteItemRemote(ItemRemote itemRemote);
+    void UpdateItemRemoteById(string id);
+    void DeleteItemRemoteById(string id);
 }

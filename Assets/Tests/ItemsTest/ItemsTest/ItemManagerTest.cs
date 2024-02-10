@@ -7,9 +7,6 @@ public class ItemManagerTest
     public bool IsAdd;
     public bool IsImageUpdated { get; private set; }
     public bool IsFieldsUpdated { get; private set; }
-    public List<ItemLocalTest> itemsToAdd { get; private set; }
-    public List<ItemLocalTest> itemsToRemove { get; private set; }
-
 
     public ItemManagerTest(string id, bool isImageUpdated, bool isFieldsUpdated, bool isRemove, bool isAdd)
     {

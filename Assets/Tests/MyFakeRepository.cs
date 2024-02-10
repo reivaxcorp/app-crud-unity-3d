@@ -14,14 +14,14 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         this.remoteDb = remoteDb;
     }
 
-    public void DeleteLocalItemById(ItemLocalTest itemLocal)
+    public void DeleteLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        localDb.DeleteLocalItemById(id);
     }
 
-    public void DeleteItemRemote(ItemRemoteTest itemRemote)
+    public void DeleteItemRemoteById(string id)
     {
-        remoteDb.DeleteItemRemote(itemRemote);
+        remoteDb.DeleteItemRemoteById(id);
     }
 
     public ItemLocalTest GetLocalItemById(string id)
@@ -69,12 +69,12 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         throw new System.NotImplementedException();
     }
 
-    public void UpdateLocalItemById(ItemLocalTest itemLocal)
+    public void UpdateLocalItemById(string id)
     {
         throw new System.NotImplementedException();
     }
 
-    public void UpdateItemRemoteById(ItemRemoteTest itemRemote)
+    public void UpdateItemRemoteById(string id)
     {
         throw new System.NotImplementedException();
     }
