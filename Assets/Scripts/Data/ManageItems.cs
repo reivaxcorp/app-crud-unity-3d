@@ -9,6 +9,8 @@ public class ManageItems : MonoBehaviour
 
     [SerializeField]
     private GameObject itemPrefab;
+    [SerializeField]
+    private GameObject myItemsOrdered;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
 
@@ -105,6 +107,7 @@ public class ManageItems : MonoBehaviour
         // Esperar a que todas las tareas se completen
         await Task.WhenAll(tasks);
 
+        myItemsOrdered.GetComponent<MyItemsOrder>().OrderItemPositionInScene(itemsLocalList);
         MyApplication.repository.SaveLocalItems(itemsToSave);
 
     }
