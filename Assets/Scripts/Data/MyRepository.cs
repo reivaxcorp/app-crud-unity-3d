@@ -5,17 +5,22 @@ using UnityEngine;
 public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLocalSaved
 {
     private readonly IRepositoryLocal localDb;
-    private readonly IRepositoryRemote remoteDb;
+
+    private IRepositoryRemote remoteDb;
+
+    private TextureManager textureManager;
 
     public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb)
     {
+        this.textureManager = new TextureManager();
         this.localDb = localDb;
         this.remoteDb = remoteDb;
     }
 
     public void DeleteLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        textureManager.RemoveTexture(id);
+        localDb.DeleteLocalItemById(id);
     }
 
     public void DeleteItemRemoteById(string id)
@@ -65,17 +70,17 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
 
     public void SaveTextureAsPNG(Texture2D textureToSave, string imageId)
     {
-        throw new System.NotImplementedException();
+        textureManager.SaveTextureAsPNG(textureToSave, imageId);
     }
 
     public void RemoveTexture(string imageId)
     {
-        throw new System.NotImplementedException();
+        textureManager.RemoveTexture(imageId);
     }
 
     public Texture2D LoadTextureAsPNG(string imageId)
     {
-        throw new System.NotImplementedException();
+        return textureManager.LoadTextureAsPNG(imageId);
     }
 
     public ItemLocal GetLocalItemById(string id)
@@ -86,5 +91,10 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     public void SaveLocalItem(ItemLocal itemLocal)
     {
         localDb.SaveLocalItem(itemLocal);
+    }
+
+    public RemoteDb GetRemoteDb()
+    {
+        return remoteDb as RemoteDb;
     }
 }

@@ -13,14 +13,14 @@ public class BuildItem: MonoBehaviour
         return MyApplication.repository.LoadTextureAsPNG(idProduct);
     }
 
-    public async Task AsignMaterialAsync(string idProduct, GameObject gameObject, string uri)
+    public async Task AsignMaterialAsync(string idProduct, string uri, GameObject gameObject)
     {
-        ManageMaterialRemote createMaterial = new ManageMaterialRemote(uri);
 
         Texture2D texture2D = GetSavedTexture(idProduct);
 
         if(texture2D == null)
         {
+            ManageMaterialRemote createMaterial = new ManageMaterialRemote(uri);
             texture2D = await createMaterial.DownloadImage();
             MyApplication.repository.SaveTextureAsPNG(texture2D, idProduct);
         }

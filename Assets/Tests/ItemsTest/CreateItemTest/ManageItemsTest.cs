@@ -1,10 +1,12 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [TestFixture]
-public class CreateItemsTest : IResult
+public class ManageItemsTest : IResult
 {
 
     [SetUp]
@@ -146,6 +148,10 @@ public class CreateItemsTest : IResult
         // simulamos una modificacion el la base de datos remota
         ItemRemoteTest getSaveItemRemote =
             MyApplicationTest.GetRepository().GetItemRemoteById(itemRemoteTest.Id);
+        if(getSaveItemRemote == null)
+        {
+            Debug.Log("null");
+        }
         getSaveItemRemote.Name = "Item modificado";
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
@@ -186,66 +192,76 @@ public class CreateItemsTest : IResult
 
     }
 
-    public void SyncronizeData()
+    public async void SyncronizeData()
     {
         List<ItemLocalTest> itemsLocalList = MyApplicationTest.GetRepository().GetLocalItems();
         List<ItemRemoteTest> itemsRemoteList = MyApplicationTest.GetRepository().GetItemsRemote();
         List<ItemLocalTest> itemsUpdated = new List<ItemLocalTest>();
+        List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
-            List<ItemManagerTest> itemListUpdates =
+        List<ItemManagerTest> itemListUpdates =
                 CheckUpdatesTest.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
 
-            foreach (ItemManagerTest itemToUpdate in itemListUpdates)
+        foreach (ItemManagerTest itemToUpdate in itemListUpdates)
+        {
+            Task task = Task.CompletedTask; // Inicializar una tarea completada
+
+            if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
             {
-
-                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
-                {
-                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else if (itemToUpdate.IsFieldsUpdated)
-                {
-                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else if (itemToUpdate.IsImageUpdated)
-                {
-                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else if (itemToUpdate.IsRemove)
-                {
-                    MyApplicationTest.GetRepository().DeleteLocalItemById(itemToUpdate.Id);
-                }
-                else if (itemToUpdate.IsAdd)
-                {
-                    // Nuevo item añadido
-                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-                else
-                {
-                    // sin cambios el ítem local con el ítem remoto
-                    ItemLocalTest itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
-                    itemsUpdated.Add(itemLocal);
-                    CreateItem(itemLocal);
-                }
-
+                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
+                itemsUpdated.Add(itemLocal);
+                task = CreateItem(itemLocal);
             }
+            else if (itemToUpdate.IsFieldsUpdated)
+            {
+                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                itemsUpdated.Add(itemLocal);
+                task = CreateItem(itemLocal);
+            }
+            else if (itemToUpdate.IsImageUpdated)
+            {
+                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
+                itemsUpdated.Add(itemLocal);
+                task = CreateItem(itemLocal);
+            }
+            else if (itemToUpdate.IsRemove)
+            {
+                MyApplicationTest.GetRepository().DeleteLocalItemById(itemToUpdate.Id);
+            }
+            else if (itemToUpdate.IsAdd)
+            {
+                // Nuevo item añadido
+                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                itemsUpdated.Add(itemLocal);
+                task = CreateItem(itemLocal);
+            }
+            else
+            {
+                // sin cambios el ítem local con el ítem remoto
+                ItemLocalTest itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                itemsUpdated.Add(itemLocal);
+                task = CreateItem(itemLocal);
+            }
+            tasks.Add(task); // Agregar la tarea a la lista de tareas
+        }
+
+        // Esperar a que todas las tareas se completen
+        await Task.WhenAll(tasks);
 
         MyApplicationTest.GetRepository().SaveLocalItems(itemsUpdated);
+
     }
 
-    private void CreateItem(ItemLocalTest itemLocalTest)
+    // Metodos await no funciona en Test,
+    // asi que lo omitimos y lo dejamos lo mas parecido a la implementacion final
+    private async Task<bool> CreateItem(ItemLocalTest itemLocalTest)
     {
+        //await Task.Delay(500); 
         Debug.Log("Item created id: " + itemLocalTest.Id);
+        return true;
     }
 
     public void SetResultCrudUi(bool successful, string msj)

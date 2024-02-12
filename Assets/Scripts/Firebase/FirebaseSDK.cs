@@ -1,6 +1,7 @@
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 using Firebase.Storage;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -54,7 +55,7 @@ public class FirebaseSDK
     public async Task<bool> InitFirebaseDependenciesAsync()
     {
 
-        await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             var dependencyStatus = task.Result;
 
@@ -66,19 +67,18 @@ public class FirebaseSDK
                 this.app = Firebase.FirebaseApp.DefaultInstance; // PRODUCTION MODE
 
                 // Set a flag here to indicate whether Firebase is ready to use by your app.
-
-                this.db = FirebaseDatabase.GetInstance(app);
+                this.db = FirebaseDatabase.DefaultInstance;
 
                 this.firebaseStorage = FirebaseStorage.DefaultInstance;
 
                 this.auth = FirebaseAuth.DefaultInstance;
-                this.auth.StateChanged += AuthStateChanged;
-                AuthStateChanged(this, null);
                 this.user = auth.CurrentUser;
 
-                // Now you can get access to collection docs.
-                // ....
+                this.auth.StateChanged += AuthStateChanged;
+
                 isFirebaseReady = true;
+
+                AuthStateChanged(this, null);
             }
             else
             {

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
- 
+
 public class CheckUpdates
 {
 
@@ -57,14 +57,23 @@ public class CheckUpdates
             // Se ha cambiado la imagén
             else if (IsImageUpdated(itemSavedLocal, itemLocal))
             {
-
-               itemUpdates.Add(new ItemManager(
-               id: itemLocal.Id,
-               isImageUpdated: true,
-               isFieldsUpdated: false,
-               isRemove: false,
-               isAdd: false));
-            } 
+                itemUpdates.Add(new ItemManager(
+                id: itemLocal.Id,
+                isImageUpdated: true,
+                isFieldsUpdated: false,
+                isRemove: false,
+                isAdd: false));
+            }
+            else
+            {
+                // sin cambios  el ítem como está.
+                itemUpdates.Add(new ItemManager(
+                id: itemLocal.Id,
+                isImageUpdated: false,
+                isFieldsUpdated: false,
+                isRemove: false,
+                isAdd: false));
+            }
         }
 
         // Nuevos items a añadir

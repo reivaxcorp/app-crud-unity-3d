@@ -3330,6 +3330,7 @@ MonoBehaviour:
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
+  createItems: {fileID: 1651622796}
   menuImagePreview: {fileID: 1429457105}
   resultMsj: {fileID: 732092310}
   inputFieldName: {fileID: 1669579673}
@@ -3981,12 +3982,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1651622791}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cfcf1b29361a54d40925c20387393dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 0}
+  waitToFirebaseInitialized: 0
+  itemPrefab: {fileID: 8836757418628724814, guid: 5f1190899dc1f544e9b5f540253355e8, type: 3}
 --- !u!1 &1669579671
 GameObject:
   m_ObjectHideFlags: 0
@@ -4449,7 +4451,7 @@ GameObject:
   - component: {fileID: 1889203353}
   - component: {fileID: 1889203354}
   m_Layer: 0
-  m_Name: MenuApp
+  m_Name: UiApp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

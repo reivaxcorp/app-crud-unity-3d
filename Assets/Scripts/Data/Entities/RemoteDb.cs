@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class RemoteDb : IRepositoryRemote
 {
+    public delegate void OnHandleValueChangedCallBack(List<ItemRemote> itemsRemoteList);
+    public event OnHandleValueChangedCallBack handleValueResult;
 
     public void DeleteItemRemoteById(string id)
     {
@@ -18,53 +20,88 @@ public class RemoteDb : IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
+
+    public void FirebaseValueChanged()
+    {
+        string userUid = FirebaseSDK.GetInstance().user.UserId;
+
+        FirebaseSDK.GetInstance().db
+               .GetReference("users")
+               .Child("items")
+               .Child(userUid)
+         .ValueChanged += HandleValueChanged;
+    }
+
+    void HandleValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+        // Do something with the data in args.Snapshot
+
+        List<ItemRemote> itemsRemoteList = new List<ItemRemote>();
+
+        foreach (DataSnapshot itemSnapshot in args.Snapshot.Children)
+        {
+            // Convierte los datos del snapshot en una instancia de ItemRemote
+            ItemRemote item = new ItemRemote(
+                id: itemSnapshot.Child("id").GetValue(true).ToString(),
+                name: itemSnapshot.Child("name").GetValue(true).ToString(),
+                path: itemSnapshot.Child("path").GetValue(true).ToString(),
+                imageIdMetadata: itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
+                creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
+
+            itemsRemoteList.Add(item);
+        }
+        handleValueResult?.Invoke(itemsRemoteList);
+    }
+
     public async Task<List<ItemRemote>> GetItemsRemote()
     {
-        // Procesa los datos del snapshot según sea necesario
-        List<ItemRemote> itemsList = new List<ItemRemote>();
+      
+        // Crear un objeto TaskCompletionSource para controlar la finalización de la tarea
+        var tcs = new TaskCompletionSource<List<ItemRemote>>();
 
         // Obtén el ID del usuario actual
         string userUid = FirebaseSDK.GetInstance().user.UserId;
-
+     
         // Obtén la referencia a la ubicación de los items para el usuario actual
-        DatabaseReference userItemsReference = FirebaseSDK.GetInstance().db.RootReference
-            .Child("users").Child("items").Child(userUid);
+        await FirebaseSDK.GetInstance().db
+            .GetReference("users")
+            .Child("items")
+            .Child(userUid).GetValueAsync().ContinueWithOnMainThread(task => {
 
-        try
-        {
-            // Realiza la operación de obtención de datos de Firebase
-            DataSnapshot snapshot = await userItemsReference.GetValueAsync();
-
-            if (snapshot.Exists)
-            {
-        
-                foreach (DataSnapshot itemSnapshot in snapshot.Children)
+                if (task.IsFaulted)
                 {
-                    // Convierte los datos del snapshot en una instancia de ItemRemote
-                    ItemRemote item = new ItemRemote
-                    {
-                        Id = itemSnapshot.Child("id").GetValue(true).ToString(),
-                        Name = itemSnapshot.Child("name").GetValue(true).ToString(),
-                        Path = itemSnapshot.Child("path").GetValue(true).ToString(),
-                        CreationDate = long.Parse(itemSnapshot.Child("timestamp").GetValue(true).ToString())
-                    };
-
-                    itemsList.Add(item);
+                    // Handle the error...
+                    tcs.SetException(task.Exception);
                 }
+                else if (task.IsCompleted)
+                {
+                    DataSnapshot snapshot = task.Result;
+                    List<ItemRemote> itemsList = new List<ItemRemote>();
 
-                return itemsList;
-            }
-            else
-            {
-                Debug.Log("No hay datos en la ubicación especificada.");
-                return itemsList;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error al obtener items: " + e.Message);
-            return itemsList;
-        }
+                    foreach (DataSnapshot itemSnapshot in snapshot.Children)
+                    {
+                        // Convierte los datos del snapshot en una instancia de ItemRemote
+                        ItemRemote item = new ItemRemote(
+                            id : itemSnapshot.Child("id").GetValue(true).ToString(),
+                            name : itemSnapshot.Child("name").GetValue(true).ToString(),
+                            path : itemSnapshot.Child("path").GetValue(true).ToString(),
+                            imageIdMetadata : itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
+                            creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
+                      
+                        itemsList.Add(item);
+                    }
+                    // Establecer el resultado de la tarea como la lista de items
+                    tcs.SetResult(itemsList);
+                }
+            });
+
+        // Devolver la tarea asociada con el TaskCompletionSource
+        return await tcs.Task;
     }
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
@@ -107,4 +144,8 @@ public class RemoteDb : IRepositoryRemote
         throw new System.NotImplementedException();
     }
 
+    public RemoteDb GetRemoteDb()
+    {
+        return this;
+    }
 }
