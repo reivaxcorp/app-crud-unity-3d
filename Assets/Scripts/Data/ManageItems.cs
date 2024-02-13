@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -11,6 +10,8 @@ public class ManageItems : MonoBehaviour
     private GameObject itemPrefab;
     [SerializeField]
     private GameObject myItemsOrdered;
+    [SerializeField]
+    private GameObject loadingMsj;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
@@ -24,6 +25,7 @@ public class ManageItems : MonoBehaviour
     void Start()
     {
         waitToFirebaseInitialized = true;
+        SetLoadingMsj(true);
     }
 
     // Update is called once per frame
@@ -36,7 +38,7 @@ public class ManageItems : MonoBehaviour
                 FirebaseSDK.GetInstance().db != null)
             {
                 waitToFirebaseInitialized = false;
-                //ListeningDbRemote();
+
                 CheckInternetConection();
             }
         }
@@ -81,7 +83,7 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-
+        
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
@@ -91,7 +93,7 @@ public class ManageItems : MonoBehaviour
         if (itemsRemoteList != null)
         {
             List<ItemManager> itemListUpdates =
-            CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
+                     CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
             foreach (ItemManager itemToUpdate in itemListUpdates)
             {
@@ -124,7 +126,8 @@ public class ManageItems : MonoBehaviour
                 else if (itemToUpdate.IsAdd)
                 {
                     // Nuevo item añadido
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                        .ItemRemoteToItemLocal();
                     itemsToSave.Add(itemLocal);
                     task = CreateItemInScene(itemLocal);
                 }
@@ -158,6 +161,8 @@ public class ManageItems : MonoBehaviour
             await Task.WhenAll(tasks);
             OrderItem(itemsLocalList);
         }
+
+        SetLoadingMsj(false);
     }
 
     private async Task<bool> CreateItemInScene(ItemLocal item)
@@ -172,40 +177,17 @@ public class ManageItems : MonoBehaviour
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.Id, item.Path, itemToCreate);
                 }
-            }
-            else
+            } else
             {
-                Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
-                return false;
+                Debug.LogWarning("Ítem no encontrado " + item.Id);
             }
+        }
+        else
+        {
+            Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
+            return false;
         }
         return true;
-    }
-
-    private async Task<bool> UpdateItemInScene(ItemLocal item, bool isFieldUpdate, bool isImageUpdate)
-    {
-        GameObject gameObjectExists = GameObject.Find(item.Name);
-        if (gameObjectExists != null)
-        {
-            if (isImageUpdate)
-            {
-                gameObjectExists.GetComponentInChildren<TextMeshPro>().text = item.Name;
-            }
-            if (isImageUpdate)
-            {
-                await buildItem.AsignMaterialAsync(item.Id, item.Path, gameObjectExists);
-            }
-        }
-        return true;
-    }
-
-    private void DeleteItemInScene(ItemLocal item)
-    {
-        GameObject gameObjectExists = GameObject.Find(item.Name);
-        if (gameObjectExists != null)
-        {
-            Destroy(gameObjectExists);
-        }
     }
 
     private void OrderItem(List<ItemLocal> itemsLocalList)
@@ -235,6 +217,17 @@ public class ManageItems : MonoBehaviour
         }
     }
 
+    private void SetLoadingMsj(bool isActive)
+    {
+        if(loadingMsj != null)
+        {
+            loadingMsj.SetActive(isActive);
+        } else
+        {
+            Debug.LogWarning("Por favor pon el LoadingMsj en el Manager desde UiApp gameObject");
+        }
+    }
+
     private void OnDestroy()
     {
         DesuscribeEventsDbListening();
@@ -243,7 +236,9 @@ public class ManageItems : MonoBehaviour
     private void DesuscribeEventsDbListening()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
-        remoteDbRef.handleValueResult -= SyncronizeData;
-        this.networkManager.handleInternetAvariableResult -= ReadData;
+        if (remoteDbRef != null)
+            remoteDbRef.handleValueResult -= SyncronizeData;
+        if(networkManager != null)
+            networkManager.handleInternetAvariableResult -= ReadData;
     }
 }

@@ -35,11 +35,6 @@ public class RemoteDb : IRepositoryRemote
                    .Child(userUid)
              .ValueChanged += HandleValueChanged;
         }
-        /*else
-        {
-            // Si no hay conexión a Internet, cargar datos desde la base de datos local
-            handleValueResult?.Invoke(null);
-        }*/
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -49,6 +44,7 @@ public class RemoteDb : IRepositoryRemote
             Debug.LogError(args.DatabaseError.Message);
             return;
         }
+
         // Do something with the data in args.Snapshot
 
         List<ItemRemote> itemsRemoteList = new List<ItemRemote>();
@@ -70,7 +66,6 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task<List<ItemRemote>> GetItemsRemote()
     {
-
         // Crear un objeto TaskCompletionSource para controlar la finalización de la tarea
         var tcs = new TaskCompletionSource<List<ItemRemote>>();
 

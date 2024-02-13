@@ -9,9 +9,14 @@ using UnityEngine;
 public class UploadFileRemote
 {
 
-    public UploadFileRemote(byte[] fileBytes, string folderUserUid, string fileName, IResult iResult, IResultFile iFileResult)
+    public UploadFileRemote(
+        byte[] fileBytes,
+        string folderUserUid,
+        string fileName,
+        IResult iResult,
+        IResultFile iFileResult
+        )
     {
-        // string FAKE_UID = "C8prXOcdOPRj4DGkfFDbXIEqRJ42";
 
         FirebaseStorage firebaseStorage = FirebaseSDK.GetInstance().firebaseStorage;
 
@@ -30,7 +35,7 @@ public class UploadFileRemote
                 },
                 ContentType = "image/png"
             };  
-
+            
             // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
             // ContinueWithOnMainThread.
             userRef.PutBytesAsync(fileBytes, newMetadata, null, CancellationToken.None)
