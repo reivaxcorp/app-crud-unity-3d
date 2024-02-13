@@ -8,6 +8,7 @@ public class MenuManagerApp : MonoBehaviour
 
     public void ShowMenuAddItem()
     {
+        menuAddItem.transform.parent.gameObject.SetActive(true);
         menuAddItem.SetActive(true);
         ButtonAddItemSetActive(false);
     }
@@ -26,6 +27,7 @@ public class MenuManagerApp : MonoBehaviour
     public void HideMenu()
     {
         MenuSetActive(false);
+        ButtonAddItemSetActive(true);
     }
 
     public void ButtonAddItemSetActive(bool isActive)
@@ -44,6 +46,7 @@ public class MenuManagerApp : MonoBehaviour
             Debug.LogWarning("Esta llamando un menú que es null");
         }
     }
+
     private void Awake()
     {
         CheckReferences();

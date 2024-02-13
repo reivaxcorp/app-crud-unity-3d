@@ -1,17 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class CameraMovement : MonoBehaviour
 {
     public float speed = 5f;
 
     void Update()
     {
-        MovePlayer();
+        MoveCamera();
     }
 
-    void MovePlayer()
+    void MoveCamera()
     {
         float horizontalMovement = Input.GetAxis("Horizontal");
         float verticalMovement = Input.GetAxis("Vertical");

@@ -23,13 +23,23 @@ public class RemoteDb : IRepositoryRemote
 
     public void FirebaseValueChanged()
     {
-        string userUid = FirebaseSDK.GetInstance().user.UserId;
+        // Verificar el estado de la conexión a Internet
+        if (Application.internetReachability != NetworkReachability.NotReachable)
+        {
+            // Si hay conexión a Internet, cargar datos desde la base de datos remota
+            string userUid = FirebaseSDK.GetInstance().user.UserId;
 
-        FirebaseSDK.GetInstance().db
-               .GetReference("users")
-               .Child("items")
-               .Child(userUid)
-         .ValueChanged += HandleValueChanged;
+            FirebaseSDK.GetInstance().db
+                   .GetReference("users")
+                   .Child("items")
+                   .Child(userUid)
+             .ValueChanged += HandleValueChanged;
+        }
+        /*else
+        {
+            // Si no hay conexión a Internet, cargar datos desde la base de datos local
+            handleValueResult?.Invoke(null);
+        }*/
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -60,18 +70,19 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task<List<ItemRemote>> GetItemsRemote()
     {
-      
+
         // Crear un objeto TaskCompletionSource para controlar la finalización de la tarea
         var tcs = new TaskCompletionSource<List<ItemRemote>>();
 
         // Obtén el ID del usuario actual
         string userUid = FirebaseSDK.GetInstance().user.UserId;
-     
+
         // Obtén la referencia a la ubicación de los items para el usuario actual
         await FirebaseSDK.GetInstance().db
             .GetReference("users")
             .Child("items")
-            .Child(userUid).GetValueAsync().ContinueWithOnMainThread(task => {
+            .Child(userUid).GetValueAsync().ContinueWithOnMainThread(task =>
+            {
 
                 if (task.IsFaulted)
                 {
@@ -87,12 +98,12 @@ public class RemoteDb : IRepositoryRemote
                     {
                         // Convierte los datos del snapshot en una instancia de ItemRemote
                         ItemRemote item = new ItemRemote(
-                            id : itemSnapshot.Child("id").GetValue(true).ToString(),
-                            name : itemSnapshot.Child("name").GetValue(true).ToString(),
-                            path : itemSnapshot.Child("path").GetValue(true).ToString(),
-                            imageIdMetadata : itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
+                            id: itemSnapshot.Child("id").GetValue(true).ToString(),
+                            name: itemSnapshot.Child("name").GetValue(true).ToString(),
+                            path: itemSnapshot.Child("path").GetValue(true).ToString(),
+                            imageIdMetadata: itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
                             creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
-                      
+
                         itemsList.Add(item);
                     }
                     // Establecer el resultado de la tarea como la lista de items

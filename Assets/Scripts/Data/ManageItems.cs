@@ -13,6 +13,7 @@ public class ManageItems : MonoBehaviour
     private GameObject myItemsOrdered;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
+    private NetworkManager networkManager;
 
     private void Awake()
     {
@@ -35,98 +36,150 @@ public class ManageItems : MonoBehaviour
                 FirebaseSDK.GetInstance().db != null)
             {
                 waitToFirebaseInitialized = false;
-                ListeningDbRemote();
+                //ListeningDbRemote();
+                CheckInternetConection();
             }
         }
     }
 
+    private void CheckInternetConection()
+    {
+        this.networkManager = GetComponent<NetworkManager>();
+
+        if (networkManager != null)
+        {
+            networkManager.handleInternetAvariableResult += ReadData;
+            networkManager.ListeningInternetAvariable();
+        } else
+        {
+            Debug.LogWarning("NetworManager.cs no esta en el Manager");
+        }
+    }
+
+    private void ReadData(bool isInternetAvariable)
+    {
+        if(isInternetAvariable)
+        {
+            ListeningDbRemote();
+        } else
+        {
+            SyncronizeData(null);
+        }
+    }
+
+    // Nos suscribimos a un evento y llamamos al metodo que lanzara el evento.
     private void ListeningDbRemote()
     {
-        RemoteDb remoteDbRef =
-             MyApplication.repository.GetRemoteDb();
+        RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
         remoteDbRef.handleValueResult += SyncronizeData;
         remoteDbRef.FirebaseValueChanged();
     }
 
+    /// <summary>
+    /// Sincronizamos datos guardados con los datos locales.
+    /// </summary>
+    /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
+
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
-        List<ItemManager> itemListUpdates =
+        // Estamos con conexión a internet.
+        if (itemsRemoteList != null)
+        {
+            List<ItemManager> itemListUpdates =
             CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-        foreach (ItemManager itemToUpdate in itemListUpdates)
-        {
-            Task task = Task.CompletedTask; // Inicializar una tarea completada
+            foreach (ItemManager itemToUpdate in itemListUpdates)
+            {
+                Task task = Task.CompletedTask; // Inicializar una tarea completada
 
-            if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
-            {
-                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                MyApplication.repository.RemoveTexture(itemToUpdate.Id);
-                itemsToSave.Add(itemLocal);
-                task = CreateItemInScene(itemLocal);
+                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
+                {
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsFieldsUpdated)
+                {
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsImageUpdated)
+                {
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsRemove)
+                {
+                    MyApplication.repository.DeleteLocalItemById(itemToUpdate.Id);
+                }
+                else if (itemToUpdate.IsAdd)
+                {
+                    // Nuevo item añadido
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else
+                {
+                    // sin cambios el ítem local con el ítem remoto
+                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                tasks.Add(task); // Agregar la tarea a la lista de tareas
             }
-            else if (itemToUpdate.IsFieldsUpdated)
-            {
-                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                itemsToSave.Add(itemLocal);
-                task = CreateItemInScene(itemLocal);
-            }
-            else if (itemToUpdate.IsImageUpdated)
-            {
-                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                MyApplication.repository.RemoveTexture(itemToUpdate.Id);
-                itemsToSave.Add(itemLocal);
-                task = CreateItemInScene(itemLocal);
-            }
-            else if (itemToUpdate.IsRemove)
-            {
-                MyApplication.repository.DeleteLocalItemById(itemToUpdate.Id);
-            }
-            else if (itemToUpdate.IsAdd)
-            {
-                // Nuevo item añadido
-                ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                itemsToSave.Add(itemLocal);
-                task = CreateItemInScene(itemLocal);
-            }
-            else
-            {
-                // sin cambios el ítem local con el ítem remoto
-                ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
-                itemsToSave.Add(itemLocal);
-                task = CreateItemInScene(itemLocal);
 
-            }
-            tasks.Add(task); // Agregar la tarea a la lista de tareas
+            // Esperar a que todas las tareas se completen
+            await Task.WhenAll(tasks);
+            OrderItem(itemsToSave);
+            // actualizamos la lista local con la remota
+            MyApplication.repository.SaveLocalItems(itemsToSave);
         }
+        else
+        {
+            // Estamos sin sin conexión a internet, cargamos los datos locales
+            foreach (ItemLocal itemLocal in itemsLocalList)
+            {
+                Task task = Task.CompletedTask;
+                task = CreateItemInScene(itemLocal);
+                tasks.Add(task);
+            }
 
-        // Esperar a que todas las tareas se completen
-        await Task.WhenAll(tasks);
-
-        myItemsOrdered.GetComponent<MyItemsOrder>().OrderItemPositionInScene(itemsLocalList);
-        MyApplication.repository.SaveLocalItems(itemsToSave);
-
+            // Esperar a que todas las tareas se completen
+            await Task.WhenAll(tasks);
+            OrderItem(itemsLocalList);
+        }
     }
 
     private async Task<bool> CreateItemInScene(ItemLocal item)
     {
         if (itemPrefab != null)
         {
-            GameObject itemToCreate = Instantiate(itemPrefab);
-            itemToCreate.GetComponentInChildren<TextMeshPro>().text = item.Name;
-            itemToCreate.name = item.Id;
-            await buildItem.AsignMaterialAsync(item.Id, item.Path, itemToCreate);
-            return true;
+            if (myItemsOrdered.transform.Find(item.Id) == null)
+            {
+                {
+                    GameObject itemToCreate = Instantiate(itemPrefab);
+                    itemToCreate.GetComponentInChildren<TextMeshPro>().text = item.Name;
+                    itemToCreate.name = item.Id;
+                    await buildItem.AsignMaterialAsync(item.Id, item.Path, itemToCreate);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
+                return false;
+            }
         }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
-            return false;
-        }
+        return true;
     }
 
     private async Task<bool> UpdateItemInScene(ItemLocal item, bool isFieldUpdate, bool isImageUpdate)
@@ -134,11 +187,11 @@ public class ManageItems : MonoBehaviour
         GameObject gameObjectExists = GameObject.Find(item.Name);
         if (gameObjectExists != null)
         {
-            if(isImageUpdate)
+            if (isImageUpdate)
             {
                 gameObjectExists.GetComponentInChildren<TextMeshPro>().text = item.Name;
             }
-            if(isImageUpdate)
+            if (isImageUpdate)
             {
                 await buildItem.AsignMaterialAsync(item.Id, item.Path, gameObjectExists);
             }
@@ -150,21 +203,47 @@ public class ManageItems : MonoBehaviour
     {
         GameObject gameObjectExists = GameObject.Find(item.Name);
         if (gameObjectExists != null)
-        { 
+        {
             Destroy(gameObjectExists);
         }
     }
 
-
+    private void OrderItem(List<ItemLocal> itemsLocalList)
+    {
+        if (myItemsOrdered != null)
+        {
+            if (itemsLocalList.Count > 0)
+            {
+                MyItemsOrder myItemsOrder = myItemsOrdered.GetComponent<MyItemsOrder>();
+                if (myItemsOrder != null)
+                {
+                    myItemsOrder.OrderItemPositionInScene(itemsLocalList);
+                }
+                else
+                {
+                    Debug.LogWarning("MyItemsOrder.cs no colocado en MyItemsOrdered gameObject");
+                }
+            }
+            else
+            {
+                Debug.Log("Lista de items local vacia");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Por favor pon MyItemsOrdened game object en el inspector en Manager");
+        }
+    }
 
     private void OnDestroy()
     {
-        DesuscribeEventDbListening();
+        DesuscribeEventsDbListening();
     }
 
-    private void DesuscribeEventDbListening()
+    private void DesuscribeEventsDbListening()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
         remoteDbRef.handleValueResult -= SyncronizeData;
+        this.networkManager.handleInternetAvariableResult -= ReadData;
     }
 }

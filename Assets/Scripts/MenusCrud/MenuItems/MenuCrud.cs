@@ -5,7 +5,7 @@ using TMPro;
 
 public class MenuCrud : MonoBehaviour, IFileSelected, IResult
 {
-    [SerializeField] MenuManagerApp menuManagerApp;
+    [SerializeField] MenuManagerApp uiApp;
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
@@ -52,7 +52,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
         if(successful)
         {
             dialogMsj.ShowDialog(title, body);
-            menuManagerApp.HideMenu();
+            uiApp.HideMenu();
         }
     }
 
@@ -97,7 +97,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
 
     public void HideMenu()
     {
-        menuManagerApp.HideMenu();
+        uiApp.HideMenu();
     }
 
     public bool IsDataSetted()
@@ -198,7 +198,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
     private void SetCurrentMenu(MenuCrud menu)
     {
         receiverMessagesFromAndroid.SetCurrentMenu(menu);
-        menuManagerApp.SetCurrentMenu(menu);
+        uiApp.SetCurrentMenu(menu);
     }
 
     private void ResetMenu()
@@ -236,7 +236,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
 
     private void CheckReferences()
     {
-        if (menuManagerApp == null) Debug.LogWarning("Coloca el script desde el MenuApp (gameObject) el script MenuManagerApp en el Inspector");
+        if (uiApp == null) Debug.LogWarning("Coloca el script desde el UiApp (gameObject) el script MenuManagerApp en el Inspector");
         if (dialogMsj == null) Debug.LogWarning("Coloca el script DialogMsj desde el DialogMsj gameObject en MenuApp -> Canvas -> DialogMsj en el inspector");
         if (inputFieldName == null) Debug.LogWarning("InputFieldName no asignado en el Inspector");
         if (menuImagePreview == null) Debug.LogWarning("MenuImagePreview no asignado en el Inspector");

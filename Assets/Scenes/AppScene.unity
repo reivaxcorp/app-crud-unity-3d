@@ -685,8 +685,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7.434845, y: 189}
-  m_SizeDelta: {x: 249.35999, y: 123.79999}
+  m_AnchoredPosition: {x: -7.434845, y: 178.9}
+  m_SizeDelta: {x: 249.35999, y: 56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &344578184
 MonoBehaviour:
@@ -1014,6 +1014,7 @@ GameObject:
   m_Component:
   - component: {fileID: 528698884}
   - component: {fileID: 528698883}
+  - component: {fileID: 528698885}
   - component: {fileID: 528698882}
   m_Layer: 0
   m_Name: camera
@@ -1087,6 +1088,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 36.415, y: 0, z: 0}
+--- !u!114 &528698885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528698881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1356eeef2651d544986643d806da74d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 5
 --- !u!1 &572022165
 GameObject:
   m_ObjectHideFlags: 0
@@ -2464,10 +2478,10 @@ RectTransform:
   m_Father: {fileID: 1304163419}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 18.4, y: -203}
-  m_SizeDelta: {x: 152, y: 54.3}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -89.8, y: 29.2}
+  m_SizeDelta: {x: 152, y: 42.100006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1095184308
 MonoBehaviour:
@@ -2600,7 +2614,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -7, y: -152}
-  m_SizeDelta: {x: 276.85, y: 67.6}
+  m_SizeDelta: {x: 276.85, y: 58.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1127525664
 MonoBehaviour:
@@ -3370,7 +3384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b5b2e4bcd1a82c42995e19a604bbc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menuManagerApp: {fileID: 1889203354}
+  uiApp: {fileID: 1889203354}
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
@@ -3412,7 +3426,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.695652, y: 35}
+  m_AnchoredPosition: {x: -8.695652, y: 50.3}
   m_SizeDelta: {x: 256, y: 176.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1429457105
@@ -3962,6 +3976,7 @@ GameObject:
   - component: {fileID: 1651622794}
   - component: {fileID: 1651622795}
   - component: {fileID: 1651622796}
+  - component: {fileID: 1651622797}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -4033,6 +4048,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPrefab: {fileID: 8836757418628724814, guid: 5f1190899dc1f544e9b5f540253355e8, type: 3}
   myItemsOrdered: {fileID: 275777492}
+--- !u!114 &1651622797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651622791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc2ae9ba1c0a84f49a02210b1ab2e76a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1669579671
 GameObject:
   m_ObjectHideFlags: 0

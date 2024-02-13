@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,11 +9,13 @@ public class MyItemsOrder : MonoBehaviour
     public void OrderItemPositionInScene(List<ItemLocal> itemlocals)
     {
         float nextPositionX = this.transform.position.x;
+
         if(item != null)
         {
             for (int index = 0; index < itemlocals.Count; index++)
             {
                 GameObject itemInScene = GameObject.Find(itemlocals[index].Id);
+
                 if (itemInScene != null)
                 {
                     //itemInScene.transform.position = this.transform.position;
