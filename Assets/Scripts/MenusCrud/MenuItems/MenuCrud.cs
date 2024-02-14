@@ -9,7 +9,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
-    [SerializeField] ManageItems createItems;
+    [SerializeField] ManageItems manageItems;
     [SerializeField] Image menuImagePreview;
     [SerializeField] protected TextMeshProUGUI resultMsj;
     [SerializeField] protected TMP_InputField inputFieldName;
