@@ -62,11 +62,11 @@ public class TextureManager : IDataTextureLocalSaved
         }
     }
 
-    public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)
+    public void SaveTextureAsPNG(Texture2D textureToSave, string imageId)
     {
         byte[] bytes = textureToSave.EncodeToPNG(); // Convierte la textura en formato PNG
         string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
-        string filePath = Path.Combine(folderPath, imageName + ".png");
+        string filePath = Path.Combine(folderPath, imageId + ".png");
 
         // Verificar si la carpeta existe, si no, crearla
         if (!Directory.Exists(folderPath))

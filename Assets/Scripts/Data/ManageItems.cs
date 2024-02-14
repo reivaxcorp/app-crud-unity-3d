@@ -52,7 +52,8 @@ public class ManageItems : MonoBehaviour
         {
             networkManager.handleInternetAvariableResult += ReadData;
             networkManager.ListeningInternetAvariable();
-        } else
+        }
+        else
         {
             Debug.LogWarning("NetworManager.cs no esta en el Manager");
         }
@@ -60,10 +61,11 @@ public class ManageItems : MonoBehaviour
 
     private void ReadData(bool isInternetAvariable)
     {
-        if(isInternetAvariable)
+        if (isInternetAvariable)
         {
             ListeningDbRemote();
-        } else
+        }
+        else
         {
             SyncronizeData(null);
         }
@@ -83,7 +85,7 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-        
+
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
@@ -104,39 +106,43 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
                     MyApplication.repository.RemoveTexture(itemToUpdate.Id);
                     itemsToSave.Add(itemLocal);
-                    task = CreateItemInScene(itemLocal);
+                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: true, isImageUpdate: true);
                 }
                 else if (itemToUpdate.IsFieldsUpdated)
                 {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    Debug.Log("Update " +  itemToUpdate.Id);
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                        .ItemRemoteToItemLocal();
+                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: true, isImageUpdate: false);
                     itemsToSave.Add(itemLocal);
-                    task = CreateItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsImageUpdated)
                 {
                     ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
                     MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: false, isImageUpdate: true);
                     itemsToSave.Add(itemLocal);
-                    task = CreateItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsRemove)
                 {
-                    MyApplication.repository.DeleteLocalItemById(itemToUpdate.Id);
+                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
+                    DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)
                 {
                     // Nuevo item añadido
                     ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
                         .ItemRemoteToItemLocal();
-                    itemsToSave.Add(itemLocal);
                     task = CreateItemInScene(itemLocal);
+                    itemsToSave.Add(itemLocal);
                 }
                 else
                 {
                     // sin cambios el ítem local con el ítem remoto
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
-                    itemsToSave.Add(itemLocal);
                     task = CreateItemInScene(itemLocal);
+                    itemsToSave.Add(itemLocal);
                 }
                 tasks.Add(task); // Agregar la tarea a la lista de tareas
             }
@@ -177,9 +183,10 @@ public class ManageItems : MonoBehaviour
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.Id, item.Path, itemToCreate);
                 }
-            } else
+            }
+            else
             {
-                Debug.LogWarning("Ítem no encontrado " + item.Id);
+                Debug.Log("Ítem ya existente (No es necesario crearlo) " + item.Id);
             }
         }
         else
@@ -190,6 +197,39 @@ public class ManageItems : MonoBehaviour
         return true;
     }
 
+    private async Task<bool> UpdateItemInScene(
+        ItemLocal item, 
+        bool isFieldUpdate,
+        bool isImageUpdate
+        )
+    {
+        GameObject gameObjectExists = GameObject.Find(item.Id);
+
+        if (gameObjectExists != null)
+        {
+            if (isFieldUpdate)
+            {
+                gameObjectExists.GetComponentInChildren<TextMeshPro>().text = item.Name;
+            }
+
+            if (isImageUpdate)
+            {
+                await buildItem.AsignMaterialAsync(item.Id, item.Path, gameObjectExists);
+            }
+        }
+        return true;
+    }
+
+    private void DeleteItemInScene(ItemLocal item)
+    {
+        GameObject gameObjectExists = GameObject.Find(item.Id);
+
+        if (gameObjectExists != null)
+        {
+            Destroy(gameObjectExists);
+        }
+    }
+     
     private void OrderItem(List<ItemLocal> itemsLocalList)
     {
         if (myItemsOrdered != null)
@@ -219,10 +259,11 @@ public class ManageItems : MonoBehaviour
 
     private void SetLoadingMsj(bool isActive)
     {
-        if(loadingMsj != null)
+        if (loadingMsj != null)
         {
             loadingMsj.SetActive(isActive);
-        } else
+        }
+        else
         {
             Debug.LogWarning("Por favor pon el LoadingMsj en el Manager desde UiApp gameObject");
         }
@@ -235,10 +276,13 @@ public class ManageItems : MonoBehaviour
 
     private void DesuscribeEventsDbListening()
     {
-        RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
-        if (remoteDbRef != null)
-            remoteDbRef.handleValueResult -= SyncronizeData;
-        if(networkManager != null)
+        if(MyApplication.repository != null)
+        {
+            RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
+            if (remoteDbRef != null)
+                remoteDbRef.handleValueResult -= SyncronizeData;
+        }
+        if (networkManager != null)
             networkManager.handleInternetAvariableResult -= ReadData;
     }
 }

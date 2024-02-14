@@ -8,6 +8,12 @@ using UnityEngine;
 
 public class UploadFileRemote
 {
+    private Byte[] _fileBytes;
+    private string _folderUserUid;
+    private string _fileName;
+    private IResult _iResult;
+    private IResultFile _iFileResult;
+    private int _tryGetDependencies;
 
     public UploadFileRemote(
         byte[] fileBytes,
@@ -17,14 +23,26 @@ public class UploadFileRemote
         IResultFile iFileResult
         )
     {
+        _fileBytes = fileBytes;
+        _folderUserUid = folderUserUid;
+        _fileName = fileName;
+        _iResult = iResult;
+        _iFileResult = iFileResult;
+        _tryGetDependencies = 2;
+    }
 
-        FirebaseStorage firebaseStorage = FirebaseSDK.GetInstance().firebaseStorage;
+    private void UpoloadFileFirebaeStorage()
+    {
+        if (_tryGetDependencies == 0)
+            return;
+
+            FirebaseStorage firebaseStorage = FirebaseSDK.GetInstance().firebaseStorage;
 
         if (firebaseStorage != null)
         {
             StorageReference storageRef =
                 firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
-            StorageReference userRef = storageRef.Child("users").Child("images").Child(folderUserUid).Child(fileName);
+            StorageReference userRef = storageRef.Child("users").Child("images").Child(_folderUserUid).Child(_fileName);
 
             string imagenIdMetadata = Guid.NewGuid().ToString();
 
@@ -34,17 +52,17 @@ public class UploadFileRemote
                     {"id_image", imagenIdMetadata},
                 },
                 ContentType = "image/png"
-            };  
-            
+            };
+
             // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
             // ContinueWithOnMainThread.
-            userRef.PutBytesAsync(fileBytes, newMetadata, null, CancellationToken.None)
+            userRef.PutBytesAsync(_fileBytes, newMetadata, null, CancellationToken.None)
                 .ContinueWithOnMainThread((Task<StorageMetadata> task) =>
                 {
                     if (task.IsFaulted || task.IsCanceled)
                     {
                         Debug.Log(task.Exception.ToString());
-                        iResult.SetResultCrudUi(false, "Tarea fallida ó cancelada");
+                        _iResult.SetResultCrudUi(false, "Tarea fallida ó cancelada");
                         // Uh-oh, an error occurred!
                     }
                     else
@@ -54,15 +72,24 @@ public class UploadFileRemote
                         string md5Hash = metadata.Md5Hash;
                         Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
-                        iResult.SetResultCrudUi(true, "Archivo subido correctamente!");
-                        iFileResult.FileUploaded(true, metadata.Path, imagenIdMetadata);
+                        _iResult.SetResultCrudUi(true, "Archivo subido correctamente!");
+                        _iFileResult.FileUploaded(true, metadata.Path, imagenIdMetadata);
                     }
                 });
         }
         else
         {
+
             Debug.LogWarning("FirebaseStorage es null");
-            iResult.SetResultCrudUi(false, "FirebaseStorage no existe");
-        }
+            _iResult.SetResultCrudUi(false, "Error en FirebaseStorage \n(Recargando dependencias..)");
+            RefreshDependencies();
+         }
+    }
+
+    private async void RefreshDependencies()
+    {
+        await FirebaseSDK.GetInstance().InitFirebaseDependenciesAsync();
+        _tryGetDependencies--;
+        UpoloadFileFirebaeStorage();
     }
 }
