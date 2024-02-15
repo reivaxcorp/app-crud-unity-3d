@@ -7,28 +7,22 @@ public class ItemRemote
 {
     public string Id {  get; set; }
     public string Name { get; set; }
-    public string Path { get; set; }
-    public string ImageIdMetadata { get; set; }
+    public string ImageName { get; set; }
     public long CreationDate { get; set; }
 
-    public ItemRemote()
-    {
+    public ItemRemote(){}
 
-    }
-
-    public ItemRemote(string name, string path, string imageIdMetadata)
+    public ItemRemote(string name, string imageName)
     {
         Name = name;
-        Path = path;
-        ImageIdMetadata = imageIdMetadata;
+        ImageName = imageName;
     }
 
-    public ItemRemote(string id, string name, string path, string imageIdMetadata, long creationDate)
+    public ItemRemote(string id, string name, string imageName, long creationDate)
     {
         Id = id;
         Name = name;
-        Path = path;
-        ImageIdMetadata = imageIdMetadata;
+        ImageName = imageName;
         CreationDate = creationDate;
     }
      
@@ -37,8 +31,7 @@ public class ItemRemote
         Dictionary<string, Object> result = new Dictionary<string, Object>();
         result["id"] = Id;
         result["name"] = Name;
-        result["path"] = Path;
-        result["image_id_metadata"] = ImageIdMetadata;
+        result["image_name"] = ImageName;
         result["creation_date"] = CreationDate;
 
         return result;

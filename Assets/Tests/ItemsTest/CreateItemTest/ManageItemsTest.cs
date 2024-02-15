@@ -41,7 +41,7 @@ public class ManageItemsTest : IResult
     public void Put_One_Item_Remote_And_Get_Local()
     {
         MyApplicationTest.GetRepository().SaveItemRemote(GetOneItemRemoteTest(), this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
         Assert.AreEqual(1, MyApplicationTest.GetRepository().GetLocalItems().Count, "El tamaño es de 1");
     }
 
@@ -52,13 +52,13 @@ public class ManageItemsTest : IResult
         // primero guardamos un ítem en la fake remote y sincronizamos con la local db
         ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
         MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
 
         // EXERCISE
         // simulamos una modificacion el la base de datos remota
         ItemRemoteTest getSaveItemRemote =
             MyApplicationTest.GetRepository().GetItemRemoteById(itemRemoteTest.Id);
-        getSaveItemRemote.ImageIdMetadata = "ImageId_11122233344455566";
+        getSaveItemRemote.ImageName = "ImageId_11122233344455566";
         getSaveItemRemote.Name = "Milanesa a la napolitana";
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
@@ -67,13 +67,13 @@ public class ManageItemsTest : IResult
 
         // VERIFY
         // no deben ser igaules
-        Assert.AreNotEqual(getSaveItemRemote.ImageIdMetadata, getItemSaveLocalOutdated.ImageIdMetadata);
+        Assert.AreNotEqual(getSaveItemRemote.ImageName, getItemSaveLocalOutdated.ImageName);
         Assert.AreNotEqual(getSaveItemRemote.Name, getItemSaveLocalOutdated.Name);
-        SyncronizeData(); // Sincronizamos los datos local con la remota.
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
           MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
         // ahora deben ser iguales
-        Assert.AreEqual(getSaveItemRemote.ImageIdMetadata, getItemSaveLocalUpdated.ImageIdMetadata);
+        Assert.AreEqual(getSaveItemRemote.ImageName, getItemSaveLocalUpdated.ImageName);
         Assert.AreEqual(getSaveItemRemote.Name, getItemSaveLocalUpdated.Name);
     }
 
@@ -84,13 +84,13 @@ public class ManageItemsTest : IResult
         // primero guardamos un ítem en la fake remote y sincronizamos con la local db
         ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
         MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
 
         // EXERCISE
         // simulamos una modificacion el la base de datos remota
         ItemRemoteTest getSaveItemRemote =
             MyApplicationTest.GetRepository().GetItemRemoteById(itemRemoteTest.Id);
-        getSaveItemRemote.ImageIdMetadata = "ImageId_11122233344455566";
+        getSaveItemRemote.ImageName = "ImageId_11122233344455566";
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
@@ -98,8 +98,8 @@ public class ManageItemsTest : IResult
 
         // VERIFY
         // no deben ser igaules
-        Assert.AreNotEqual(getSaveItemRemote.ImageIdMetadata, getItemSaveLocalOutdated.ImageIdMetadata);
-        SyncronizeData(); // Sincronizamos los datos local con la remota.
+        Assert.AreNotEqual(getSaveItemRemote.ImageName, getItemSaveLocalOutdated.ImageName);
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
           MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
         // ahora deben ser iguales
@@ -113,13 +113,13 @@ public class ManageItemsTest : IResult
         // primero guardamos un ítem en la fake remote y sincronizamos con la local db
         ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
         MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
 
         // EXERCISE
         // simulamos una modificacion el la base de datos remota
         ItemRemoteTest getSaveItemRemote =
             MyApplicationTest.GetRepository().GetItemRemoteById(itemRemoteTest.Id);
-        getSaveItemRemote.Path = "./test/image.png";
+        getSaveItemRemote.ImageName = "adsfasdfasdfasd232fsdf.png";
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
@@ -127,12 +127,12 @@ public class ManageItemsTest : IResult
 
         // VERIFY
         // no deben ser igaules
-        Assert.AreNotEqual(getSaveItemRemote.Path, getItemSaveLocalOutdated.Path);
-        SyncronizeData(); // Sincronizamos los datos local con la remota.
+        Assert.AreNotEqual(getSaveItemRemote.ImageName, getItemSaveLocalOutdated.ImageName);
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
           MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
         // ahora deben ser iguales
-        Assert.AreEqual(getSaveItemRemote.Path, getItemSaveLocalUpdated.Path);
+        Assert.AreEqual(getSaveItemRemote.ImageName, getItemSaveLocalUpdated.ImageName);
     }
 
     [Test]
@@ -142,7 +142,7 @@ public class ManageItemsTest : IResult
         // primero guardamos un ítem en la fake remote y sincronizamos con la local db
         ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
         MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
 
         // EXERCISE
         // simulamos una modificacion el la base de datos remota
@@ -161,7 +161,7 @@ public class ManageItemsTest : IResult
         // VERIFY
         // no deben ser igaules
         Assert.AreNotEqual(getSaveItemRemote.Name, getItemSaveLocalOutdated.Name);
-        SyncronizeData(); // Sincronizamos los datos local con la remota.
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
           MyApplicationTest.GetRepository().GetLocalItems().Find(item => item.Id.Equals(itemRemoteTest.Id));
         // ahora deben ser iguales
@@ -175,7 +175,7 @@ public class ManageItemsTest : IResult
         // primero guardamos un ítem en la fake remote y sincronizamos con la local db
         ItemRemoteTest itemRemoteTest = GetOneItemRemoteTest();
         MyApplicationTest.GetRepository().SaveItemRemote(itemRemoteTest, this);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
 
         // EXERCISE
         // simulamos una eliminación el la base de datos remota
@@ -185,79 +185,95 @@ public class ManageItemsTest : IResult
         // VERIFY
         Assert.AreNotEqual(MyApplicationTest.GetRepository().GetItemsRemote().Count,
             MyApplicationTest.GetRepository().GetLocalItems().Count);
-        SyncronizeData();
+        SyncronizeData(MyApplicationTest.GetRepository().GetItemsRemote());
         // deben ser igaules
         Assert.AreEqual(MyApplicationTest.GetRepository().GetItemsRemote().Count,
             MyApplicationTest.GetRepository().GetLocalItems().Count);
 
     }
 
-    public async void SyncronizeData()
+    public async void SyncronizeData(List<ItemRemoteTest> itemsRemoteList)
     {
         List<ItemLocalTest> itemsLocalList = MyApplicationTest.GetRepository().GetLocalItems();
-        List<ItemRemoteTest> itemsRemoteList = MyApplicationTest.GetRepository().GetItemsRemote();
-        List<ItemLocalTest> itemsUpdated = new List<ItemLocalTest>();
+         List<ItemLocalTest> itemsToSave = new List<ItemLocalTest>();
+
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
-        List<ItemManagerTest> itemListUpdates =
-                CheckUpdatesTest.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
-
-
-        foreach (ItemManagerTest itemToUpdate in itemListUpdates)
+        // Estamos con conexión a internet.
+        if (itemsRemoteList != null)
         {
-            Task task = Task.CompletedTask; // Inicializar una tarea completada
+            List<ItemManagerTest> itemListUpdates =
+  CheckUpdatesTest.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-            if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
+
+            foreach (ItemManagerTest itemToUpdate in itemListUpdates)
             {
-                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
-                itemsUpdated.Add(itemLocal);
-                task = CreateItem(itemLocal);
+                Task task = Task.CompletedTask; // Inicializar una tarea completada
+
+                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
+                {
+                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsFieldsUpdated)
+                {
+                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsImageUpdated)
+                {
+                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else if (itemToUpdate.IsRemove)
+                {
+                    MyApplicationTest.GetRepository().DeleteLocalItemById(itemToUpdate.Id);
+                }
+                else if (itemToUpdate.IsAdd)
+                {
+                    // Nuevo item añadido
+                    ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                else
+                {
+                    // sin cambios el ítem local con el ítem remoto
+                    ItemLocalTest itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    itemsToSave.Add(itemLocal);
+                    task = CreateItemInScene(itemLocal);
+                }
+                tasks.Add(task); // Agregar la tarea a la lista de tareas
             }
-            else if (itemToUpdate.IsFieldsUpdated)
+
+            // Esperar a que todas las tareas se completen
+            await Task.WhenAll(tasks);
+
+            MyApplicationTest.GetRepository().SaveLocalItems(itemsToSave);
+
+        } else
+        {
+            // Estamos sin sin conexión a internet, cargamos los datos locales
+            foreach (ItemLocalTest itemLocal in itemsLocalList)
             {
-                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                itemsUpdated.Add(itemLocal);
-                task = CreateItem(itemLocal);
+                Task task = Task.CompletedTask;
+                task = CreateItemInScene(itemLocal);
+                tasks.Add(task);
             }
-            else if (itemToUpdate.IsImageUpdated)
-            {
-                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
-                itemsUpdated.Add(itemLocal);
-                task = CreateItem(itemLocal);
-            }
-            else if (itemToUpdate.IsRemove)
-            {
-                MyApplicationTest.GetRepository().DeleteLocalItemById(itemToUpdate.Id);
-            }
-            else if (itemToUpdate.IsAdd)
-            {
-                // Nuevo item añadido
-                ItemLocalTest itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                itemsUpdated.Add(itemLocal);
-                task = CreateItem(itemLocal);
-            }
-            else
-            {
-                // sin cambios el ítem local con el ítem remoto
-                ItemLocalTest itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
-                itemsUpdated.Add(itemLocal);
-                task = CreateItem(itemLocal);
-            }
-            tasks.Add(task); // Agregar la tarea a la lista de tareas
+
+            // Esperar a que todas las tareas se completen
+            await Task.WhenAll(tasks);
         }
-
-        // Esperar a que todas las tareas se completen
-        await Task.WhenAll(tasks);
-
-        MyApplicationTest.GetRepository().SaveLocalItems(itemsUpdated);
-
     }
 
     // Metodos await no funciona en Test,
     // asi que lo omitimos y lo dejamos lo mas parecido a la implementacion final
-    private async Task<bool> CreateItem(ItemLocalTest itemLocalTest)
+    private async Task<bool> CreateItemInScene(ItemLocalTest itemLocalTest)
     {
         //await Task.Delay(500); 
         Debug.Log("Item created id: " + itemLocalTest.Id);
@@ -296,12 +312,11 @@ public class ManageItemsTest : IResult
         // Genera datos aleatorios para el item
         string id = Guid.NewGuid().ToString();
         string name = $"Item_{id.Substring(0, 5)}";
-        string path = $"Path_{id.Substring(0, 5)}";
-        string imageIdMetadata = $"ImageId_{id.Substring(0, 5)}";
+        string imageName = $"ImageName_{id.Substring(0, 5)}";
         long creationDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Crea una nueva instancia de ItemRemote
-        ItemLocalTest item = new ItemLocalTest(id, name, path, imageIdMetadata, creationDate);
+        ItemLocalTest item = new ItemLocalTest(id, name, imageName, creationDate);
         return item;
     }
 
@@ -310,12 +325,11 @@ public class ManageItemsTest : IResult
         // Genera datos aleatorios para el item
         string id = Guid.NewGuid().ToString();
         string name = $"Item_{id.Substring(0, 5)}";
-        string path = $"Path_{id.Substring(0, 5)}";
-        string imageIdMetadata = $"ImageId_{id.Substring(0, 5)}";
+        string imageName = $"ImageName_{id.Substring(0, 5)}";
         long creationDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Crea una nueva instancia de ItemRemote
-        ItemRemoteTest item = new ItemRemoteTest(id, name, path, imageIdMetadata, creationDate);
+        ItemRemoteTest item = new ItemRemoteTest(id, name, imageName, creationDate);
         return item;
     }
 }

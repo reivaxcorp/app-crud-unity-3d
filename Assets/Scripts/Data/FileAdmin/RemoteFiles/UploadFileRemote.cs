@@ -31,7 +31,7 @@ public class UploadFileRemote
         _tryGetDependencies = 2;
     }
 
-    private void UpoloadFileFirebaeStorage()
+    public void UpoloadFileFirebaeStorage()
     {
         if (_tryGetDependencies == 0)
             return;
@@ -40,23 +40,18 @@ public class UploadFileRemote
 
         if (firebaseStorage != null)
         {
+            string imageName = Guid.NewGuid().ToString();
+
             StorageReference storageRef =
                 firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
-            StorageReference userRef = storageRef.Child("users").Child("images").Child(_folderUserUid).Child(_fileName);
-
-            string imagenIdMetadata = Guid.NewGuid().ToString();
-
-            var newMetadata = new MetadataChange
-            {
-                CustomMetadata = new Dictionary<string, string> {
-                    {"id_image", imagenIdMetadata},
-                },
-                ContentType = "image/png"
-            };
+            StorageReference userRef = storageRef
+                .Child("users")
+                .Child("images")
+                .Child(_folderUserUid).Child(imageName);
 
             // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
             // ContinueWithOnMainThread.
-            userRef.PutBytesAsync(_fileBytes, newMetadata, null, CancellationToken.None)
+            userRef.PutBytesAsync(_fileBytes)
                 .ContinueWithOnMainThread((Task<StorageMetadata> task) =>
                 {
                     if (task.IsFaulted || task.IsCanceled)
@@ -73,7 +68,7 @@ public class UploadFileRemote
                         Debug.Log("Finished uploading..." + metadata.Path);
                         Debug.Log("md5 hash = " + md5Hash);
                         _iResult.SetResultCrudUi(true, "Archivo subido correctamente!");
-                        _iFileResult.FileUploaded(true, metadata.Path, imagenIdMetadata);
+                        _iFileResult.FileUploaded(true, imageName);
                     }
                 });
         }

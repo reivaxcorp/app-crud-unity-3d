@@ -39,11 +39,7 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         return localDb.GetLocalItems();
     }
 
-    public  List<ItemRemoteTest> GetItemsRemote()
-    {
-        return remoteDb.GetItemsRemote();
-    }
-
+ 
     public Texture2D LoadTextureAsPNG(string imageId)
     {
         throw new System.NotImplementedException();
@@ -82,5 +78,15 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
     public void SaveLocalItem(ItemLocalTest itemLocal)
     {
         localDb.SaveLocalItem(itemLocal);
+    }
+
+    public List<ItemRemoteTest> GetItemsRemote()
+    {
+        return remoteDb.GetItemsRemote();
+    }
+
+    public RemoteDbTest GetRemoteDb()
+    {
+        throw new System.NotImplementedException();
     }
 }

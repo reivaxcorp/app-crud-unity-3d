@@ -11,8 +11,7 @@ public static class ItemExtensionsTest
             // Realiza la conversión de los campos según sea necesario
             Id = itemRemote.Id,
             Name = itemRemote.Name,
-            Path = itemRemote.Path,
-            ImageIdMetadata = itemRemote.ImageIdMetadata,
+            ImageName = itemRemote.ImageName,
             CreationDate = itemRemote.CreationDate
         };
     }
@@ -28,8 +27,7 @@ public static class ItemExtensionsTest
                 // Realiza la conversión de los campos según sea necesario
                 Id = remoteItem.Id,
                 Name = remoteItem.Name,
-                Path = remoteItem.Path,
-                ImageIdMetadata = remoteItem.ImageIdMetadata,
+                ImageName = remoteItem.ImageName,
                 CreationDate = remoteItem.CreationDate
             };
 

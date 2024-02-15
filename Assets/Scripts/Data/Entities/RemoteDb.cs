@@ -55,8 +55,7 @@ public class RemoteDb : IRepositoryRemote
             ItemRemote item = new ItemRemote(
                 id: itemSnapshot.Child("id").GetValue(true).ToString(),
                 name: itemSnapshot.Child("name").GetValue(true).ToString(),
-                path: itemSnapshot.Child("path").GetValue(true).ToString(),
-                imageIdMetadata: itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
+                imageName: itemSnapshot.Child("image_name").GetValue(true).ToString(),
                 creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
 
             itemsRemoteList.Add(item);
@@ -95,8 +94,7 @@ public class RemoteDb : IRepositoryRemote
                         ItemRemote item = new ItemRemote(
                             id: itemSnapshot.Child("id").GetValue(true).ToString(),
                             name: itemSnapshot.Child("name").GetValue(true).ToString(),
-                            path: itemSnapshot.Child("path").GetValue(true).ToString(),
-                            imageIdMetadata: itemSnapshot.Child("image_id_metadata").GetValue(true).ToString(),
+                            imageName: itemSnapshot.Child("image_name").GetValue(true).ToString(),
                             creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
 
                         itemsList.Add(item);
@@ -124,7 +122,7 @@ public class RemoteDb : IRepositoryRemote
         long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
 
         ItemRemote entry =
-            new ItemRemote(key, itemRemote.Name, itemRemote.Path, itemRemote.ImageIdMetadata, timestampUnix);
+            new ItemRemote(key, itemRemote.Name, itemRemote.ImageName, timestampUnix);
 
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -104,7 +105,7 @@ public class ManageItems : MonoBehaviour
                 if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
                 {
                     ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
                     itemsToSave.Add(itemLocal);
                     task = UpdateItemInScene(item: itemLocal, isFieldUpdate: true, isImageUpdate: true);
                 }
@@ -119,7 +120,7 @@ public class ManageItems : MonoBehaviour
                 else if (itemToUpdate.IsImageUpdated)
                 {
                     ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemToUpdate.Id);
+                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
                     task = UpdateItemInScene(item: itemLocal, isFieldUpdate: false, isImageUpdate: true);
                     itemsToSave.Add(itemLocal);
                 }
@@ -127,6 +128,7 @@ public class ManageItems : MonoBehaviour
                 {
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
                     MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
+                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
                     DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)
@@ -181,7 +183,7 @@ public class ManageItems : MonoBehaviour
                     GameObject itemToCreate = Instantiate(itemPrefab);
                     itemToCreate.GetComponentInChildren<TextMeshPro>().text = item.Name;
                     itemToCreate.name = item.Id;
-                    await buildItem.AsignMaterialAsync(item.Id, item.Path, itemToCreate);
+                    await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
                 }
             }
             else
@@ -214,7 +216,7 @@ public class ManageItems : MonoBehaviour
 
             if (isImageUpdate)
             {
-                await buildItem.AsignMaterialAsync(item.Id, item.Path, gameObjectExists);
+                await buildItem.AsignMaterialAsync(item.ImageName, gameObjectExists);
             }
         }
         return true;

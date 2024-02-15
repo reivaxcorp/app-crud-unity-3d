@@ -19,6 +19,11 @@ public class RemoteDbTest : IRepositoryRemoteTest
         return ItemRemoteTestManager.GetInstance().GetItemsRemote();
     }
 
+    public RemoteDbTest GetRemoteDb()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
     {
          ItemRemoteTestManager.GetInstance().SaveItemRemote(itemRemote, resultUi);

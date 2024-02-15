@@ -2,8 +2,8 @@ using UnityEngine;
 
 public interface IDataTextureLocalSaved
 {
-    void SaveTextureAsPNG(Texture2D textureToSave, string imageId);
-    void RemoveTexture(string imageId);
-    Texture2D LoadTextureAsPNG(string imageId);
+    void SaveTextureAsPNG(Texture2D textureToSave, string imageName);
+    void RemoveTexture(string imageName);
+    Texture2D LoadTextureAsPNG(string imageName);
 }
 

@@ -37,7 +37,7 @@ public class TextureManager : IDataTextureLocalSaved
         }
         else
         {
-            throw new Exception("La imagén no existe!");
+            return null;
         }
     }
 
@@ -63,11 +63,11 @@ public class TextureManager : IDataTextureLocalSaved
         }
     }
 
-    public void SaveTextureAsPNG(Texture2D textureToSave, string imageId)
+    public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)
     {
         byte[] bytes = textureToSave.EncodeToPNG(); // Convierte la textura en formato PNG
         string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
-        string filePath = Path.Combine(folderPath, imageId + ".png");
+        string filePath = Path.Combine(folderPath, imageName + ".png");
 
         // Verificar si la carpeta existe, si no, crearla
         if (!Directory.Exists(folderPath))

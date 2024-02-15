@@ -4,11 +4,11 @@ using UnityEngine;
 public class MenuAddItem : MenuCrud, IResultFile
 {
 
-    public void FileUploaded(bool isFileUploaded, string pathReference, string imagenIdMetadata)
+    public void FileUploaded(bool isFileUploaded, string imageName)
     {
         if(isFileUploaded)
         {
-            WriteDocument(pathReference, imagenIdMetadata);
+            WriteDocument(imageName);
         }
     }
 
@@ -22,6 +22,7 @@ public class MenuAddItem : MenuCrud, IResultFile
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
                 UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResult: this, iFileResult: this);
+                uploadFileRemote.UpoloadFileFirebaeStorage();
             }
             catch (Exception excepcion)
             {
@@ -30,11 +31,11 @@ public class MenuAddItem : MenuCrud, IResultFile
         }
     }
 
-    private void WriteDocument(string pathReference, string imagenIdMetadata)
+    private void WriteDocument(string imageName)
     {
         if(MyApplication.repository != null)
         {
-            ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, path: pathReference, imageIdMetadata: imagenIdMetadata);
+            ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, imageName: imageName);
             MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
         } else
         {

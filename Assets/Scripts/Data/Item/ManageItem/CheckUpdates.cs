@@ -111,8 +111,7 @@ public class CheckUpdates
     // y si cambia a otra imagen cambia tambien el path.
     private static bool IsImageUpdated(ItemRemote productRemote, ItemLocal itemLocal)
     {
-        return !productRemote.ImageIdMetadata.Equals(itemLocal.ImageIdMetadata) ||
-               !productRemote.Path.Equals(itemLocal.Path);
+        return !productRemote.ImageName.Equals(itemLocal.ImageName);
     }
 
 }

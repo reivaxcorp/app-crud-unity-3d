@@ -1,26 +1,22 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MenuUpdateItem : MenuCrud
 {
-    /*[SerializeField] private GameObject closeMenuBtn;
-    [SerializeField] private GameObject imageSelectBtn;
-    [SerializeField] private GameObject imagePreview;
-    [SerializeField] private GameObject inputImageName;
-    [SerializeField] private GameObject deleteItemBtn;*/
+    private string itemSelectedId;
 
-    public void InitMenu(string idItem)
+    public void InitMenu(string itemId)
     {
         if (MyApplication.repository != null)
         {
             try
             {
-                Texture2D texture2D = MyApplication.repository.LoadTextureAsPNG(idItem);
-                SetImagePreview(texture2D);
-                ItemLocal itemLocal = MyApplication.repository.GetLocalItemById(idItem);
+                this.itemSelectedId = itemId;
+                ItemLocal itemLocal = MyApplication.repository.GetLocalItemById(itemId);
                 SetImageName(itemLocal.Name);
+                Texture2D texture2D = MyApplication.repository.LoadTextureAsPNG(itemLocal.ImageName);
+                SetImagePreview(texture2D);
+
             }catch(Exception exception)
             {
                 Debug.LogError("Error en la textura o el ítem no existe! " + exception);
@@ -32,7 +28,7 @@ public class MenuUpdateItem : MenuCrud
         }
     }
 
-    private void ClearMenu()
+    public void UpdateItem()
     {
 
     }

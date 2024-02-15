@@ -8,21 +8,21 @@ public class BuildItem: MonoBehaviour
 {
 
     // Get Texture saved in local device
-    public Texture2D GetSavedTexture(string idProduct)
+    public Texture2D GetSavedTexture(string imageName)
     {
-        return MyApplication.repository.LoadTextureAsPNG(idProduct);
+        return MyApplication.repository.LoadTextureAsPNG(imageName);
     }
 
-    public async Task AsignMaterialAsync(string idProduct, string uri, GameObject gameObject)
+    public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
     {
 
-        Texture2D texture2D = GetSavedTexture(idProduct);
+        Texture2D texture2D = GetSavedTexture(imageName);
 
         if(texture2D == null)
         {
-            ManageMaterialRemote createMaterial = new ManageMaterialRemote(uri);
+            ManageMaterialRemote createMaterial = new ManageMaterialRemote(imageName);
             texture2D = await createMaterial.DownloadImage();
-            MyApplication.repository.SaveTextureAsPNG(texture2D, idProduct);
+            MyApplication.repository.SaveTextureAsPNG(texture2D, imageName);
         }
 
         Material newMaterial = new Material(Shader.Find("Standard"));

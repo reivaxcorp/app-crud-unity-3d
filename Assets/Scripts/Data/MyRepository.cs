@@ -19,8 +19,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
 
     public void DeleteLocalItemById(string id)
     {
-        textureManager.RemoveTexture(id);
-        localDb.DeleteLocalItemById(id);
+         localDb.DeleteLocalItemById(id);
     }
 
     public void DeleteItemRemoteById(string id)
@@ -63,9 +62,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         throw new System.NotImplementedException();
     }
 
-    public void SaveTextureAsPNG(Texture2D textureToSave, string imageId)
+    public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)
     {
-        textureManager.SaveTextureAsPNG(textureToSave, imageId);
+        textureManager.SaveTextureAsPNG(textureToSave, imageName);
     }
 
     public void RemoveTexture(string imageId)
@@ -73,9 +72,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         textureManager.RemoveTexture(imageId);
     }
 
-    public Texture2D LoadTextureAsPNG(string imageId)
+    public Texture2D LoadTextureAsPNG(string imageName)
     {
-        return textureManager.LoadTextureAsPNG(imageId);
+        return textureManager.LoadTextureAsPNG(imageName);
     }
 
     public ItemLocal GetLocalItemById(string id)

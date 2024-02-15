@@ -4890,7 +4890,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1774787952}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 326654716}
+        m_TargetAssemblyTypeName: MenuUpdateItem, Assembly-CSharp
+        m_MethodName: UpdateItem
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1774787952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5265,8 +5277,7 @@ MonoBehaviour:
   addItemBtn: {fileID: 1095184306}
   menuAddItem: {fileID: 1421400309}
   menuUpdateItem: {fileID: 326654712}
-  itemPrefab: {fileID: 8836757418628724814, guid: 5f1190899dc1f544e9b5f540253355e8, type: 3}
-  myCamera: {fileID: 528698881}
+  myItemsOrdened: {fileID: 275777492}
 --- !u!1 &1936705473
 GameObject:
   m_ObjectHideFlags: 0
