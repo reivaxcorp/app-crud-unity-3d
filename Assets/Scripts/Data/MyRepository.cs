@@ -27,12 +27,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     {
         throw new System.NotImplementedException();
     }
-
-    public ItemLocal GetItemById(string id)
-    {
-        throw new System.NotImplementedException();
-    }
-
+     
     public ItemRemote GetItemRemoteById(string id)
     {
         throw new System.NotImplementedException();
@@ -85,7 +80,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
 
     public ItemLocal GetLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        return localDb.GetLocalItemById(id);
     }
 
     public void SaveLocalItem(ItemLocal itemLocal)

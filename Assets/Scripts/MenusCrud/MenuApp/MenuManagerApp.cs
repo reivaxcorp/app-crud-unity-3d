@@ -4,13 +4,82 @@ public class MenuManagerApp : MonoBehaviour
 {
     [SerializeField] GameObject addItemBtn;
     [SerializeField] GameObject menuAddItem;
+    [SerializeField] GameObject menuUpdateItem;
+    [SerializeField] GameObject myItemsOrdened;
+
     private MenuCrud menu;
+
+    private void Update()
+    {
+        if ((Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) || Input.GetMouseButtonDown(0))
+        {
+            if (Camera.main != null)
+            {
+                Ray ray;
+
+                if (Input.touchCount > 0)
+                {
+                    ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+                }
+                else if (Input.GetMouseButtonDown(0))
+                {
+                    ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                }
+                else
+                {
+                    // No se realizó ningún toque ni clic, no se realiza ninguna acción
+                    return;
+                }
+
+                RaycastHit hit;
+                // Debug del rayo lanzado por el Raycast
+                Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.green); // Aquí puedes ajustar la longitud del rayo multiplicando la dirección por un valor específico
+             
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+                {
+
+                    if(myItemsOrdened != null)
+                    {
+                        for (int indexChild = 0; indexChild < myItemsOrdened.transform.childCount; indexChild++)
+                        {
+                            if (myItemsOrdened.transform.GetChild(indexChild).name.Equals(hit.collider.name))
+                            {
+                             //   Debug.Log("Item box clicked.. " + hit.collider);
+                                ShowMenuUpdateItem(hit.collider.name);
+                            }
+                        }
+                    } else
+                    {
+                        Debug.LogWarning("MyItemsOrdener no esta colocado en el inspector");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Colocar la camara principal, con la etiqueta MainCamera");
+            }
+        }
+    }
 
     public void ShowMenuAddItem()
     {
-        menuAddItem.transform.parent.gameObject.SetActive(true);
-        menuAddItem.SetActive(true);
-        ButtonAddItemSetActive(false);
+        if(!menuAddItem.activeSelf && !menuUpdateItem.activeSelf)
+        {
+            menuAddItem.transform.parent.gameObject.SetActive(true);
+            menuAddItem.SetActive(true);
+            ButtonAddItemSetActive(false);
+        }
+    }
+
+    public void ShowMenuUpdateItem(string idItem)
+    {
+        if (!menuUpdateItem.activeSelf && !menuAddItem.activeSelf)
+        {
+            menuUpdateItem.transform.parent.gameObject.SetActive(true);
+            menuUpdateItem.SetActive(true);
+            ButtonAddItemSetActive(false);
+            menuUpdateItem.GetComponent<MenuUpdateItem>().InitMenu(idItem);
+        }
     }
 
     public void SetCurrentMenu(MenuCrud menu)
@@ -37,7 +106,7 @@ public class MenuManagerApp : MonoBehaviour
 
     private void MenuSetActive(bool isActive)
     {
-        if(menu != null)
+        if (menu != null)
         {
             menu.gameObject.SetActive(isActive);
         }

@@ -10,7 +10,7 @@ public class MyApplication : MonoBehaviour
         get { return _repository; }
     }
     private static MyRepository _repository;
-   
+
 
     private async void Start()
     {
@@ -19,13 +19,22 @@ public class MyApplication : MonoBehaviour
 
     private async Task<MyRepository> CreateRepositoryAsync()
     {
-        // FIRST wait to initialize Sdk Firebase
-        await InicializeFirebase();
+        try
+        {
+            // FIRST wait to initialize Sdk Firebase
+            await InicializeFirebase();
 
-        RemoteDb remoteDb = new RemoteDb();
-        LocalDb localDb = new LocalDb();
-        repository = new MyRepository(localDb, remoteDb);
-        return repository;
+            RemoteDb remoteDb = new RemoteDb();
+            LocalDb localDb = new LocalDb();
+            repository = new MyRepository(localDb, remoteDb);
+            return repository;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
+        
+        throw new Exception("Error al crear el respositorio");
     }
 
     // we wait firebase start
@@ -46,14 +55,14 @@ public class MyApplication : MonoBehaviour
             {
                 // Handle the exception where Firebase initialization failed.
                 Debug.Log($"Firebase initialization it's false");
-                return null;
+                throw new Exception("Firebase initialization it's false");
             }
         }
         catch (Exception ex)
         {
             // Handle the exception where Firebase initialization failed.
             Debug.Log($"Firebase initialization error: {ex.Message}");
-            return null;
+            throw new Exception($"Firebase initialization error: {ex.Message}");
         }
 
     }

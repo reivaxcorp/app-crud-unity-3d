@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.IO;
+using System;
+
 public class TextureManager : IDataTextureLocalSaved
 {
     private string folderUidUser;
@@ -35,8 +37,7 @@ public class TextureManager : IDataTextureLocalSaved
         }
         else
         {
-            //Debug.LogError("No se encontró la imagen en: " + filePath);
-            return null;
+            throw new Exception("La imagén no existe!");
         }
     }
 

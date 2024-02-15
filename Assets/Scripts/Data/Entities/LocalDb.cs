@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -36,14 +37,17 @@ public class LocalDb : IRepositoryLocal
         SaveLocalItems(localItemsList);
     }
 
-    public ItemLocal GetItemById(string id)
-    {
-        throw new System.NotImplementedException();
-    }
-
     public ItemLocal GetLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        List<ItemLocal> localItemsList = GetLocalItems();
+
+        int existingIndex = localItemsList.FindIndex(x => x.Id == id);
+
+        if (existingIndex != -1)
+        {
+            return localItemsList[existingIndex];
+        }
+        throw new Exception("El item local fue borrado o no existe");
     }
 
     public List<ItemLocal> GetLocalItems()
