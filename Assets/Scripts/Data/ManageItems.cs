@@ -95,10 +95,10 @@ public class ManageItems : MonoBehaviour
         // Estamos con conexión a internet.
         if (itemsRemoteList != null)
         {
-            List<ItemManager> itemListUpdates =
+            List<ItemUpdate> itemListUpdates =
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-            foreach (ItemManager itemToUpdate in itemListUpdates)
+            foreach (ItemUpdate itemToUpdate in itemListUpdates)
             {
                 Task task = Task.CompletedTask; // Inicializar una tarea completada
 

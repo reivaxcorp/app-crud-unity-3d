@@ -1,5 +1,5 @@
 
 public interface IResultFile 
 {
-    public void FileUploaded(bool isFileUploaded, string imageNamee);
+    public void FileUploaded(bool isFileUploaded, string imageName);
 }

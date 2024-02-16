@@ -57,9 +57,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         throw new System.NotImplementedException();
     }
 
-    public void UpdateItemRemoteById(string id)
+    public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
-        throw new System.NotImplementedException();
+        remoteDb.UpdateItemRemote(itemRemote, iResult);
     }
 
     public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)

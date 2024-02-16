@@ -3,7 +3,9 @@ using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.VersionControl;
 using UnityEngine;
+using static UnityEngine.Networking.UnityWebRequest;
 
 public class RemoteDb : IRepositoryRemote
 {
@@ -140,12 +142,34 @@ public class RemoteDb : IRepositoryRemote
                 Debug.Log("Datos escritos exitosamente en la base de datos");
                 resultUi.SetResultWriteDocument(true, "Ítem subido", "Nuevo ítem agregado");
             }
-        }); ;
+        });
     }
 
-    public void UpdateItemRemoteById(string id)
+    public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
-        throw new System.NotImplementedException();
+        String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
+        DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
+        rootRef
+            .Child("users")
+            .Child("items")
+            .Child(userUid)
+            .Child(itemRemote.Id)
+            .UpdateChildrenAsync(itemRemote.ToDictionary()).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    
+                    // Manejar error
+                    Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
+                    iResult.SetResultCrudUi(false, "Error al actualizar la base de datos");
+                }
+                else
+                {
+                    // Operación exitosa
+                    Debug.Log("Datos escritos exitosamente en la base de datos");
+                    iResult.SetResultCrudUi(true, "Datos actualizados exitosamente en la base de datos");
+                }
+            });
     }
 
     public RemoteDb GetRemoteDb()

@@ -14,6 +14,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
     [SerializeField] protected TextMeshProUGUI resultMsj;
     [SerializeField] protected TMP_InputField inputFieldName;
     protected ProgressText progressText;
+    protected bool isImageChanged;
 
     public FileManager fileManager
     {
@@ -61,9 +62,8 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
         byte[] fileData = File.ReadAllBytes(path);
         Texture2D texture = new Texture2D(2, 2);
         texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
-        string fileName = Path.GetFileName(path);
-        SetImageName(fileName);
         SetImagePreview(texture);
+        this.isImageChanged = true;
     }
 
     public void SetImagePreview(Texture2D texture)
@@ -208,6 +208,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
         inputFieldName.text = "";
         SetCurrentMenu(null);
         this.waitForFirebaseSdk = true;
+        this.isImageChanged = false;
     }
 
     private void Awake()

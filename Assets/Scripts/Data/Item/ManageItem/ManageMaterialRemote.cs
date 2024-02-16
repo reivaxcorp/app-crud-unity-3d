@@ -48,4 +48,24 @@ public class ManageMaterialRemote
 
        return await initializationTask.Task;
     }
+
+    /// <summary>
+    /// Para actualizar y borrar, necesitamos borrar la imagén anterior.
+    /// </summary>
+    /// <param name="filePath"></param>
+    public void DeleteImageRemote()
+    {
+        var storageReference = FirebaseSDK.GetInstance().firebaseStorage.GetReferenceFromUrl(_storageUrl);
+        // Delete the file
+        storageReference.DeleteAsync().ContinueWithOnMainThread(task => {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Archivo remoto borrado correctamente.");
+            }
+            else
+            {
+                // Uh-oh, an error occurred!
+            }
+        });
+    }
 }

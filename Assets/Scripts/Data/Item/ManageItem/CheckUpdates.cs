@@ -11,12 +11,12 @@ public class CheckUpdates
     /// <returns>
     /// Lista, con los items a actualizar, eliminar o crear.
     /// </returns>
-    public static List<ItemManager> CheckUpdatesItems(
+    public static List<ItemUpdate> CheckUpdatesItems(
        List<ItemRemote> itemsRemoteList,
        List<ItemLocal> itemsLocalList
        )
     {
-        List<ItemManager> itemUpdates = new List<ItemManager>();
+        List<ItemUpdate> itemUpdates = new List<ItemUpdate>();
 
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
@@ -27,7 +27,7 @@ public class CheckUpdates
             // Se a removido un item de la base de datos
             if (itemSavedLocal == null)
             {
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                     id: itemLocal.Id,
                     isImageUpdated: false,
                     isFieldsUpdated: false,
@@ -37,7 +37,7 @@ public class CheckUpdates
             // Se ha cambiado los campos y la imagén
             else if (IsFielsUpdate(itemSavedLocal, itemLocal) && IsImageUpdated(itemSavedLocal, itemLocal))
             {
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                   id: itemLocal.Id,
                   isImageUpdated: true,
                   isFieldsUpdated: true,
@@ -47,7 +47,7 @@ public class CheckUpdates
             // Solo se han cambiado los campos
             else if (IsFielsUpdate(itemSavedLocal, itemLocal))
             {
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                  id: itemLocal.Id,
                  isImageUpdated: false,
                  isFieldsUpdated: true,
@@ -57,7 +57,7 @@ public class CheckUpdates
             // Se ha cambiado la imagén
             else if (IsImageUpdated(itemSavedLocal, itemLocal))
             {
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                 id: itemLocal.Id,
                 isImageUpdated: true,
                 isFieldsUpdated: false,
@@ -67,7 +67,7 @@ public class CheckUpdates
             else
             {
                 // sin cambios  el ítem como está.
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                 id: itemLocal.Id,
                 isImageUpdated: false,
                 isFieldsUpdated: false,
@@ -84,7 +84,7 @@ public class CheckUpdates
 
             if (itemToSaveLocal == null)
             {
-                itemUpdates.Add(new ItemManager(
+                itemUpdates.Add(new ItemUpdate(
                 id: itemRemote.Id,
                 isImageUpdated: false,
                 isFieldsUpdated: false,
