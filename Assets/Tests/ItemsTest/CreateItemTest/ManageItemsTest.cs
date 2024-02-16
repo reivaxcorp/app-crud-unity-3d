@@ -202,11 +202,11 @@ public class ManageItemsTest : IResult
         // Estamos con conexión a internet.
         if (itemsRemoteList != null)
         {
-            List<ItemManagerTest> itemListUpdates =
+            List<ItemUpdateTest> itemListUpdates =
   CheckUpdatesTest.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
 
-            foreach (ItemManagerTest itemToUpdate in itemListUpdates)
+            foreach (ItemUpdateTest itemToUpdate in itemListUpdates)
             {
                 Task task = Task.CompletedTask; // Inicializar una tarea completada
 

@@ -8,7 +8,6 @@ using UnityEngine;
 public class MenuUpdateItem : MenuCrud, IResultFile
 {
     private ItemLocal selectedItemLocal;
-    private string oldImageName;
     private string newImageName;
 
     public void FileUploaded(bool isFileUploaded, string imageName)
@@ -28,8 +27,6 @@ public class MenuUpdateItem : MenuCrud, IResultFile
             {
                 ItemLocal itemLocal = MyApplication.repository.GetLocalItemById(itemId);
                 this.selectedItemLocal = itemLocal;
-                this.oldImageName = itemLocal.ImageName;
-                this.newImageName = itemLocal.ImageName; // si elige otra imagén cambiará
                 Texture2D texture2D = MyApplication.repository.LoadTextureAsPNG(itemLocal.ImageName);
                 SetImageName(itemLocal.Name);
                 SetImagePreview(texture2D);
@@ -47,28 +44,50 @@ public class MenuUpdateItem : MenuCrud, IResultFile
 
     public void UpdateItem()
     {
-        if (IsDataSetted() && IsItemChanged())
+        if (IsDataSetted())
         {
-            try
+            if(IsItemChanged())
             {
-                progressText?.StartProgressTextAnimation("Actualizando", resultMsj);
+                try
+                {
+                    progressText?.StartProgressTextAnimation("Actualizando", resultMsj);
 
-                if(isImageChanged)
-                {
-                    byte[] fileBytes = fileManager.GetBytesImageSelected();
-                    UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResult: this, iFileResult: this);
-                    uploadFileRemote.UpoloadFileFirebaeStorage();
-                } 
-                else
-                {
-                    // solo se cambio los campos
-                    UpdateItemRemote(); 
+                    if (isImageChanged)
+                    {
+                        byte[] fileBytes = fileManager.GetBytesImageSelected();
+                        UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResult: this, iFileResult: this);
+                        uploadFileRemote.UpoloadFileFirebaeStorage();
+                    }
+                    else
+                    {
+                        // solo se cambio los campos
+                        UpdateItemRemote();
+                    }
                 }
-            }
-            catch (Exception excepcion)
+                catch (Exception excepcion)
+                {
+                    SetResultCrudUi(false, "Error - " + excepcion.Message);
+                }
+            } else
             {
-                SetResultCrudUi(false, "Error - " + excepcion.Message);
+                SetResultCrudUi(true, "Nada ha cambiado....");
             }
+        }
+    }
+
+    public override void ConfirmButtonDialogPressed(bool isDialogConfirm)
+    {
+        if(isDialogConfirm)
+        {
+            Debug.Log("Eliminando!");
+        }
+    }
+
+    public void DeleteItem()
+    {
+        if(selectedItemLocal != null)
+        {
+            OpenDialog("Eliminar ítem", "¿Desea eliminar el ítem?");
         }
     }
 
@@ -78,15 +97,15 @@ public class MenuUpdateItem : MenuCrud, IResultFile
         ItemRemote itemRemote = new ItemRemote(
             id: selectedItemLocal.Id, 
             name: inputFieldName.text,
-            imageName: !newImageName.Equals(oldImageName) ? newImageName : oldImageName, 
+            imageName: isImageChanged ? newImageName : selectedItemLocal.ImageName, 
             creationDate: selectedItemLocal.CreationDate);
 
         // actualizamos el documente de firebase realtimadatabase
         MyApplication.repository.UpdateItemRemote(itemRemote, this);
         // borramos la imagén anterior en firebase storage si es necesario
-        if(!newImageName.Equals(oldImageName))
+        if(isImageChanged)
         {
-            ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(oldImageName);
+            ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(selectedItemLocal.ImageName);
             manageMaterialRemote.DeleteImageRemote();
         }
     }
@@ -94,6 +113,6 @@ public class MenuUpdateItem : MenuCrud, IResultFile
     private bool IsItemChanged()
     {
         string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        return !newImageName.Equals(oldImageName) || !sanitizedFileName.Equals(selectedItemLocal.Name);
+        return isImageChanged || !sanitizedFileName.Equals(selectedItemLocal.Name);
     }
 }

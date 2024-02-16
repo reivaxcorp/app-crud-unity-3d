@@ -8,23 +8,31 @@ public class MenuDialogConfirm : MonoBehaviour
     [SerializeField] TextMeshProUGUI textTitle;
     [SerializeField] TextMeshProUGUI textBody;
     [SerializeField] MenuManagerApp menuManager;
-
+    private IResultDialog iResultDialog;
     private void Awake()
     {
         CheckReferences();
     }
 
-    public void ShowDialog(string title, string message)
+    public void ShowDialog(string title, string message, IResultDialog resultDialog)
     {
+        this.iResultDialog = resultDialog;
         SetTitle(title);
         SetBodyText(message);
         ShowDialog();
     }
 
-    public void HideDialog()
+
+    public void OnAccept()
     {
-        gameObject.SetActive(false);
-        menuManager.ButtonAddItemSetActive(true);
+        iResultDialog.ConfirmButtonDialogPressed(true);
+        HideDialog();
+    }
+
+    public void OnCancel()
+    {
+        iResultDialog.ConfirmButtonDialogPressed(false);
+        HideDialog();
     }
 
     public void ShowDialog()
@@ -40,6 +48,12 @@ public class MenuDialogConfirm : MonoBehaviour
     public void SetBodyText(string bodyText)
     {
         this.textBody.text = bodyText;
+    }
+
+    private void HideDialog()
+    {
+        menuManager.ButtonAddItemSetActive(true);
+        gameObject.SetActive(false);
     }
 
     private void OnDisable()

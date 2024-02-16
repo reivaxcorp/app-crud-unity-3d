@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class ItemManagerTest
+public class ItemUpdateTest
 {
     public string Id;
     public bool IsRemove;
@@ -8,7 +8,7 @@ public class ItemManagerTest
     public bool IsImageUpdated { get; private set; }
     public bool IsFieldsUpdated { get; private set; }
 
-    public ItemManagerTest(string id, bool isImageUpdated, bool isFieldsUpdated, bool isRemove, bool isAdd)
+    public ItemUpdateTest(string id, bool isImageUpdated, bool isFieldsUpdated, bool isRemove, bool isAdd)
     {
         this.Id = id;
         this.IsRemove = isRemove;

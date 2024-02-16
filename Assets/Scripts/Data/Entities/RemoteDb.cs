@@ -3,7 +3,6 @@ using Firebase.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using static UnityEngine.Networking.UnityWebRequest;
 
@@ -11,26 +10,24 @@ public class RemoteDb : IRepositoryRemote
 {
     public delegate void OnHandleValueChangedCallBack(List<ItemRemote> itemsRemoteList);
     public event OnHandleValueChangedCallBack handleValueResult;
+    private string userUid;
 
-    public void DeleteItemRemoteById(string id)
+    public RemoteDb()
     {
-        throw new System.NotImplementedException();
+        // Obtén el ID del usuario actual
+         this.userUid = FirebaseSDK.GetInstance().user.UserId;
     }
 
-    public ItemRemote GetItemRemoteById(string id)
+    public RemoteDb GetRemoteDb()
     {
-        throw new System.NotImplementedException();
+        return this;
     }
-
 
     public void FirebaseValueChanged()
     {
         // Verificar el estado de la conexión a Internet
         if (Application.internetReachability != NetworkReachability.NotReachable)
         {
-            // Si hay conexión a Internet, cargar datos desde la base de datos remota
-            string userUid = FirebaseSDK.GetInstance().user.UserId;
-
             FirebaseSDK.GetInstance().db
                    .GetReference("users")
                    .Child("items")
@@ -69,9 +66,6 @@ public class RemoteDb : IRepositoryRemote
     {
         // Crear un objeto TaskCompletionSource para controlar la finalización de la tarea
         var tcs = new TaskCompletionSource<List<ItemRemote>>();
-
-        // Obtén el ID del usuario actual
-        string userUid = FirebaseSDK.GetInstance().user.UserId;
 
         // Obtén la referencia a la ubicación de los items para el usuario actual
         await FirebaseSDK.GetInstance().db
@@ -112,9 +106,6 @@ public class RemoteDb : IRepositoryRemote
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        // string id, string name, string path, string timestamp
-        // Debug.Log(referenciaRuta);
-        String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
         DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
 
         // key generada con Push()
@@ -147,7 +138,6 @@ public class RemoteDb : IRepositoryRemote
 
     public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
-        String userUid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
         DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
         rootRef
             .Child("users")
@@ -172,8 +162,30 @@ public class RemoteDb : IRepositoryRemote
             });
     }
 
-    public RemoteDb GetRemoteDb()
+   
+    public void DeleteItemRemoteById(string id, IResult iResult)
     {
-        return this;
+        DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
+        rootRef
+            .Child("users")
+            .Child("items")
+            .Child(userUid)
+            .Child(id)
+            .RemoveValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+
+                    // Manejar error
+                    Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
+                    iResult.SetResultCrudUi(false, "Error al borrar el ítem remoto de la base de datos");
+                }
+                else
+                {
+                    // Operación exitosa
+                    Debug.Log("Ítem remoto borrado correctamente");
+                    iResult.SetResultCrudUi(true, "Ítem remoto borrado correctamente");
+                }
+            });
     }
 }

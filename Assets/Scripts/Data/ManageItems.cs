@@ -129,6 +129,10 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
                     MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
                     MyApplication.repository.RemoveTexture(itemLocal.ImageName);
+                    ManageMaterialRemote manageMaterialRemote = 
+                        new ManageMaterialRemote(itemLocal.ImageName);
+                    manageMaterialRemote.DeleteImageRemote();
+
                     DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)

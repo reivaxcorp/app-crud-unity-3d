@@ -12,12 +12,12 @@ public class CheckUpdatesTest
     /// <returns>
     /// Lista, con los items a actualizar, eliminar o crear.
     /// </returns>
-    public static List<ItemManagerTest> CheckUpdatesItems(
+    public static List<ItemUpdateTest> CheckUpdatesItems(
        List<ItemRemoteTest> itemsRemoteList,
        List<ItemLocalTest> itemsLocalList
        )
     {
-        List<ItemManagerTest> itemUpdates = new List<ItemManagerTest>();
+        List<ItemUpdateTest> itemUpdates = new List<ItemUpdateTest>();
 
         // Comprobar si hay que sincronizar algún ítem local con el ítem remoto.
         foreach (ItemLocalTest itemLocal in itemsLocalList)
@@ -29,7 +29,7 @@ public class CheckUpdatesTest
             // Se a removido un item de la base de datos
             if (itemSavedLocal == null)
             {
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                     id: itemLocal.Id,
                     isImageUpdated: false,
                     isFieldsUpdated: false,
@@ -39,7 +39,7 @@ public class CheckUpdatesTest
             // Se ha cambiado los campos y la imagén
             else if (IsFielsUpdate(itemSavedLocal, itemLocal) && IsImageUpdated(itemSavedLocal, itemLocal))
             {
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                   id: itemLocal.Id,
                   isImageUpdated: true,
                   isFieldsUpdated: true,
@@ -49,7 +49,7 @@ public class CheckUpdatesTest
             // Solo se han cambiado los campos
             else if (IsFielsUpdate(itemSavedLocal, itemLocal))
             {
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                  id: itemLocal.Id,
                  isImageUpdated: false,
                  isFieldsUpdated: true,
@@ -60,7 +60,7 @@ public class CheckUpdatesTest
             else if (IsImageUpdated(itemSavedLocal, itemLocal))
             {
 
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                 id: itemLocal.Id,
                 isImageUpdated: true,
                 isFieldsUpdated: false,
@@ -70,7 +70,7 @@ public class CheckUpdatesTest
             else
             {
                 // sin cambios  el ítem como está.
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                 id: itemLocal.Id,
                 isImageUpdated: false,
                 isFieldsUpdated: false,
@@ -87,7 +87,7 @@ public class CheckUpdatesTest
 
             if (itemToSaveLocal == null)
             {
-                itemUpdates.Add(new ItemManagerTest(
+                itemUpdates.Add(new ItemUpdateTest(
                 id: itemRemote.Id,
                 isImageUpdated: false,
                 isFieldsUpdated: false,

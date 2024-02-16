@@ -3,7 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class MenuCrud : MonoBehaviour, IFileSelected, IResult
+public enum EResultMenuAction    
+{
+    Failed,
+    Success,
+    Nothing
+}
+
+public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
 {
     [SerializeField] MenuManagerApp uiApp;
     [SerializeField] MenuDialogConfirm dialogMsj;
@@ -52,9 +59,13 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
     {
         if(successful)
         {
-            dialogMsj.ShowDialog(title, body);
-            uiApp.HideMenu();
+            OpenDialog(title, body);
         }
+    }
+
+    public void OpenDialog(string title, string body)
+    {
+        dialogMsj.ShowDialog(title, body, this);
     }
 
     public void FileSelectedResultEditor(string path)
@@ -133,6 +144,18 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
         return true;
     }
 
+    public virtual void ConfirmButtonDialogPressed(bool isDialogConfirm)
+    {
+        if (isDialogConfirm)
+        {
+            uiApp.HideMenu();
+        }
+        else
+        {
+            ClearMenu();
+        }
+    }
+
     private void OpenImageAndroid()
     {
         androidPermission.OnPermissionResult += HandlePermissionResult;
@@ -204,11 +227,19 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
     private void ResetMenu()
     {
         menuImagePreview.sprite = null;
-        ClearResultCrud();
         inputFieldName.text = "";
+        waitForFirebaseSdk = true;
+        isImageChanged = false;
+        ClearResultCrud();
         SetCurrentMenu(null);
-        this.waitForFirebaseSdk = true;
-        this.isImageChanged = false;
+    }
+
+    private void ClearMenu()
+    {
+        menuImagePreview.sprite = null;
+        inputFieldName.text = "";
+        isImageChanged = false;
+        ClearResultCrud();
     }
 
     private void Awake()
@@ -245,5 +276,4 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult
         if (resultMsj == null) Debug.LogWarning("ResultMsj no está colocado en el inspector");
         if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
     }
-
 }

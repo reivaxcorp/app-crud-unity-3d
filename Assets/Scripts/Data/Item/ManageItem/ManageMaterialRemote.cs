@@ -8,8 +8,7 @@ public class ManageMaterialRemote
                                                                                // public Material materialToUpdate; // El material que se actualizará con la imagen descargada.
     public ManageMaterialRemote(string imageName)
     {
-        _storageUrl += FirebaseSDK.GetInstance().user.UserId + "/" + imageName;
-        //Debug.Log("storage " + _storageUrl);
+        _storageUrl += FirebaseSDK.GetInstance().user.UserId + "/" + imageName + ".png";
     }
 
     public async Task<Texture2D> DownloadImage()
@@ -55,6 +54,9 @@ public class ManageMaterialRemote
     /// <param name="filePath"></param>
     public void DeleteImageRemote()
     {
+
+        Debug.Log("imagen a eliminar " + _storageUrl);
+
         var storageReference = FirebaseSDK.GetInstance().firebaseStorage.GetReferenceFromUrl(_storageUrl);
         // Delete the file
         storageReference.DeleteAsync().ContinueWithOnMainThread(task => {
@@ -64,6 +66,7 @@ public class ManageMaterialRemote
             }
             else
             {
+                Debug.LogWarning("Archivo remoto anterior no encontrado.");
                 // Uh-oh, an error occurred!
             }
         });

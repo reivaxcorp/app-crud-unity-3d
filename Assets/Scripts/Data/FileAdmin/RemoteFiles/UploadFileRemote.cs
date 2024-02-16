@@ -1,7 +1,6 @@
 using Firebase.Extensions;
 using Firebase.Storage;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -47,11 +46,15 @@ public class UploadFileRemote
             StorageReference userRef = storageRef
                 .Child("users")
                 .Child("images")
-                .Child(_folderUserUid).Child(imageName);
+                .Child(_folderUserUid).Child(imageName + ".png");
+
+            // Create file metadata including the content type
+            var newMetadata = new MetadataChange();
+            newMetadata.ContentType = "image/png";
 
             // Debemos continuar en el hilo principal, ya que debemos actualizar la UI, por eso usamos
             // ContinueWithOnMainThread.
-            userRef.PutBytesAsync(_fileBytes)
+            userRef.PutBytesAsync(_fileBytes, newMetadata, null, CancellationToken.None)
                 .ContinueWithOnMainThread((Task<StorageMetadata> task) =>
                 {
                     if (task.IsFaulted || task.IsCanceled)

@@ -22,16 +22,11 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
          localDb.DeleteLocalItemById(id);
     }
 
-    public void DeleteItemRemoteById(string id)
+    public void DeleteItemRemoteById(string id, IResult iResult)
     {
-        throw new System.NotImplementedException();
+        remoteDb.DeleteItemRemoteById(id, iResult);
     }
-     
-    public ItemRemote GetItemRemoteById(string id)
-    {
-        throw new System.NotImplementedException();
-    }
-
+   
     public List<ItemLocal> GetLocalItems()
     {
         return localDb.GetLocalItems();
@@ -50,11 +45,6 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
         remoteDb.SaveItemRemote(itemRemote, resultUi);
-    }
-
-    public void UpdateLocalItemById(string id)
-    {
-        throw new System.NotImplementedException();
     }
 
     public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
