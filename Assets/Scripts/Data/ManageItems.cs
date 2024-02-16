@@ -132,7 +132,6 @@ public class ManageItems : MonoBehaviour
                     ManageMaterialRemote manageMaterialRemote = 
                         new ManageMaterialRemote(itemLocal.ImageName);
                     manageMaterialRemote.DeleteImageRemote();
-
                     DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)
@@ -185,7 +184,14 @@ public class ManageItems : MonoBehaviour
             {
                 {
                     GameObject itemToCreate = Instantiate(itemPrefab);
-                    itemToCreate.GetComponentInChildren<TextMeshPro>().text = item.Name;
+                    TextMeshPro itemNameText = itemToCreate.GetComponentInChildren<TextMeshPro>();
+                    if (itemNameText != null)
+                    {
+                        itemNameText.text = item.Name;
+                    } else
+                    {
+                        Debug.LogWarning("El componente TextMeshPro no esta ajuntado al prefab item");
+                    }
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
                 }

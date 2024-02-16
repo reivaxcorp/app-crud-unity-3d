@@ -1,8 +1,7 @@
 
-
 public enum EResultMenuAction
 {
-    Failed,
     Success,
+    Failed,
     Nothing
 }

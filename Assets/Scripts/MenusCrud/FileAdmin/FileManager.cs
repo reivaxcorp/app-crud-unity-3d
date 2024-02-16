@@ -6,6 +6,8 @@ using UnityEngine;
 public class FileManager
 {
     private IFileSelected fileSelected;
+    private const int SIZE_WIDTH = 500;
+    private const int SIZE_HEIGHT = 500;
 
     public string currentImageName
     {
@@ -103,7 +105,8 @@ public class FileManager
 
 
     /// <summary>
-    /// We're going to use the user Id to create a folder with uid's name then we put all images there.
+    /// el nombre de la carpeta de nuestra cuenta, será nuestro Uid de usuario, donde colocaremos las imagenes
+    /// de los items de esa cuenta.
     /// </summary>
     public void SetFolderUidName()
     {
@@ -119,7 +122,7 @@ public class FileManager
     }
 
     /// <summary>
-    /// We're deleting previous image copy of app device.
+    /// Borramos la imagén anterior del dispositivo.
     /// </summary>
     /// <param name="ImageName"></param>
     public void DeletePreviousCopyImage()
@@ -139,12 +142,17 @@ public class FileManager
         }
     }
 
+    /// <summary>
+    /// Redimensionamos las texturas de los items
+    /// </summary>
+    /// <param name="texture"></param>
+    /// <param name="fileName"></param>
     public void SaveFileInternalExtorage(Texture2D texture, string fileName)
     {
         if (_folderUidName != null && _folderUidName.Length > 0)
         {
-            // Redimensionar la textura a 512x512 (si es necesario)
-             Texture2D resizedTexture = TextureScaler.ScaleTexture(texture, 512, 512);
+            // Redimensionar la textura a 512x512 px (si es necesario)
+             Texture2D resizedTexture = TextureScaler.ScaleTexture(texture, SIZE_WIDTH, SIZE_HEIGHT);
 
             // Crear la carpeta con el UID del usuario si no existe
             string userFolderPath = Path.Combine(Application.persistentDataPath, _folderUidName);

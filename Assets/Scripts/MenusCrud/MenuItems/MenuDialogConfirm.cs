@@ -25,14 +25,14 @@ public class MenuDialogConfirm : MonoBehaviour
 
     public void OnAccept()
     {
-        iResultDialog.ConfirmButtonDialogPressed(true);
         HideDialog();
+        iResultDialog.ConfirmButtonDialogPressed(true);
     }
 
-    public void OnCancel()
+    public void OnClosed()
     {
+        gameObject.SetActive(false);
         iResultDialog.ConfirmButtonDialogPressed(false);
-        HideDialog();
     }
 
     public void ShowDialog()

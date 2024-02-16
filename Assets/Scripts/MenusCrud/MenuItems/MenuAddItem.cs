@@ -12,7 +12,10 @@ public class MenuAddItem : MenuCrud, IResultFile
         }
     }
 
-    // Acción del botón "Crear item"
+    /// <summary>
+    /// Cuando colocamos subir ítem, lo primero que hacemos es subir la imagén, luego escribimos
+    /// los datos en realtime database, con WriteDocument, si la subida se realizó correctamente.
+    /// </summary>
     public void OnUploadItem()
     {
         if (IsDataSetted())
@@ -26,11 +29,15 @@ public class MenuAddItem : MenuCrud, IResultFile
             }
             catch (Exception excepcion)
             {
-                SetResultCrudUi(false, "Error - " + excepcion.Message);
+                SetResultCrudUi(EResultMenuAction.Failed, "Error - " + excepcion.Message);
             }
         }
     }
 
+    /// <summary>
+    /// Una vez subida la imagén, procedemos a escribir el documento.
+    /// </summary>
+    /// <param name="imageName"></param>
     private void WriteDocument(string imageName)
     {
         if(MyApplication.repository != null)

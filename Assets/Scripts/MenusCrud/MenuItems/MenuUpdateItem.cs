@@ -66,11 +66,11 @@ public class MenuUpdateItem : MenuCrud, IResultFile
                 }
                 catch (Exception excepcion)
                 {
-                    SetResultCrudUi(false, "Error - " + excepcion.Message);
+                    SetResultCrudUi(EResultMenuAction.Failed, "Error - " + excepcion.Message);
                 }
             } else
             {
-                SetResultCrudUi(true, "Nada ha cambiado....");
+                SetResultCrudUi(EResultMenuAction.Nothing, "Nada ha cambiado....");
             }
         }
     }
@@ -79,7 +79,12 @@ public class MenuUpdateItem : MenuCrud, IResultFile
     {
         if(isDialogConfirm)
         {
-            Debug.Log("Eliminando!");
+            if(MyApplication.repository != null)
+            {
+                MyApplication.repository.DeleteItemRemoteById(selectedItemLocal.Id, this);
+                HideMenu();
+                ResetMenu();
+            }
         }
     }
 

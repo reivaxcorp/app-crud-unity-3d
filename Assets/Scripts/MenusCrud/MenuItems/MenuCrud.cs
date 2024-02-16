@@ -3,15 +3,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public enum EResultMenuAction    
-{
-    Failed,
-    Success,
-    Nothing
-}
+
 
 public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
 {
+   
+
     [SerializeField] MenuManagerApp uiApp;
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
@@ -32,21 +29,28 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
     private bool waitForFirebaseSdk;
     private FileManager _fileManager;
 
-    public void SetResultCrudUi(bool exitoso, string msj)
+    public void SetResultCrudUi(EResultMenuAction result, string msj)
     {
         progressText?.StopProgressTextAnimation();
 
         if (resultMsj != null)
         {
-            if (exitoso)
+            switch (result)
             {
-                resultMsj.text = msj;
-                resultMsj.color = Color.green;
-            }
-            else
-            {
-                resultMsj.text = msj;
-                resultMsj.color = Color.red;
+                case EResultMenuAction.Success:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.green;
+                    break;
+                case EResultMenuAction.Failed:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.red;
+                    break;
+                case EResultMenuAction.Nothing:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.cyan;
+                    break;
+                default:
+                    break;
             }
         }
         else
@@ -55,9 +59,9 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         }
     }
 
-    public void SetResultWriteDocument(bool successful, string title, string body)
+    public void SetResultWriteDocument(EResultMenuAction result, string title, string body)
     {
-        if(successful)
+        if (result == EResultMenuAction.Success)
         {
             OpenDialog(title, body);
         }
@@ -155,6 +159,15 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
             ClearMenu();
         }
     }
+    public void ResetMenu()
+    {
+        menuImagePreview.sprite = null;
+        inputFieldName.text = "";
+        waitForFirebaseSdk = true;
+        isImageChanged = false;
+        ClearResultCrud();
+        SetCurrentMenu(null);
+    }
 
     private void OpenImageAndroid()
     {
@@ -215,23 +228,13 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
     private void LogWarningAndSetResult(string mensajeAdvertencia)
     {
         Debug.LogWarning(mensajeAdvertencia);
-        SetResultCrudUi(false, mensajeAdvertencia);
+        SetResultCrudUi(EResultMenuAction.Failed, mensajeAdvertencia);
     }
 
     private void SetCurrentMenu(MenuCrud menu)
     {
         receiverMessagesFromAndroid.SetCurrentMenu(menu);
         uiApp.SetCurrentMenu(menu);
-    }
-
-    private void ResetMenu()
-    {
-        menuImagePreview.sprite = null;
-        inputFieldName.text = "";
-        waitForFirebaseSdk = true;
-        isImageChanged = false;
-        ClearResultCrud();
-        SetCurrentMenu(null);
     }
 
     private void ClearMenu()

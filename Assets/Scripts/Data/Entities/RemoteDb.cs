@@ -125,13 +125,13 @@ public class RemoteDb : IRepositoryRemote
             {
                 // Manejar error
                 Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                resultUi.SetResultCrudUi(false, "Error al escribir en la base de datos");
+                resultUi.SetResultCrudUi(EResultMenuAction.Failed, "Error al escribir en la base de datos");
             }
             else
             {
                 // Operación exitosa
                 Debug.Log("Datos escritos exitosamente en la base de datos");
-                resultUi.SetResultWriteDocument(true, "Ítem subido", "Nuevo ítem agregado");
+                resultUi.SetResultWriteDocument(EResultMenuAction.Success, "Ítem subido", "Nuevo ítem agregado");
             }
         });
     }
@@ -151,13 +151,13 @@ public class RemoteDb : IRepositoryRemote
                     
                     // Manejar error
                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                    iResult.SetResultCrudUi(false, "Error al actualizar la base de datos");
+                    iResult.SetResultCrudUi(EResultMenuAction.Failed, "Error al actualizar la base de datos");
                 }
                 else
                 {
                     // Operación exitosa
                     Debug.Log("Datos escritos exitosamente en la base de datos");
-                    iResult.SetResultCrudUi(true, "Datos actualizados exitosamente en la base de datos");
+                    iResult.SetResultCrudUi(EResultMenuAction.Success, "Datos actualizados exitosamente en la base de datos");
                 }
             });
     }
@@ -178,13 +178,13 @@ public class RemoteDb : IRepositoryRemote
 
                     // Manejar error
                     Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
-                    iResult.SetResultCrudUi(false, "Error al borrar el ítem remoto de la base de datos");
+                    iResult.SetResultCrudUi(EResultMenuAction.Failed, "Error al borrar el ítem remoto de la base de datos");
                 }
                 else
                 {
                     // Operación exitosa
                     Debug.Log("Ítem remoto borrado correctamente");
-                    iResult.SetResultCrudUi(true, "Ítem remoto borrado correctamente");
+                    iResult.SetResultCrudUi(EResultMenuAction.Success, "Ítem remoto borrado correctamente");
                 }
             });
     }
