@@ -164,7 +164,7 @@ public class ManageItems : MonoBehaviour
         }
         else
         {
-            // Estamos sin sin conexión a internet, cargamos los datos locales
+            // Estamos sin conexión a internet, cargamos los datos locales
             foreach (ItemLocal itemLocal in itemsLocalList)
             {
                 Task task = Task.CompletedTask;

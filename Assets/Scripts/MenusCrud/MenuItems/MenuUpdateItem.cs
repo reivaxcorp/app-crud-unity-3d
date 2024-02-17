@@ -8,9 +8,10 @@ using UnityEngine;
 /// </summary>
 public class MenuUpdateItem : MenuCrud
 {
-    private ItemLocal selectedItemLocal;
+    private ItemLocal currentItemSelected;
     private string newImageName;
     private string oldImageName;
+    private bool isDelteItem;
 
     public void InitMenu(string itemId)
     {
@@ -19,7 +20,7 @@ public class MenuUpdateItem : MenuCrud
             try
             {
                 ItemLocal itemLocal = MyApplication.repository.GetLocalItemById(itemId);
-                this.selectedItemLocal = itemLocal;
+                this.currentItemSelected = itemLocal;
                 Texture2D texture2D = MyApplication.repository.LoadTextureAsPNG(itemLocal.ImageName);
                 SetImageName(itemLocal.Name);
                 SetImagePreview(texture2D);
@@ -76,22 +77,27 @@ public class MenuUpdateItem : MenuCrud
         }
     }
 
-    public override void ConfirmButtonDialogPressed(bool isDialogConfirm)
+    public async override void ConfirmButtonDialogPressed(bool isDialogConfirm)
     {
         if(isDialogConfirm)
         {
             if(MyApplication.repository != null)
             {
+                if(isDelteItem)
+                {
+                    await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, this);
+                    SetItemToDelete(false);
+                }
                 HideMenu();
-                ResetMenu();
             }
         }
     }
 
     public void DeleteItem()
     {
-        if(selectedItemLocal != null)
+        if(currentItemSelected != null)
         {
+            SetItemToDelete(true);
             OpenDialog("Eliminar ítem", "¿Desea eliminar el ítem?");
         }
     }
@@ -100,13 +106,14 @@ public class MenuUpdateItem : MenuCrud
     {
         // Ítem a actualizar
         ItemRemote itemRemote = new ItemRemote(
-            id: selectedItemLocal.Id, 
+            id: currentItemSelected.Id, 
             name: inputFieldName.text,
             imageName: isImageChanged ? newImageName : oldImageName, 
-            creationDate: selectedItemLocal.CreationDate);
+            creationDate: currentItemSelected.CreationDate);
 
         // actualizamos el documente de firebase realtimadatabase
         MyApplication.repository.UpdateItemRemote(itemRemote, this);
+        HideMenu();
     }
  
 
@@ -118,6 +125,11 @@ public class MenuUpdateItem : MenuCrud
         this.newImageName = uploadFileRemote.newImageName;
 
         return resultUpload;
+    }
+
+    private void SetItemToDelete(bool isItemToDelete)
+    {
+        this.isDelteItem = isItemToDelete;
     }
 
     private bool IsSomeDatachanged()

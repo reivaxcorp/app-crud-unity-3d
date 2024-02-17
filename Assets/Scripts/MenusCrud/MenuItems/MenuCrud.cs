@@ -217,6 +217,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
 
     private void OnEnable()
     {
+        ResetMenu();
         SetCurrentMenu(this);
     }
 

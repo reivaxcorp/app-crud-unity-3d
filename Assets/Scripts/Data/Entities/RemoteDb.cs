@@ -164,39 +164,45 @@ public class RemoteDb : IRepositoryRemote
     }
 
 
-    public void DeleteItemRemoteById(string id, IResult iResult)
+    public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
     {
         DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
-        rootRef
-            .Child("users")
-            .Child("items")
-            .Child(userUid)
-            .Child(id)
-            .RemoveValueAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted || task.IsCanceled)
-                {
 
-                    // Manejar error
-                    Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
-                    iResult.SetResultCrudUi(EResultMenuAction.Failed, "Error al borrar el ítem remoto de la base de datos");
-                }
-                else
-                {
-                    // Operación exitosa
-                    Debug.Log("Ítem remoto borrado correctamente");
-                    iResult.SetResultCrudUi(EResultMenuAction.Success, "Ítem remoto borrado correctamente");
-                }
-            });
+        bool deleteSuccess = false;
+
+        await rootRef
+             .Child("users")
+             .Child("items")
+             .Child(userUid)
+             .Child(id)
+             .RemoveValueAsync().ContinueWithOnMainThread(task =>
+             {
+                 if (task.IsFaulted || task.IsCanceled)
+                 {
+
+                     // Manejar error
+                     Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
+                     iResult.SetResultCrudUi(EResultMenuAction.Failed, "Error al borrar el ítem remoto de la base de datos");
+                     deleteSuccess = false;
+                 }
+                 else
+                 {
+                     // Operación exitosa
+                     Debug.Log("Ítem remoto borrado correctamente");
+                     iResult.SetResultCrudUi(EResultMenuAction.Success, "Ítem remoto borrado correctamente");
+                     deleteSuccess = true;
+                 }
+             });
+        return deleteSuccess;
     }
 
     /// <summary>
     /// Anteriormente subimos un archivo a firebase storage, asi cuando falla la lectura
     /// en RealtimeDatabase, debemos quitar el archivo subido de firebase storage
     /// </summary>
-    private void RemoveFailedImageUploaded(string imageNameToRemove)
+    private async void RemoveFailedImageUploaded(string imageNameToRemove)
     {
         ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(imageNameToRemove);
-        manageMaterialRemote.DeleteImageRemote();
+        await manageMaterialRemote.DeleteImageRemote();
     }
 }

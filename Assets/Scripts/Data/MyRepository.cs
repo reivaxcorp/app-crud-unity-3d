@@ -22,9 +22,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
          localDb.DeleteLocalItemById(id);
     }
 
-    public void DeleteItemRemoteById(string id, IResult iResult)
+    public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
     {
-        remoteDb.DeleteItemRemoteById(id, iResult);
+        return await remoteDb.DeleteItemRemoteById(id, iResult);
     }
    
     public List<ItemLocal> GetLocalItems()
