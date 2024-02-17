@@ -131,7 +131,7 @@ public class ManageItems : MonoBehaviour
                     MyApplication.repository.RemoveTexture(itemLocal.ImageName);
                     ManageMaterialRemote manageMaterialRemote = 
                         new ManageMaterialRemote(itemLocal.ImageName);
-                    manageMaterialRemote.DeleteImageRemote();
+                    await manageMaterialRemote.DeleteImageRemote();
                     DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)

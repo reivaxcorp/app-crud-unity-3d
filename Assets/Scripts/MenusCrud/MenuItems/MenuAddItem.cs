@@ -1,22 +1,14 @@
 using System;
 using UnityEngine;
 
-public class MenuAddItem : MenuCrud, IResultFile
+public class MenuAddItem : MenuCrud
 {
-
-    public void FileUploaded(bool isFileUploaded, string imageName)
-    {
-        if(isFileUploaded)
-        {
-            WriteDocument(imageName);
-        }
-    }
 
     /// <summary>
     /// Cuando colocamos subir ítem, lo primero que hacemos es subir la imagén, luego escribimos
     /// los datos en realtime database, con WriteDocument, si la subida se realizó correctamente.
     /// </summary>
-    public void OnUploadItem()
+    public async void OnUploadItem()
     {
         if (IsDataSetted())
         {
@@ -24,8 +16,11 @@ public class MenuAddItem : MenuCrud, IResultFile
             {
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, inputFieldName.text, iResult: this, iFileResult: this);
-                uploadFileRemote.UpoloadFileFirebaeStorage();
+                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, iResult: this);
+                bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
+                if (resultUpload) { 
+                    WriteDocument(uploadFileRemote.newImageName); 
+                }
             }
             catch (Exception excepcion)
             {

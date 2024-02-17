@@ -15,7 +15,7 @@ public class RemoteDb : IRepositoryRemote
     public RemoteDb()
     {
         // Obtén el ID del usuario actual
-         this.userUid = FirebaseSDK.GetInstance().user.UserId;
+        this.userUid = FirebaseSDK.GetInstance().user.UserId;
     }
 
     public RemoteDb GetRemoteDb()
@@ -148,9 +148,10 @@ public class RemoteDb : IRepositoryRemote
             {
                 if (task.IsFaulted || task.IsCanceled)
                 {
-                    
+
                     // Manejar error
                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
+                    RemoveFailedImageUploaded(itemRemote.ImageName); // remover el archivo subido
                     iResult.SetResultCrudUi(EResultMenuAction.Failed, "Error al actualizar la base de datos");
                 }
                 else
@@ -162,7 +163,7 @@ public class RemoteDb : IRepositoryRemote
             });
     }
 
-   
+
     public void DeleteItemRemoteById(string id, IResult iResult)
     {
         DatabaseReference rootRef = FirebaseSDK.GetInstance().db.RootReference;
@@ -187,5 +188,15 @@ public class RemoteDb : IRepositoryRemote
                     iResult.SetResultCrudUi(EResultMenuAction.Success, "Ítem remoto borrado correctamente");
                 }
             });
+    }
+
+    /// <summary>
+    /// Anteriormente subimos un archivo a firebase storage, asi cuando falla la lectura
+    /// en RealtimeDatabase, debemos quitar el archivo subido de firebase storage
+    /// </summary>
+    private void RemoveFailedImageUploaded(string imageNameToRemove)
+    {
+        ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(imageNameToRemove);
+        manageMaterialRemote.DeleteImageRemote();
     }
 }

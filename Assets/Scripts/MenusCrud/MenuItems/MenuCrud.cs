@@ -129,7 +129,13 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
         if (string.IsNullOrEmpty(sanitizedFileName))
         {
-            LogWarningAndSetResult("Ingrese el nombre de la imagen");
+            LogWarningAndSetResult("Ingrese el nombre de la imagén");
+            return false;
+        }
+
+        if(sanitizedFileName.Length > 30)
+        {
+            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
             return false;
         }
 

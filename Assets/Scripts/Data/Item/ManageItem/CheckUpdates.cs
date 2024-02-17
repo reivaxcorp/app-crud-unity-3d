@@ -21,11 +21,11 @@ public class CheckUpdates
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
 
-            ItemRemote itemSavedLocal =
+            ItemRemote itemRemote =
                 itemsRemoteList.Find(p => p.Id.Equals(itemLocal.Id));
 
             // Se a removido un item de la base de datos
-            if (itemSavedLocal == null)
+            if (itemRemote == null)
             {
                 itemUpdates.Add(new ItemUpdate(
                     id: itemLocal.Id,
@@ -35,7 +35,7 @@ public class CheckUpdates
                     isAdd: false));
             }
             // Se ha cambiado los campos y la imagén
-            else if (IsFielsUpdate(itemSavedLocal, itemLocal) && IsImageUpdated(itemSavedLocal, itemLocal))
+            else if (IsFielsUpdate(itemRemote, itemLocal) && IsImageUpdated(itemRemote, itemLocal))
             {
                 itemUpdates.Add(new ItemUpdate(
                   id: itemLocal.Id,
@@ -45,7 +45,7 @@ public class CheckUpdates
                   isAdd: false));
             }
             // Solo se han cambiado los campos
-            else if (IsFielsUpdate(itemSavedLocal, itemLocal))
+            else if (IsFielsUpdate(itemRemote, itemLocal))
             {
                 itemUpdates.Add(new ItemUpdate(
                  id: itemLocal.Id,
@@ -55,7 +55,7 @@ public class CheckUpdates
                  isAdd: false));
             }
             // Se ha cambiado la imagén
-            else if (IsImageUpdated(itemSavedLocal, itemLocal))
+            else if (IsImageUpdated(itemRemote, itemLocal))
             {
                 itemUpdates.Add(new ItemUpdate(
                 id: itemLocal.Id,
