@@ -20,7 +20,7 @@ public class MenuAuth : MonoBehaviour
             resultMsj.color = result.MessageColor;
             if(result.IsSuccessed)
             {
-                StartCoroutine(GoMenuUserAccount());
+                GoMenuUserAccount();
             }
         }
         else
@@ -46,12 +46,8 @@ public class MenuAuth : MonoBehaviour
         resultMsj.color = Color.white;
     }
 
-    IEnumerator GoMenuUserAccount()
+    private void GoMenuUserAccount()
     {
-        // you can show a progress bar here....
-
-        yield return new WaitForSeconds(2);
-
         MenuManager menuManager = gameObject.transform.parent.GetComponent<MenuManager>();
         if (menuManager != null)
         {
@@ -71,7 +67,6 @@ public class MenuAuth : MonoBehaviour
     {
         firebaseAuthManager = new FirebaseAuthManager();
     }
-
 
     // Se llama cuando se decativa el gameObject 
     private void OnDisable()

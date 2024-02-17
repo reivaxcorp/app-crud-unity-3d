@@ -12,7 +12,7 @@ public class ManageItems : MonoBehaviour
     [SerializeField]
     private GameObject myItemsOrdered;
     [SerializeField]
-    private GameObject loadingMsj;
+    private GameObject loadingScreen;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
@@ -287,9 +287,9 @@ public class ManageItems : MonoBehaviour
 
     private void SetLoadingMsj(bool isActive)
     {
-        if (loadingMsj != null)
+        if (loadingScreen != null)
         {
-            loadingMsj.SetActive(isActive);
+            loadingScreen.SetActive(isActive);
         }
         else
         {
