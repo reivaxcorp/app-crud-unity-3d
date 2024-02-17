@@ -8,18 +8,8 @@ public class MenuAuth : MonoBehaviour
     protected FirebaseAuthManager firebaseAuthManager;
     protected ValidateMenuInputs validateInputs;
 
-    private void Awake()
-    {
-        validateInputs = gameObject.AddComponent<ValidateMenuInputs>();
-    }
-
-    private void Start()
-    {
-        firebaseAuthManager = new FirebaseAuthManager();
-    }
-
     /// <summary>
-    /// We show the result for interactions with Sdk. 
+    /// Establece el texto del resultado de la autenticación.
     /// </summary>
     /// <param name="result"></param>
     public virtual void SetResult(AccountAuthResult result) {
@@ -35,7 +25,7 @@ public class MenuAuth : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("msj result menu is null");
+            Debug.LogWarning("msj result menu es null");
         }
     }
 
@@ -68,11 +58,22 @@ public class MenuAuth : MonoBehaviour
             menuManager.ShowMenuByName("MenuUserAccount");
         } else
         {
-            Debug.LogWarning("MenuManager doesn't exist in parent menu");
+            Debug.LogWarning("MenuManager no existe en el menú padre");
         }
     }
 
-    // call it when we use SetActive "false"
+    private void Awake()
+    {
+        validateInputs = gameObject.AddComponent<ValidateMenuInputs>();
+    }
+
+    private void Start()
+    {
+        firebaseAuthManager = new FirebaseAuthManager();
+    }
+
+
+    // Se llama cuando se decativa el gameObject 
     private void OnDisable()
     {
         ClearMsjResult();

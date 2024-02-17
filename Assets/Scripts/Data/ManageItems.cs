@@ -86,7 +86,7 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-
+        Debug.Log("SyncronizeData");
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
