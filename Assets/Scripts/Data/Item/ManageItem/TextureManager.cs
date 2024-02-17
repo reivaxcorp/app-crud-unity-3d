@@ -41,7 +41,7 @@ public class TextureManager : IDataTextureLocalSaved
         }
     }
 
-    public void RemoveTexture(string imageName)
+    public void RemoveLocalTexture(string imageName)
     {
         string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
         string filePath = Path.Combine(folderPath, imageName + ".png");

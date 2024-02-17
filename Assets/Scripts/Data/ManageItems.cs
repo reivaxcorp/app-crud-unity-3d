@@ -104,34 +104,38 @@ public class ManageItems : MonoBehaviour
 
                 if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
                 {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
-                    itemsToSave.Add(itemLocal);
-                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: true, isImageUpdate: true);
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                        .ItemRemoteToItemLocal();
+                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    RemoveLocalTexture(itemOld.ImageName);
+                    RemoveRemoteOldTexture(itemOld.ImageName);
+                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: true);
+                    itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsFieldsUpdated)
                 {
                     Debug.Log("Update " +  itemToUpdate.Id);
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
                         .ItemRemoteToItemLocal();
-                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: true, isImageUpdate: false);
-                    itemsToSave.Add(itemLocal);
+                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: false);
+                    itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsImageUpdated)
                 {
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
-                    task = UpdateItemInScene(item: itemLocal, isFieldUpdate: false, isImageUpdate: true);
-                    itemsToSave.Add(itemLocal);
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                        .ItemRemoteToItemLocal();
+                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    RemoveLocalTexture(itemOld.ImageName);
+                    RemoveRemoteOldTexture(itemOld.ImageName);
+                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: false, isImageUpdate: true);
+                    itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
                 {
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
                     MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
-                    MyApplication.repository.RemoveTexture(itemLocal.ImageName);
-                    ManageMaterialRemote manageMaterialRemote = 
-                        new ManageMaterialRemote(itemLocal.ImageName);
-                    await manageMaterialRemote.DeleteImageRemote();
+                    RemoveLocalTexture(itemLocal.ImageName);
+                    RemoveRemoteOldTexture(itemLocal.ImageName);
                     DeleteItemInScene(itemLocal);
                 }
                 else if (itemToUpdate.IsAdd)
@@ -207,6 +211,18 @@ public class ManageItems : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    private void RemoveLocalTexture(string oldImageName)
+    {
+        MyApplication.repository.RemoveLocalTexture(oldImageName);
+    }
+
+    private async void RemoveRemoteOldTexture(string remoteOldImage)
+    {
+        ManageMaterialRemote manageMaterialRemote =
+                     new ManageMaterialRemote(remoteOldImage);
+        await manageMaterialRemote.DeleteImageRemote();
     }
 
     private async Task<bool> UpdateItemInScene(

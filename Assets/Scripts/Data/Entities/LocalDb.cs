@@ -77,13 +77,6 @@ public class LocalDb : IRepositoryLocal
         }
     }
 
-    public void SaveLocalItem(ItemLocal itemLocal)
-    {
-        List<ItemLocal> currentLocalList = GetLocalItems();
-        currentLocalList.Add(itemLocal);
-        SaveLocalItems(currentLocalList);
-    }
-
     public void SaveLocalItems(List<ItemLocal> listItemsLocal)
     {
 

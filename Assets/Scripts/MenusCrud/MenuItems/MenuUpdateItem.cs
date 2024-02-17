@@ -53,11 +53,14 @@ public class MenuUpdateItem : MenuCrud
 
                     if (isImageChanged)
                     {
-                        await UpdateImageRemote();
+                        bool resultUpload = await UpdateImageRemote();
+                        if (resultUpload)
+                        {
+                            UpdateDocumentRemote();
+                        }
                     }
                     else
                     {
-                        // solo se cambio los campos
                         UpdateDocumentRemote();
                     }
                 }
@@ -65,10 +68,6 @@ public class MenuUpdateItem : MenuCrud
                 {
                     SetResultCrudUi(EResultMenuAction.Failed, "Error - " + excepcion.Message);
                 }
-            } 
-            else if(IsAllDataChanged())
-            {
-                UpdateAllItem();
             }
              else
             {
@@ -83,7 +82,6 @@ public class MenuUpdateItem : MenuCrud
         {
             if(MyApplication.repository != null)
             {
-                MyApplication.repository.DeleteItemRemoteById(selectedItemLocal.Id, this);
                 HideMenu();
                 ResetMenu();
             }
@@ -110,40 +108,16 @@ public class MenuUpdateItem : MenuCrud
         // actualizamos el documente de firebase realtimadatabase
         MyApplication.repository.UpdateItemRemote(itemRemote, this);
     }
-
-    private async void UpdateAllItem()
-    {
-        bool resultUpload = await UpdateImageRemote();
-        if (resultUpload)
-        {
-            UpdateDocumentRemote();
-        }
-    }
+ 
 
     private async Task<bool> UpdateImageRemote()
     {
         byte[] fileBytes = fileManager.GetBytesImageSelected();
         UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderUidName, iResult: this);
         bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
-        await RemoveOldImageRemote();
         this.newImageName = uploadFileRemote.newImageName;
+
         return resultUpload;
-    }
-
-    /// <summary>
-    /// borramos la imagén anterior en firebase storage si es necesario
-    /// </summary>
-    private async Task<bool> RemoveOldImageRemote()
-    {
-        ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(oldImageName);
-        bool resultDeleteRemote = await manageMaterialRemote.DeleteImageRemote();
-        return resultDeleteRemote;
-    }
-
-    private bool IsAllDataChanged()
-    {
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        return isImageChanged && !sanitizedFileName.Equals(oldImageName);
     }
 
     private bool IsSomeDatachanged()

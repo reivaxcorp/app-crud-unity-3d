@@ -57,9 +57,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         textureManager.SaveTextureAsPNG(textureToSave, imageName);
     }
 
-    public void RemoveTexture(string imageId)
+    public void RemoveLocalTexture(string imageId)
     {
-        textureManager.RemoveTexture(imageId);
+        textureManager.RemoveLocalTexture(imageId);
     }
 
     public Texture2D LoadTextureAsPNG(string imageName)
@@ -70,11 +70,6 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     public ItemLocal GetLocalItemById(string id)
     {
         return localDb.GetLocalItemById(id);
-    }
-
-    public void SaveLocalItem(ItemLocal itemLocal)
-    {
-        localDb.SaveLocalItem(itemLocal);
     }
 
     public RemoteDb GetRemoteDb()
