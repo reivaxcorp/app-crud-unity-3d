@@ -2,8 +2,21 @@ using UnityEngine;
 
 public class MyCameraController : MonoBehaviour
 {
-    public float panSpeed = 20f;
-    public float zoomSpeed = 5f;
+    private float panSpeed = 20f;
+    private float zoomSpeed = 5f;
+
+    private void Start()
+    {
+        if(Application.isMobilePlatform)
+        {
+            this.panSpeed = 0.5f;
+            this.zoomSpeed = 0.1f;
+        } else
+        {
+            this.panSpeed = 50f;
+            this.zoomSpeed = 17f;
+        }
+    }
 
     private void Update()
     {
