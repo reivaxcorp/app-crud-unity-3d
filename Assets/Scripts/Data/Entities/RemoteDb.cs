@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.Networking.UnityWebRequest;
 
 public class RemoteDb : IRepositoryRemote
 {
@@ -25,15 +24,11 @@ public class RemoteDb : IRepositoryRemote
 
     public void FirebaseValueChanged()
     {
-        // Verificar el estado de la conexión a Internet
-        if (Application.internetReachability != NetworkReachability.NotReachable)
-        {
             FirebaseSDK.GetInstance().db
                    .GetReference("users")
                    .Child("items")
                    .Child(userUid)
              .ValueChanged += HandleValueChanged;
-        }
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -112,7 +107,7 @@ public class RemoteDb : IRepositoryRemote
         string key = rootRef.Child("users").Child("items").Child(userUid).Push().Key;
 
         // Obtener la marca de tiempo del servidor en formato Unix
-        long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+        long timestampUnix = TimeUtils.GetTimeStampUnix();
 
         ItemRemote entry =
             new ItemRemote(key, itemRemote.Name, itemRemote.ImageName, timestampUnix);

@@ -55,7 +55,7 @@ public class TextureManager : IDataTextureLocalSaved
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
-            Debug.Log("Imagen eliminada: " + filePath);
+            Debug.Log("Imagen local eliminada: " + filePath);
         }
         else
         {

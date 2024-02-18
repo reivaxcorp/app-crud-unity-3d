@@ -86,7 +86,7 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-        Debug.Log("SyncronizeData");
+       
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
@@ -114,7 +114,6 @@ public class ManageItems : MonoBehaviour
                 }
                 else if (itemToUpdate.IsFieldsUpdated)
                 {
-                    Debug.Log("Update " +  itemToUpdate.Id);
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
                         .ItemRemoteToItemLocal();
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: false);
@@ -188,14 +187,14 @@ public class ManageItems : MonoBehaviour
             {
                 {
                     GameObject itemToCreate = Instantiate(itemPrefab);
-                    TextMeshPro itemNameText = itemToCreate.GetComponentInChildren<TextMeshPro>();
-                    if (itemNameText != null)
+                    TextMeshPro [] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
+                   
+                    if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
                     {
-                        itemNameText.text = item.Name;
-                    } else
-                    {
-                        Debug.LogWarning("El componente TextMeshPro no esta ajuntado al prefab item");
-                    }
+                        textMeshProChildren[0].text = item.Name;
+                        textMeshProChildren[1].text = TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
+                    } 
+
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
                 }

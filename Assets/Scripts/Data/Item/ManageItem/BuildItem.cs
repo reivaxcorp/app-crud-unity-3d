@@ -13,7 +13,7 @@ public class BuildItem: MonoBehaviour
 
     public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
     {
-
+       
         Texture2D texture2D = GetSavedTexture(imageName);
 
         if(texture2D == null)

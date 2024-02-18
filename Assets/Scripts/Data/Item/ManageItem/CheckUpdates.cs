@@ -79,10 +79,10 @@ public class CheckUpdates
         // Nuevos items a añadir
         foreach (ItemRemote itemRemote in itemsRemoteList)
         {
-            ItemLocal itemToSaveLocal =
+            ItemLocal itemLocal =
               itemsLocalList.Find(p => p.Id.Equals(itemRemote.Id));
 
-            if (itemToSaveLocal == null)
+            if (itemLocal == null)
             {
                 itemUpdates.Add(new ItemUpdate(
                 id: itemRemote.Id,
@@ -102,16 +102,16 @@ public class CheckUpdates
     /// <param name="itemRemote"></param>
     /// <param name="itemLocal"></param>
     /// <returns></returns>
-    private static bool IsFielsUpdate(ItemRemote productRemote, ItemLocal itemLocal)
+    private static bool IsFielsUpdate(ItemRemote itemRemote, ItemLocal itemLocal)
     {
-        return !productRemote.Name.Equals(itemLocal.Name);
+        return !itemRemote.Name.Equals(itemLocal.Name);
     }
 
     // si cambia el el image_id_metadata, es probrable que cambie el nombre de la imagen, 
     // y si cambia a otra imagen cambia tambien el path.
-    private static bool IsImageUpdated(ItemRemote productRemote, ItemLocal itemLocal)
+    private static bool IsImageUpdated(ItemRemote itemRemote, ItemLocal itemLocal)
     {
-        return !productRemote.ImageName.Equals(itemLocal.ImageName);
+        return !itemRemote.ImageName.Equals(itemLocal.ImageName);
     }
 
 }

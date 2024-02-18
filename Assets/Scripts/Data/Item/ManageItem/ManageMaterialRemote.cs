@@ -22,7 +22,7 @@ public class ManageMaterialRemote
          {
              if (task2.IsFaulted || task2.IsCanceled)
              {
-                 Debug.Log("esto no existe" + _storageUrl);
+                 Debug.Log("La imagén no existe " + _storageUrl);
                  Debug.LogError("Error al descargar la imagen: " + task2.Exception);
                  initializationTask.SetResult(new Texture2D(1, 1));
              }
