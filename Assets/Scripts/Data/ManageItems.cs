@@ -16,6 +16,7 @@ public class ManageItems : MonoBehaviour
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
+    private bool syncStarted;
 
     private void Awake()
     {
@@ -25,6 +26,7 @@ public class ManageItems : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        this.syncStarted = false;
         waitToFirebaseInitialized = true;
         SetLoadingMsj(true);
     }
@@ -60,16 +62,25 @@ public class ManageItems : MonoBehaviour
         }
     }
 
-    private void ReadData(bool isInternetAvariable)
+    private async void ReadData(bool isInternetAvariable)
     {
         if (isInternetAvariable)
         {
+            List<ItemRemote> listRemote = await GetItemsRemote();
+            SyncronizeData(listRemote);
+            Debug.Log("tamaño list items remotos" + listRemote.Count);
             ListeningDbRemote();
         }
         else
         {
             SyncronizeData(null);
         }
+    }
+
+    private async Task<List<ItemRemote>> GetItemsRemote()
+    {
+        List<ItemRemote> itemsRemote = await MyApplication.repository.GetItemsRemote();
+        return itemsRemote;
     }
 
     // Nos suscribimos a un evento y llamamos al metodo que lanzara el evento.
@@ -86,27 +97,35 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-       
+        if(syncStarted) return;
+
+        syncStarted = true;
+
         List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
-        // Estamos con conexión a internet.
-        if (itemsRemoteList != null)
+        bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
+        Debug.Log("Ambás db son iguales? " + isSomeListDbEquals);
+
+        if (!isSomeListDbEquals)
         {
+
             List<ItemUpdate> itemListUpdates =
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
+
             foreach (ItemUpdate itemToUpdate in itemListUpdates)
             {
+               
                 Task task = Task.CompletedTask; // Inicializar una tarea completada
 
                 if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
                 {
-                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
-                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     RemoveLocalTexture(itemOld.ImageName);
                     RemoveRemoteOldTexture(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: true);
@@ -114,16 +133,16 @@ public class ManageItems : MonoBehaviour
                 }
                 else if (itemToUpdate.IsFieldsUpdated)
                 {
-                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: false);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsImageUpdated)
                 {
-                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
-                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     RemoveLocalTexture(itemOld.ImageName);
                     RemoveRemoteOldTexture(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: false, isImageUpdate: true);
@@ -131,7 +150,7 @@ public class ManageItems : MonoBehaviour
                 }
                 else if (itemToUpdate.IsRemove)
                 {
-                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
                     RemoveLocalTexture(itemLocal.ImageName);
                     RemoveRemoteOldTexture(itemLocal.ImageName);
@@ -140,7 +159,7 @@ public class ManageItems : MonoBehaviour
                 else if (itemToUpdate.IsAdd)
                 {
                     // Nuevo item añadido
-                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
+                    ItemLocal itemLocal = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     task = CreateItemInScene(itemLocal);
                     itemsToSave.Add(itemLocal);
@@ -148,7 +167,7 @@ public class ManageItems : MonoBehaviour
                 else
                 {
                     // sin cambios el ítem local con el ítem remoto
-                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
+                    ItemLocal itemLocal = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     task = CreateItemInScene(itemLocal);
                     itemsToSave.Add(itemLocal);
                 }
@@ -177,6 +196,8 @@ public class ManageItems : MonoBehaviour
         }
 
         SetLoadingMsj(false);
+
+        syncStarted = false;
     }
 
     private async Task<bool> CreateItemInScene(ItemLocal item)
@@ -311,5 +332,21 @@ public class ManageItems : MonoBehaviour
         }
         if (networkManager != null)
             networkManager.handleInternetAvariableResult -= ReadData;
+    }
+
+    private bool IsListsDbEquals(List<ItemLocal> itemLocals, List<ItemRemote> itemRemotes)
+    {
+        if(itemLocals.Count !=  itemRemotes.Count) return false;
+        if (itemLocals.Count == 0) return false;
+
+        bool isSameContent = true;
+
+        for (int i = 0; i < itemLocals.Count; i++)
+        {
+            ItemRemote itemRemote =
+                itemRemotes.Find(item => item.Id.Equals(itemLocals[i].Id));
+            isSameContent = isSameContent && ItemExtensions.IsSameContent(itemLocals[i], itemRemote);
+        }
+        return isSameContent;
     }
 }

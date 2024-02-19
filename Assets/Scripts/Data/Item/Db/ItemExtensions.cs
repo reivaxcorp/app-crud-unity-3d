@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public static class ItemExtensions 
+public static class ItemExtensions
 {
     public static ItemLocal ItemRemoteToItemLocal(this ItemRemote itemRemote)
     {
@@ -8,7 +8,7 @@ public static class ItemExtensions
         {
             // Realiza la conversión de los campos según sea necesario
             Id = itemRemote.Id,
-            Name = itemRemote.Name, 
+            Name = itemRemote.Name,
             ImageName = itemRemote.ImageName,
             CreationDate = itemRemote.CreationDate
         };
@@ -24,7 +24,7 @@ public static class ItemExtensions
             {
                 // Realiza la conversión de los campos según sea necesario
                 Id = remoteItem.Id,
-                Name = remoteItem.Name, 
+                Name = remoteItem.Name,
                 ImageName = remoteItem.ImageName,
                 CreationDate = remoteItem.CreationDate
             };
@@ -33,5 +33,16 @@ public static class ItemExtensions
         }
 
         return itemsLocal;
+    }
+
+    public static bool IsSameContent(ItemLocal itemLocal, ItemRemote itemRemote)
+    {
+        if(itemLocal == null || itemRemote == null) return false;
+
+        return
+                itemLocal.Id.Equals(itemRemote.Id) &&
+                itemLocal.Name.Equals(itemRemote.Name) &&
+                itemLocal.ImageName.Equals(itemRemote.ImageName) && 
+                itemLocal.CreationDate == itemRemote.CreationDate;
     }
 }

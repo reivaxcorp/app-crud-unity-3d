@@ -22,8 +22,8 @@ public class ManageMaterialRemote
          {
              if (task2.IsFaulted || task2.IsCanceled)
              {
-                 Debug.Log("La imagén no existe " + _storageUrl);
-                 Debug.LogError("Error al descargar la imagen: " + task2.Exception);
+                 Debug.Log("La imagén no existe " + _storageUrl);   
+                 Debug.LogWarning("Error al descargar la imagen: " + task2.Exception);
                  initializationTask.SetResult(new Texture2D(1, 1));
              }
              else
@@ -33,8 +33,9 @@ public class ManageMaterialRemote
 
                  // Crea una textura desde los bytes de la imagen.
                  Texture2D texture = new Texture2D(1, 1);
+                 bool loadImage = texture.LoadImage(fileContents);
 
-                 if (texture.LoadImage(fileContents))
+                 if (loadImage)
                  {
                      initializationTask.SetResult(texture);
                  }
@@ -55,7 +56,7 @@ public class ManageMaterialRemote
     /// <param name="filePath"></param>
     public async Task<bool> DeleteImageRemote()
     {
-        Debug.Log("Imagen a eliminar: " + _storageUrl);
+        Debug.Log("Imagen remota a eliminar: " + _storageUrl);
 
         var storageReference = FirebaseSDK.GetInstance().firebaseStorage.GetReferenceFromUrl(_storageUrl);
 

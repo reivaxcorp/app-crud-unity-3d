@@ -10,9 +10,11 @@ public class RemoteDb : IRepositoryRemote
     public delegate void OnHandleValueChangedCallBack(List<ItemRemote> itemsRemoteList);
     public event OnHandleValueChangedCallBack handleValueResult;
     private string userUid;
+    private bool isListeningDb;
 
     public RemoteDb()
     {
+        this.isListeningDb = false;
         // Obtén el ID del usuario actual
         this.userUid = FirebaseSDK.GetInstance().user.UserId;
     }
@@ -24,15 +26,21 @@ public class RemoteDb : IRepositoryRemote
 
     public void FirebaseValueChanged()
     {
+        if (!isListeningDb)
+        {
+            isListeningDb = true;
+
             FirebaseSDK.GetInstance().db
-                   .GetReference("users")
-                   .Child("items")
-                   .Child(userUid)
-             .ValueChanged += HandleValueChanged;
+                .GetReference("users")
+                .Child("items")
+                .Child(userUid)
+                .ValueChanged += HandleValueChanged;
+        }
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
+        Debug.Log("handled");
         if (args.DatabaseError != null)
         {
             Debug.LogError(args.DatabaseError.Message);
@@ -54,13 +62,19 @@ public class RemoteDb : IRepositoryRemote
 
             itemsRemoteList.Add(item);
         }
-        handleValueResult?.Invoke(itemsRemoteList);
+        if(itemsRemoteList.Count == 0)
+        {
+            handleValueResult?.Invoke(null);
+        } else
+        {
+            handleValueResult?.Invoke(itemsRemoteList);
+        }
     }
 
     public async Task<List<ItemRemote>> GetItemsRemote()
     {
-        // Crear un objeto TaskCompletionSource para controlar la finalización de la tarea
-        var tcs = new TaskCompletionSource<List<ItemRemote>>();
+
+        List<ItemRemote> itemsList = new List<ItemRemote>();
 
         // Obtén la referencia a la ubicación de los items para el usuario actual
         await FirebaseSDK.GetInstance().db
@@ -68,16 +82,14 @@ public class RemoteDb : IRepositoryRemote
             .Child("items")
             .Child(userUid).GetValueAsync().ContinueWithOnMainThread(task =>
             {
-
                 if (task.IsFaulted)
                 {
                     // Handle the error...
-                    tcs.SetException(task.Exception);
+                    throw new Exception("Error al recuperar los datos " + task.Exception.ToString());
                 }
                 else if (task.IsCompleted)
                 {
                     DataSnapshot snapshot = task.Result;
-                    List<ItemRemote> itemsList = new List<ItemRemote>();
 
                     foreach (DataSnapshot itemSnapshot in snapshot.Children)
                     {
@@ -90,13 +102,10 @@ public class RemoteDb : IRepositoryRemote
 
                         itemsList.Add(item);
                     }
-                    // Establecer el resultado de la tarea como la lista de items
-                    tcs.SetResult(itemsList);
                 }
             });
 
-        // Devolver la tarea asociada con el TaskCompletionSource
-        return await tcs.Task;
+        return itemsList;
     }
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)

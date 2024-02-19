@@ -4,8 +4,8 @@ public class TimeUtils
 {
     public static long GetTimeStampUnix()
     {
-        // Obtener la marca de tiempo del servidor en formato Unix
-        long timestampUnix = (long)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+        // Obtener la marca de tiempo actual del dispositivo en formato Unix
+        long timestampUnix = (long)(DateTime.Now.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         return timestampUnix;
     }
 

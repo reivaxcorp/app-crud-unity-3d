@@ -77,7 +77,6 @@ public class FirebaseSDK
                 this.auth.StateChanged += AuthStateChanged;
 
                 isFirebaseReady = true;
-
                 AuthStateChanged(this, null);
             }
             else
@@ -88,7 +87,7 @@ public class FirebaseSDK
                 isFirebaseReady = false;
             }
         });
-
+       
         return isFirebaseReady;
     }
 
