@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public interface IRepositoryLocal
 {
-    List<ItemLocal> GetLocalItems();
-    ItemLocal GetLocalItemById(string id);
-    void SaveLocalItems(List<ItemLocal> listItemsLocal);
-    void DeleteLocalItemById(string id);
+    Task<List<ItemLocal>> GetLocalItemsAsync();
+    Task<ItemLocal> GetLocalItemById(string id);
+    Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal);
+    Task DeleteLocalItemById(string id);
 }

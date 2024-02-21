@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class ManageItems : MonoBehaviour
 {
@@ -17,6 +19,7 @@ public class ManageItems : MonoBehaviour
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
     private bool syncStarted;
+    private List<ItemLocal> itemsLocalList;
 
     private void Awake()
     {
@@ -26,6 +29,7 @@ public class ManageItems : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        this.itemsLocalList = new List<ItemLocal>();
         this.syncStarted = false;
         waitToFirebaseInitialized = true;
         SetLoadingMsj(true);
@@ -38,22 +42,46 @@ public class ManageItems : MonoBehaviour
         {
             if (FirebaseSDK.GetInstance().isFirebaseReady &&
                 MyApplication.repository != null &&
-                FirebaseSDK.GetInstance().db != null)
+                FirebaseSDK.GetInstance().defaultInstance != null)
             {
                 waitToFirebaseInitialized = false;
-
-                CheckInternetConection();
+           
+                LoadLocalData();
             }
         }
     }
 
-    private void CheckInternetConection()
+    // cargamos la base de datos local, y si hay internet luego la remota
+    private async void LoadLocalData()
     {
+
+        List<ItemLocal> itemsLocal = await MyApplication.repository.GetLocalItemsAsync();
+       
+        this.itemsLocalList = itemsLocal;
+
+        List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
+
+        foreach (ItemLocal itemLocal in itemsLocalList)
+        {
+            Task task = CreateItemInScene(itemLocal);
+            tasks.Add(task);
+        }
+        OrderItem(itemsLocalList);
+        await Task.WhenAll(tasks);
+
+        StartCoroutine(CheckInternetConection());
+    }
+
+    IEnumerator CheckInternetConection()
+    {
+        // Esperar 3 segundos
+        yield return new WaitForSeconds(3f);
+
         this.networkManager = GetComponent<NetworkManager>();
 
         if (networkManager != null)
         {
-            networkManager.handleInternetAvariableResult += ReadData;
+            networkManager.handleInternetAvariableResult += ResultInternetAvariable;
             networkManager.ListeningInternetAvariable();
         }
         else
@@ -62,33 +90,21 @@ public class ManageItems : MonoBehaviour
         }
     }
 
-    private async void ReadData(bool isInternetAvariable)
+    // si hay internet, podemos leer la base de datos remote, de lo contrario no hacemos nada
+    private void ResultInternetAvariable(bool isInternetAvariable)
     {
         if (isInternetAvariable)
         {
-            List<ItemRemote> listRemote = await GetItemsRemote();
-            SyncronizeData(listRemote);
-            Debug.Log("tamaño list items remotos" + listRemote.Count);
             ListeningDbRemote();
         }
-        else
-        {
-            SyncronizeData(null);
-        }
     }
 
-    private async Task<List<ItemRemote>> GetItemsRemote()
-    {
-        List<ItemRemote> itemsRemote = await MyApplication.repository.GetItemsRemote();
-        return itemsRemote;
-    }
-
-    // Nos suscribimos a un evento y llamamos al metodo que lanzara el evento.
-    private void ListeningDbRemote()
+    // Escuchamos los cambios en la base de datos remota, al suscribirnos a los cambios
+    private async void ListeningDbRemote()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
         remoteDbRef.handleValueResult += SyncronizeData;
-        remoteDbRef.FirebaseValueChanged();
+        await remoteDbRef.FirebaseValueChanged();
     }
 
     /// <summary>
@@ -97,17 +113,20 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-        if(syncStarted) return;
+        if (syncStarted) return;
 
         syncStarted = true;
 
-        List<ItemLocal> itemsLocalList = MyApplication.repository.GetLocalItems();
+        //  List<ItemLocal> itemsLocalList = await MyApplication.repository.GetLocalItemsAsync();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
 
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
-        Debug.Log("Ambás db son iguales? " + isSomeListDbEquals);
+        Debug.Log("Ambás db son iguales? " + isSomeListDbEquals + " " +
+            itemsLocalList.Count + " " + itemsRemoteList.Count);
+
+        //  printDb(itemsLocalList, itemsRemoteList);
 
         if (!isSomeListDbEquals)
         {
@@ -115,10 +134,9 @@ public class ManageItems : MonoBehaviour
             List<ItemUpdate> itemListUpdates =
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-
             foreach (ItemUpdate itemToUpdate in itemListUpdates)
             {
-               
+
                 Task task = Task.CompletedTask; // Inicializar una tarea completada
 
                 if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
@@ -151,7 +169,7 @@ public class ManageItems : MonoBehaviour
                 else if (itemToUpdate.IsRemove)
                 {
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
+                    await MyApplication.repository.DeleteLocalItemById(itemLocal.Id);
                     RemoveLocalTexture(itemLocal.ImageName);
                     RemoveRemoteOldTexture(itemLocal.ImageName);
                     DeleteItemInScene(itemLocal);
@@ -178,7 +196,7 @@ public class ManageItems : MonoBehaviour
             await Task.WhenAll(tasks);
             OrderItem(itemsToSave);
             // actualizamos la lista local con la remota
-            MyApplication.repository.SaveLocalItems(itemsToSave);
+            await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
         }
         else
         {
@@ -187,12 +205,15 @@ public class ManageItems : MonoBehaviour
             {
                 Task task = Task.CompletedTask;
                 task = CreateItemInScene(itemLocal);
+                itemsToSave.Add(itemLocal);
                 tasks.Add(task);
             }
 
             // Esperar a que todas las tareas se completen
             await Task.WhenAll(tasks);
             OrderItem(itemsLocalList);
+
+            await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
         }
 
         SetLoadingMsj(false);
@@ -208,13 +229,13 @@ public class ManageItems : MonoBehaviour
             {
                 {
                     GameObject itemToCreate = Instantiate(itemPrefab);
-                    TextMeshPro [] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
-                   
+                    TextMeshPro[] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
+
                     if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
                     {
                         textMeshProChildren[0].text = item.Name;
                         textMeshProChildren[1].text = TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
-                    } 
+                    }
 
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
@@ -246,7 +267,7 @@ public class ManageItems : MonoBehaviour
     }
 
     private async Task<bool> UpdateItemInScene(
-        ItemLocal item, 
+        ItemLocal item,
         bool isFieldUpdate,
         bool isImageUpdate
         )
@@ -277,7 +298,7 @@ public class ManageItems : MonoBehaviour
             Destroy(gameObjectExists);
         }
     }
-     
+
     private void OrderItem(List<ItemLocal> itemsLocalList)
     {
         if (myItemsOrdered != null)
@@ -324,19 +345,22 @@ public class ManageItems : MonoBehaviour
 
     private void DesuscribeEventsDbListening()
     {
-        if(MyApplication.repository != null)
+        if (MyApplication.repository != null)
         {
             RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
             if (remoteDbRef != null)
+            {
+                remoteDbRef.CancelHandleValueChanged();
                 remoteDbRef.handleValueResult -= SyncronizeData;
+            }
         }
         if (networkManager != null)
-            networkManager.handleInternetAvariableResult -= ReadData;
+            networkManager.handleInternetAvariableResult -= ResultInternetAvariable;
     }
 
     private bool IsListsDbEquals(List<ItemLocal> itemLocals, List<ItemRemote> itemRemotes)
     {
-        if(itemLocals.Count !=  itemRemotes.Count) return false;
+        if (itemLocals.Count != itemRemotes.Count) return false;
         if (itemLocals.Count == 0) return false;
 
         bool isSameContent = true;
@@ -348,5 +372,32 @@ public class ManageItems : MonoBehaviour
             isSameContent = isSameContent && ItemExtensions.IsSameContent(itemLocals[i], itemRemote);
         }
         return isSameContent;
+    }
+
+    private void printDb(List<ItemLocal> itemLocals, List<ItemRemote> itemsRemote)
+    {
+        Debug.Log("LOCAL DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        for (int i = 0; i < itemLocals.Count; i++)
+        {
+
+            Debug.Log(itemLocals[i].Id);
+            Debug.Log(itemLocals[i].Name);
+            Debug.Log(itemLocals[i].ImageName);
+            Debug.Log(itemLocals[i].CreationDate);
+
+        }
+        Debug.Log("FIN LOCAL DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+
+
+        Debug.Log("REMOTE DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        for (int i = 0; i < itemsRemote.Count; i++)
+        {
+            Debug.Log(itemsRemote[i].Id);
+            Debug.Log(itemsRemote[i].Name);
+            Debug.Log(itemsRemote[i].ImageName);
+            Debug.Log(itemsRemote[i].CreationDate);
+        }
+        Debug.Log("FIN REMOTE DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+
     }
 }

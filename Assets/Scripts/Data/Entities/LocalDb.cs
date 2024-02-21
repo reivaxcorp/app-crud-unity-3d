@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class LocalDb : IRepositoryLocal
@@ -21,9 +22,9 @@ public class LocalDb : IRepositoryLocal
         }
     }
 
-    public void DeleteLocalItemById(string id)
+    public async Task DeleteLocalItemById(string id)
     {
-        List<ItemLocal> localItemsList = GetLocalItems();
+        List<ItemLocal> localItemsList = await GetLocalItemsAsync();
 
         // Buscar si el item ya existe en la lista
         int existingIndex = localItemsList.FindIndex(x => x.Id == id);
@@ -33,12 +34,12 @@ public class LocalDb : IRepositoryLocal
             // Si el item existe, eliminarlo de la lista
             localItemsList.RemoveAt(existingIndex);
         }
-        SaveLocalItems(localItemsList);
+        await SaveLocalItemsAsync(localItemsList);
     }
 
-    public ItemLocal GetLocalItemById(string id)
+    public async Task<ItemLocal> GetLocalItemById(string id)
     {
-        List<ItemLocal> localItemsList = GetLocalItems();
+        List<ItemLocal> localItemsList = await GetLocalItemsAsync();
 
         int existingIndex = localItemsList.FindIndex(x => x.Id == id);
 
@@ -49,9 +50,8 @@ public class LocalDb : IRepositoryLocal
         throw new Exception("El item local fue borrado o no existe");
     }
 
-    public List<ItemLocal> GetLocalItems()
+    public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
-
         string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
@@ -63,12 +63,12 @@ public class LocalDb : IRepositoryLocal
 
         if (File.Exists(filePath))
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(filePath, FileMode.Open);
-
-            List<ItemLocal> itemsLocal = formatter.Deserialize(stream) as List<ItemLocal>;
-            stream.Close();
-            return itemsLocal;
+            using (FileStream stream = new FileStream(filePath, FileMode.Open))
+            {
+                // Deserializar de manera asíncrona
+                BinaryFormatter formatter = new BinaryFormatter();
+                return await Task.FromResult(formatter.Deserialize(stream) as List<ItemLocal>);
+            }
         }
         else
         {
@@ -77,9 +77,8 @@ public class LocalDb : IRepositoryLocal
         }
     }
 
-    public void SaveLocalItems(List<ItemLocal> listItemsLocal)
+    public async Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal)
     {
-
         string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
@@ -89,11 +88,15 @@ public class LocalDb : IRepositoryLocal
             Directory.CreateDirectory(folderPath);
         }
 
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream stream = new FileStream(filePath, FileMode.Create);
-
-        formatter.Serialize(stream, listItemsLocal);
-        stream.Close();
+        await Task.Run(() =>
+        {
+            // Serializar y guardar de manera asíncrona
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, listItemsLocal);
+            }
+        });
     }
 
 }

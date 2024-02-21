@@ -13,13 +13,13 @@ public class MenuUpdateItem : MenuCrud
     private string oldImageName;
     private bool isDelteItem;
 
-    public void InitMenu(string itemId)
+    public async void InitMenu(string itemId)
     {
         if (MyApplication.repository != null)
         {
             try
             {
-                ItemLocal itemLocal = MyApplication.repository.GetLocalItemById(itemId);
+                ItemLocal itemLocal = await MyApplication.repository.GetLocalItemById(itemId);
                 this.currentItemSelected = itemLocal;
                 Texture2D texture2D = MyApplication.repository.LoadTextureAsPNG(itemLocal.ImageName);
                 SetImageName(itemLocal.Name);

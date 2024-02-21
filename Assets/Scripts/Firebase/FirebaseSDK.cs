@@ -13,10 +13,10 @@ public class FirebaseSDK
         private set { _app = value; }
         get { return _app; }
     }
-    public FirebaseDatabase db
+    public FirebaseDatabase defaultInstance
     {
-        private set { _db = value; }
-        get { return _db; }
+        private set { _defaultInstance = value; }
+        get { return _defaultInstance; }
     }
     public FirebaseStorage firebaseStorage
     {
@@ -41,7 +41,7 @@ public class FirebaseSDK
 
     private static FirebaseSDK instance;
     private FirebaseApp _app;
-    private FirebaseDatabase _db;
+    private FirebaseDatabase _defaultInstance;
     private FirebaseStorage _firebaseStorage;
     private FirebaseAuth _auth;
     private FirebaseUser _user;
@@ -67,7 +67,7 @@ public class FirebaseSDK
                 this.app = Firebase.FirebaseApp.DefaultInstance; // PRODUCTION MODE
 
                 // Set a flag here to indicate whether Firebase is ready to use by your app.
-                this.db = FirebaseDatabase.DefaultInstance;
+                this.defaultInstance = FirebaseDatabase.DefaultInstance;
 
                 this.firebaseStorage = FirebaseStorage.DefaultInstance;
 

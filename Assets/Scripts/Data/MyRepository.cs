@@ -17,9 +17,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         this.remoteDb = remoteDb;
     }
 
-    public void DeleteLocalItemById(string id)
+    public async Task DeleteLocalItemById(string id)
     {
-         localDb.DeleteLocalItemById(id);
+         await localDb.DeleteLocalItemById(id);
     }
 
     public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
@@ -27,9 +27,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         return await remoteDb.DeleteItemRemoteById(id, iResult);
     }
    
-    public List<ItemLocal> GetLocalItems()
+    public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
-        return localDb.GetLocalItems();
+        return await localDb.GetLocalItemsAsync();
     }
 
     public async Task<List<ItemRemote>> GetItemsRemote()
@@ -37,9 +37,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
          return await remoteDb.GetItemsRemote();
     }
 
-    public void SaveLocalItems(List<ItemLocal> listItemsLocal)
+    public async Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal)
     {
-        localDb.SaveLocalItems(listItemsLocal);
+        await localDb.SaveLocalItemsAsync(listItemsLocal);
     }
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
@@ -67,9 +67,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         return textureManager.LoadTextureAsPNG(imageName);
     }
 
-    public ItemLocal GetLocalItemById(string id)
+    public async Task<ItemLocal> GetLocalItemById(string id)
     {
-        return localDb.GetLocalItemById(id);
+        return await localDb.GetLocalItemById(id);
     }
 
     public RemoteDb GetRemoteDb()
