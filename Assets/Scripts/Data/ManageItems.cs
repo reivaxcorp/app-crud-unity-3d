@@ -40,12 +40,10 @@ public class ManageItems : MonoBehaviour
     {
         if (waitToFirebaseInitialized)
         {
-            if (FirebaseSDK.GetInstance().isFirebaseReady &&
-                MyApplication.repository != null &&
-                FirebaseSDK.GetInstance().defaultInstance != null)
+            if (CheckDependenciesInitialize())
             {
                 waitToFirebaseInitialized = false;
-           
+
                 LoadLocalData();
             }
         }
@@ -56,7 +54,7 @@ public class ManageItems : MonoBehaviour
     {
 
         List<ItemLocal> itemsLocal = await MyApplication.repository.GetLocalItemsAsync();
-       
+
         this.itemsLocalList = itemsLocal;
 
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
@@ -69,13 +67,15 @@ public class ManageItems : MonoBehaviour
         OrderItem(itemsLocalList);
         await Task.WhenAll(tasks);
 
+        SetLoadingMsj(false);
+
         StartCoroutine(CheckInternetConection());
     }
 
     IEnumerator CheckInternetConection()
     {
         // Esperar 3 segundos
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.0f);
 
         this.networkManager = GetComponent<NetworkManager>();
 
@@ -126,7 +126,7 @@ public class ManageItems : MonoBehaviour
         Debug.Log("Ambás db son iguales? " + isSomeListDbEquals + " " +
             itemsLocalList.Count + " " + itemsRemoteList.Count);
 
-        //  printDb(itemsLocalList, itemsRemoteList);
+        //printDb(itemsLocalList, itemsRemoteList);
 
         if (!isSomeListDbEquals)
         {
@@ -216,7 +216,6 @@ public class ManageItems : MonoBehaviour
             await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
         }
 
-        SetLoadingMsj(false);
 
         syncStarted = false;
     }
@@ -229,6 +228,8 @@ public class ManageItems : MonoBehaviour
             {
                 {
                     GameObject itemToCreate = Instantiate(itemPrefab);
+                    itemToCreate.transform.position = myItemsOrdered.transform.position;
+
                     TextMeshPro[] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
 
                     if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
@@ -374,6 +375,15 @@ public class ManageItems : MonoBehaviour
         return isSameContent;
     }
 
+    private bool CheckDependenciesInitialize()
+    {
+
+        return    MyApplication.repository != null &&
+                  FirebaseSDK.GetInstance().isFirebaseReady &&
+                  FirebaseSDK.GetInstance().firebaseStorage != null &&
+                  FirebaseSDK.GetInstance().defaultInstance != null;
+    }
+
     private void printDb(List<ItemLocal> itemLocals, List<ItemRemote> itemsRemote)
     {
         Debug.Log("LOCAL DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
@@ -398,6 +408,5 @@ public class ManageItems : MonoBehaviour
             Debug.Log(itemsRemote[i].CreationDate);
         }
         Debug.Log("FIN REMOTE DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-
     }
 }
