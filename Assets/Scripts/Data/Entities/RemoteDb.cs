@@ -37,7 +37,6 @@ public class RemoteDb : IRepositoryRemote
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
-        Debug.Log("handled");
         if (args.DatabaseError != null)
         {
             Debug.LogError(args.DatabaseError.Message);
@@ -73,7 +72,6 @@ public class RemoteDb : IRepositoryRemote
 
     public void CancelHandleValueChanged()
     {
-        Debug.Log("desuscribe " + userUid);
         FirebaseSDK.GetInstance().defaultInstance
          .GetReference("users")
          .Child("items")

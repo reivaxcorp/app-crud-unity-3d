@@ -123,10 +123,6 @@ public class ManageItems : MonoBehaviour
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
-        Debug.Log("Ambás db son iguales? " + isSomeListDbEquals + " " +
-            itemsLocalList.Count + " " + itemsRemoteList.Count);
-
-        //printDb(itemsLocalList, itemsRemoteList);
 
         if (!isSomeListDbEquals)
         {
@@ -241,10 +237,6 @@ public class ManageItems : MonoBehaviour
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
                 }
-            }
-            else
-            {
-                Debug.Log("Ítem ya existente (No es necesario crearlo) " + item.Id);
             }
         }
         else
@@ -382,31 +374,5 @@ public class ManageItems : MonoBehaviour
                   FirebaseSDK.GetInstance().isFirebaseReady &&
                   FirebaseSDK.GetInstance().firebaseStorage != null &&
                   FirebaseSDK.GetInstance().defaultInstance != null;
-    }
-
-    private void printDb(List<ItemLocal> itemLocals, List<ItemRemote> itemsRemote)
-    {
-        Debug.Log("LOCAL DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-        for (int i = 0; i < itemLocals.Count; i++)
-        {
-
-            Debug.Log(itemLocals[i].Id);
-            Debug.Log(itemLocals[i].Name);
-            Debug.Log(itemLocals[i].ImageName);
-            Debug.Log(itemLocals[i].CreationDate);
-
-        }
-        Debug.Log("FIN LOCAL DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-
-
-        Debug.Log("REMOTE DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-        for (int i = 0; i < itemsRemote.Count; i++)
-        {
-            Debug.Log(itemsRemote[i].Id);
-            Debug.Log(itemsRemote[i].Name);
-            Debug.Log(itemsRemote[i].ImageName);
-            Debug.Log(itemsRemote[i].CreationDate);
-        }
-        Debug.Log("FIN REMOTE DBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     }
 }

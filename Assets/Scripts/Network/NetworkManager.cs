@@ -48,12 +48,12 @@ public class NetworkManager : MonoBehaviour
         switch (reachability)
         {
             case NetworkReachability.NotReachable:
-                Debug.Log("No hay conexión a Internet.");
+                // Debug.Log("No hay conexión a Internet.");
                 handleInternetAvariableResult?.Invoke(false);
                 break;
             case NetworkReachability.ReachableViaCarrierDataNetwork:
             case NetworkReachability.ReachableViaLocalAreaNetwork:
-                Debug.Log("Conexión a Internet disponible.");
+                // Debug.Log("Conexión a Internet disponible.");
                 handleInternetAvariableResult?.Invoke(true);
                 break;
         }
