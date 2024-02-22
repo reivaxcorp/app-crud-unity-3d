@@ -52,7 +52,7 @@ public class MenuDialogConfirm : MonoBehaviour
 
     private void HideDialog()
     {
-        menuManager.ButtonAddItemSetActive(true);
+        menuManager.HideBackButtons(true);
         gameObject.SetActive(false);
     }
 

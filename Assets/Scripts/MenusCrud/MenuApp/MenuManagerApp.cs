@@ -1,12 +1,22 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuManagerApp : MonoBehaviour
 {
-    [SerializeField] GameObject addItemBtn;
+
+    [Header("Menu CRUD")]
     [SerializeField] GameObject menuAddItem;
     [SerializeField] GameObject menuUpdateItem;
-    [SerializeField] GameObject myItemsOrdened;
 
+    [Header("Botones Main UI")]
+    [SerializeField] GameObject addItemBtn;
+    [SerializeField] GameObject menuCompanyBtn;
+    [SerializeField] GameObject backBtn;
+
+    [Header("APP info")]
+    [SerializeField] GameObject menuCompany;
+    [SerializeField] GameObject myItemsOrdened;
+    
     private MenuCrud menu;
 
     private bool firstTouch = false;
@@ -21,7 +31,7 @@ public class MenuManagerApp : MonoBehaviour
         {
             menuAddItem.transform.parent.gameObject.SetActive(true);
             menuAddItem.SetActive(true);
-            ButtonAddItemSetActive(false);
+            HideBackButtons(false);
         }
     }
 
@@ -31,10 +41,29 @@ public class MenuManagerApp : MonoBehaviour
         {
             menuUpdateItem.transform.parent.gameObject.SetActive(true);
             menuUpdateItem.SetActive(true);
-            ButtonAddItemSetActive(false);
+            HideBackButtons(false);
             menuUpdateItem.GetComponent<MenuUpdateItem>().InitMenu(idItem);
         }
     }
+
+    public void ShowMenuCompany()
+    {
+        if(!menuCompany.activeSelf)
+        {
+            menuCompany.SetActive(true);
+            HideBackButtons(false);
+        }
+    }
+
+    public void HideMenuCompany()
+    {
+        if (menuCompany.activeSelf)
+        {
+            menuCompany.SetActive(false);
+            HideBackButtons(true);
+        }
+    }
+
 
     public void SetCurrentMenu(MenuCrud menu)
     {
@@ -43,19 +72,21 @@ public class MenuManagerApp : MonoBehaviour
 
     public void ShowMenu()
     {
-        ButtonAddItemSetActive(false);
+        HideBackButtons(false);
         MenuSetActive(true);
     }
 
     public void HideMenu()
     {
         MenuSetActive(false);
-        ButtonAddItemSetActive(true);
+        HideBackButtons(true);
     }
 
-    public void ButtonAddItemSetActive(bool isActive)
+    public void HideBackButtons(bool isActive)
     {
         addItemBtn.SetActive(isActive);
+        backBtn.SetActive(isActive);
+        menuCompanyBtn.SetActive(isActive);
     }
 
     private void MenuSetActive(bool isActive)
@@ -70,10 +101,15 @@ public class MenuManagerApp : MonoBehaviour
         }
     }
 
+    public void GoBack()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex - 1);
+    }
+
     private void Update()
     {
         timepassed = Time.time - timetouch;
-        //Debug.Log(timepassed);
 
         if ((Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) || Input.GetMouseButtonDown(0))
         {
@@ -158,7 +194,10 @@ public class MenuManagerApp : MonoBehaviour
 
     private void CheckReferences()
     {
-        if (addItemBtn == null) { Debug.LogWarning("Por favor por la referencia AddItemBtn (child MenuApp gameObject) en el  inspector"); }
-        if (menuAddItem == null) { Debug.LogWarning("Por favor por el gameobject MenuAddItem en el  inspector"); }
+        if (addItemBtn == null) { Debug.LogWarning("Por favor, por la referencia AddItemBtn (child MenuApp gameObject) en el  inspector"); }
+        if (menuAddItem == null) { Debug.LogWarning("Por favor, por el gameobject MenuAddItem en el inspector"); }
+        if(menuCompany == null) { Debug.LogWarning("Por favor, por el gameobject MenuCompany en el inspector"); }
+        if (backBtn == null) { Debug.LogWarning("Por favor, por el gameobject BackBtn en el inspector"); }
+        if(menuCompanyBtn == null) { Debug.LogWarning("Por favor, por el gameobject MenuCompanyBtn en el inspector"); }
     }
 }
