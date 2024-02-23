@@ -2,29 +2,18 @@ using System.Collections.Generic;
 
 public class LocalDbTest : IRepositoryLocalTest
 {
-    private const string SAVE_FILE_NAME = "items.crud";
-   
-    public void DeleteLocalItemById(string id)
-    {
-        ItemLocalTestManager.GetInstance().DeleteItemLocalById(id);
-    }
 
     public ItemLocalTest GetLocalItemById(string id)
     {
-        throw new System.NotImplementedException();
+        return ItemLocalTestManager.GetInstance().GetLocalItemById(id);
     }
 
-    public List<ItemLocalTest> GetLocalItems()
+    public List<ItemLocalTest> GetLocalItemsAsync()
     {
         return ItemLocalTestManager.GetInstance().GetItemsLocal();
     }
 
-    public void SaveLocalItem(ItemLocalTest itemLocal)
-    {
-        ItemLocalTestManager.GetInstance().SaveItemLocal(itemLocal);
-    }
-
-    public void SaveLocalItems(List<ItemLocalTest> listItemsLocal)
+    public void SaveLocalItemsAsync(List<ItemLocalTest> listItemsLocal)
     {
         ItemLocalTestManager.GetInstance().SaveItemsLocalList(listItemsLocal);
     }

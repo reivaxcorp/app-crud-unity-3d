@@ -6,5 +6,4 @@ public interface IRepositoryLocal
     Task<List<ItemLocal>> GetLocalItemsAsync();
     Task<ItemLocal> GetLocalItemById(string id);
     Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal);
-    Task DeleteLocalItemById(string id);
 }

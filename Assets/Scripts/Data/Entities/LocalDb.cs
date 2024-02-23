@@ -22,21 +22,6 @@ public class LocalDb : IRepositoryLocal
         }
     }
 
-    public async Task DeleteLocalItemById(string id)
-    {
-        List<ItemLocal> localItemsList = await GetLocalItemsAsync();
-
-        // Buscar si el item ya existe en la lista
-        int existingIndex = localItemsList.FindIndex(x => x.Id == id);
-
-        if (existingIndex != -1)
-        {
-            // Si el item existe, eliminarlo de la lista
-            localItemsList.RemoveAt(existingIndex);
-        }
-        await SaveLocalItemsAsync(localItemsList);
-    }
-
     public async Task<ItemLocal> GetLocalItemById(string id)
     {
         List<ItemLocal> localItemsList = await GetLocalItemsAsync();

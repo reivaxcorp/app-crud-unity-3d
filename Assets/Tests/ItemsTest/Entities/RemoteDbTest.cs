@@ -21,7 +21,7 @@ public class RemoteDbTest : IRepositoryRemoteTest
 
     public RemoteDbTest GetRemoteDb()
     {
-        throw new System.NotImplementedException();
+        return this;
     }
 
     public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
@@ -29,9 +29,8 @@ public class RemoteDbTest : IRepositoryRemoteTest
          ItemRemoteTestManager.GetInstance().SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemRemoteById(string id)
+    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResult resultUi)
     {
-        throw new System.NotImplementedException();
+        ItemRemoteTestManager.GetInstance().UpdateItemRemote(itemRemoteTest, resultUi);
     }
-
 }

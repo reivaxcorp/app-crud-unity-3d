@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
-public class ItemRemoteTestManager 
+public class ItemRemoteTestManager
 {
     private static ItemRemoteTestManager instance;
     private List<ItemRemoteTest> itemRemoteList;
@@ -11,7 +10,7 @@ public class ItemRemoteTestManager
         itemRemoteList = new List<ItemRemoteTest>();
     }
 
-    public  List<ItemRemoteTest> GetItemsRemote()
+    public List<ItemRemoteTest> GetItemsRemote()
     {
         return itemRemoteList;
     }
@@ -36,6 +35,21 @@ public class ItemRemoteTestManager
             // Si el item existe, eliminarlo de la lista
             itemRemoteList.RemoveAt(existingIndex);
         }
+    }
+
+    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResult resultUi)
+    {
+        int existingIndex = itemRemoteList.FindIndex(x => x.Id == itemRemoteTest.Id);
+
+        if (existingIndex != -1)
+        {
+            // Si el item existe, eliminarlo de la lista
+            itemRemoteList.RemoveAt(existingIndex);
+            itemRemoteList.Add(itemRemoteTest);
+            resultUi.SetResultCrudUi(true, "Se actualizo el documento");
+            return;
+        }
+        resultUi.SetResultCrudUi(true, "No se encuentra el documento");
     }
 
     public void ClearAllData()

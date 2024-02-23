@@ -17,11 +17,6 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         this.remoteDb = remoteDb;
     }
 
-    public async Task DeleteLocalItemById(string id)
-    {
-         await localDb.DeleteLocalItemById(id);
-    }
-
     public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
     {
         return await remoteDb.DeleteItemRemoteById(id, iResult);
