@@ -1,6 +1,13 @@
 using UnityEngine;
 
 
+public enum AuthType
+{
+    LOGIN, LOGOUT, LOGIN_SUCCESS, LOGIN_FAILURE, 
+    CREATE_ACCOUNT, CREATE_ACCOUNT_FAILURE,
+    MAIL_VERIFICATION_SUCCESS, MAIL_VERIFICATION_FAILURE,
+}
+
 /// <summary>
 /// Get result when we do auth actions.
 /// </summary>

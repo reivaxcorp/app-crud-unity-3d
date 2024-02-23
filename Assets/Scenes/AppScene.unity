@@ -6426,6 +6426,7 @@ MonoBehaviour:
   itemPrefab: {fileID: 4569062494654351502, guid: 5f1190899dc1f544e9b5f540253355e8, type: 3}
   myItemsOrdered: {fileID: 275777492}
   loadingScreen: {fileID: 891477796}
+  addItemBtn: {fileID: 1095184306}
 --- !u!114 &1651622797
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// Punto de entrada de los tests. 
-/// Aqui se prueba las partes sensibles de CRUD, solo la mas importantes. 
+// Punto de entrada de los tests. 
+/// Aquí se prueba las partes sensibles de CRUD, solo la más importantes. 
+/// Se simula la lectura y escritura de archivos en forma local y remota, así como 
+/// también las texturas.
 /// </summary>
 [TestFixture]
 public class ManageItemsTest : IResult
@@ -86,7 +88,7 @@ public class ManageItemsTest : IResult
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
-            LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+             MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
 
         // VERIFY
         // no deben ser igaules
@@ -94,7 +96,7 @@ public class ManageItemsTest : IResult
         Assert.AreNotEqual(getSaveItemRemote.Name, getItemSaveLocalOutdated.Name);
         SyncronizeData(GetFakeDbRemoteListening()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
-          LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+            MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
         // ahora deben ser iguales
         Assert.AreEqual(getSaveItemRemote.ImageName, getItemSaveLocalUpdated.ImageName);
         Assert.AreEqual(getSaveItemRemote.Name, getItemSaveLocalUpdated.Name);
@@ -117,14 +119,14 @@ public class ManageItemsTest : IResult
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
-            LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+            MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
 
         // VERIFY
         // no deben ser igaules
         Assert.AreNotEqual(getSaveItemRemote.ImageName, getItemSaveLocalOutdated.ImageName);
         SyncronizeData(GetFakeDbRemoteListening()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
-          LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+          MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
         // ahora deben ser iguales
         Assert.AreEqual(getSaveItemRemote.Name, getItemSaveLocalUpdated.Name);
     }
@@ -146,14 +148,14 @@ public class ManageItemsTest : IResult
 
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
-            LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+            MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
 
         // VERIFY
         // no deben ser igaules
         Assert.AreNotEqual(getSaveItemRemote.ImageName, getItemSaveLocalOutdated.ImageName);
         SyncronizeData(GetFakeDbRemoteListening()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
-          LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+          MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
         // ahora deben ser iguales
         Assert.AreEqual(getSaveItemRemote.ImageName, getItemSaveLocalUpdated.ImageName);
     }
@@ -179,14 +181,14 @@ public class ManageItemsTest : IResult
             
         // obtenemos el item local, pero este debe estar desactualizado, ya que se cambio el nombre
         ItemLocalTest getItemSaveLocalOutdated =
-            LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+            MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
 
         // VERIFY
         // no deben ser igaules
         Assert.AreNotEqual(getSaveItemRemote.Name, getItemSaveLocalOutdated.Name);
         SyncronizeData(GetFakeDbRemoteListening()); // Sincronizamos los datos local con la remota.
         ItemLocalTest getItemSaveLocalUpdated =
-          LoadLocalData().Find(item => item.Id.Equals(itemRemoteTest.Id));
+          MyApplicationTest.GetRepository().GetLocalItemById(itemRemoteTest.Id);
         // ahora deben ser iguales
         Assert.AreEqual(getSaveItemRemote.Name, getItemSaveLocalUpdated.Name);
     }

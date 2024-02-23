@@ -96,6 +96,30 @@ public class FirebaseAuthManager
         }
     }
 
+    public void SendEmailUserVerification()
+    {
+        if (FirebaseSDK.GetInstance().isFirebaseReady)
+        {
+            FirebaseSDK.GetInstance().user.SendEmailVerificationAsync()
+                .ContinueWithOnMainThread(task =>
+                {
+
+                    if (task.IsCanceled)
+                    {
+                        Debug.LogError("SendEmailVerificationAsync was canceled.");
+                        return;
+                    }
+                    if (task.IsFaulted)
+                    {
+                        Debug.LogError("SendEmailVerificationAsync encountered an error: " + task.Exception);
+                        return;
+                    }
+
+                    Debug.Log("Email sent successfully.");
+                });
+        }
+    }
+
     public void LogOut()
     {
         FirebaseSDK.GetInstance().LogOut();

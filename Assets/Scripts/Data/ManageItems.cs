@@ -14,6 +14,8 @@ public class ManageItems : MonoBehaviour
     private GameObject myItemsOrdered;
     [SerializeField]
     private GameObject loadingScreen;
+    [SerializeField]
+    private GameObject addItemBtn;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
@@ -99,7 +101,12 @@ public class ManageItems : MonoBehaviour
     {
         if (isInternetAvariable)
         {
+            DisableBtnAddItem(false);
             ListeningDbRemote();
+        }
+        else
+        {
+            DisableBtnAddItem(true);
         }
     }
 
@@ -127,7 +134,9 @@ public class ManageItems : MonoBehaviour
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
-
+        Debug.Log("Is somoe list equals " + isSomeListDbEquals + " " + 
+            " Lista local " + 
+            itemsLocalList.Count + " lista remota " + itemsRemoteList.Count);
         if (!isSomeListDbEquals)
         {
 
@@ -173,7 +182,8 @@ public class ManageItems : MonoBehaviour
                 else if (itemToUpdate.IsAdd)
                 {
                     // Nuevo item añadido
-                    ItemLocal itemLocalToAdd = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
+                    ItemLocal itemLocalToAdd = 
+                        itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     task = CreateItemInScene(itemLocalToAdd);
                     itemsToSave.Add(itemLocalToAdd);
@@ -187,6 +197,12 @@ public class ManageItems : MonoBehaviour
                 }
                 tasks.Add(task); // Agregar la tarea a la lista de tareas
             }
+
+            // Esperar a que todas las tareas se completen
+            await Task.WhenAll(tasks);
+            OrderItem(itemsToSave);
+            // actualizamos la lista local con la remota
+            await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
         }
         else
         {
@@ -198,13 +214,10 @@ public class ManageItems : MonoBehaviour
                 itemsToSave.Add(itemLocal);
                 tasks.Add(task);
             }
+
+            // Esperar a que todas las tareas se completen
+            OrderItem(itemsLocalList);
         }
-
-        // Esperar a que todas las tareas se completen
-        await Task.WhenAll(tasks);
-        OrderItem(itemsLocalList);
-
-        await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
 
         syncStarted = false;
     }
@@ -248,18 +261,6 @@ public class ManageItems : MonoBehaviour
         // imagén de firebase storage
         ManageMaterialRemote manageMaterialRemote =
                      new ManageMaterialRemote(oldImageName);
-        await manageMaterialRemote.DeleteImageRemote();
-    }
-
-    private void RemoveLocalTexture(string oldImageName)
-    {
-        MyApplication.repository.RemoveLocalTexture(oldImageName);
-    }
-
-    private async void RemoveRemoteOldTexture(string remoteOldImage)
-    {
-        ManageMaterialRemote manageMaterialRemote =
-                     new ManageMaterialRemote(remoteOldImage);
         await manageMaterialRemote.DeleteImageRemote();
     }
 
@@ -378,5 +379,17 @@ public class ManageItems : MonoBehaviour
                   FirebaseSDK.GetInstance().isFirebaseReady &&
                   FirebaseSDK.GetInstance().firebaseStorage != null &&
                   FirebaseSDK.GetInstance().defaultInstance != null;
+    }
+
+    // Cuando no tenemos conexion a internet, no podemos añadir items.
+    private void DisableBtnAddItem(bool isEnable)
+    {
+        if(addItemBtn != null)
+        {
+            addItemBtn.SetActive(!isEnable);
+        } else
+        {
+            Debug.LogWarning("Por favor, coloca el botón añadir item (addItemBtn) en el inspector del Manager");
+        }
     }
 }
