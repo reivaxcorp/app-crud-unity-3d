@@ -11,10 +11,10 @@ public class RemoteDb : IRepositoryRemote
     public event OnHandleValueChangedCallBack handleValueResult;
     private string userUid;
 
-    public RemoteDb()
+    
+    public void SetUserUid(string userUid)
     {
-        // Obtén el ID del usuario actual
-        this.userUid = FirebaseSDK.GetInstance().user.UserId;
+        this.userUid = userUid;
     }
 
     public RemoteDb GetRemoteDb()
@@ -24,6 +24,8 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task FirebaseValueChanged()
     {
+
+        if (!IsUserUid()) return;
 
         FirebaseSDK.GetInstance().defaultInstance
             .GetReference("users")
@@ -72,6 +74,8 @@ public class RemoteDb : IRepositoryRemote
 
     public void CancelHandleValueChanged()
     {
+        if (!IsUserUid()) return;
+
         FirebaseSDK.GetInstance().defaultInstance
          .GetReference("users")
          .Child("items")
@@ -82,6 +86,8 @@ public class RemoteDb : IRepositoryRemote
     {
 
         List<ItemRemote> itemsList = new List<ItemRemote>();
+
+        if (!IsUserUid()) return itemsList;
 
         // Obtén la referencia a la ubicación de los items para el usuario actual
         await FirebaseSDK.GetInstance().defaultInstance
@@ -114,28 +120,7 @@ public class RemoteDb : IRepositoryRemote
 
                         // Agregar el objeto ItemRemote a la lista
                         itemsList.Add(item);
-                    }
-
-                    /*foreach(Dictionary<string, object> dictionary in (snapshot.Value as Dictionary<string, object>).Values)
-                    {
-                       foreach(string key in dictionary.Keys)
-                        {
-                             Debug.Log(key + ": " + dictionary[key]);
-                        }
-                    }*/
-
-
-                    /*foreach (DataSnapshot itemSnapshot in snapshot.Children)
-                    {
-                        // Convierte los datos del snapshot en una instancia de ItemRemote
-                        ItemRemote item = new ItemRemote(
-                            id: itemSnapshot.Child("id").GetValue(true).ToString(),
-                            name: itemSnapshot.Child("name").GetValue(true).ToString(),
-                            imageName: itemSnapshot.Child("image_name").GetValue(true).ToString(),
-                            creationDate: long.Parse(itemSnapshot.Child("creation_date").GetValue(true).ToString()));
-
-                        itemsList.Add(item);
-                    }*/
+                    }                  
                 }
             });
 
@@ -144,6 +129,8 @@ public class RemoteDb : IRepositoryRemote
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
+        if (!IsUserUid()) return;
+
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
 
         // key generada con Push()
@@ -176,6 +163,8 @@ public class RemoteDb : IRepositoryRemote
 
     public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
+        if (!IsUserUid()) return;
+
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
         rootRef
             .Child("users")
@@ -204,6 +193,8 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
     {
+        if (!IsUserUid()) return false;
+
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
 
         bool deleteSuccess = false;
@@ -232,6 +223,16 @@ public class RemoteDb : IRepositoryRemote
                  }
              });
         return deleteSuccess;
+    }
+
+    private bool IsUserUid()
+    {
+        if (userUid == null)
+        {
+            Debug.LogWarning("No hay un userUid!!!");
+            return false;
+        }
+        return true;
     }
 
     /// <summary>

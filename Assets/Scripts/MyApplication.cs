@@ -19,26 +19,29 @@ public class MyApplication : MonoBehaviour
 
     private async Task<MyRepository> CreateRepositoryAsync()
     {
-        try
-        {
-            // FIRST wait to initialize Sdk Firebase
-            await InicializeFirebase();
 
-            RemoteDb remoteDb = new RemoteDb();
-            LocalDb localDb = new LocalDb();
-            repository = new MyRepository(localDb, remoteDb);
+        RemoteDb remoteDb = new RemoteDb();
+        LocalDb localDb = new LocalDb();
+        TextureManager textureManager = new TextureManager();
+
+        repository = new MyRepository(localDb, remoteDb, textureManager);
+
+        // FIRST wait to initialize Sdk Firebase
+        bool isInitialize = await InicializeFirebase();
+
+        if (isInitialize)
+        {
             return repository;
         }
-        catch (Exception ex)
+        else
         {
-            Debug.LogError(ex);
+            Debug.LogWarning("Error al crear el respositorio");
+            return null;
         }
-        
-        throw new Exception("Error al crear el respositorio");
     }
 
     // we wait firebase start
-    private async Task<FirebaseSDK> InicializeFirebase()
+    private async Task<bool> InicializeFirebase()
     {
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
 
@@ -49,22 +52,21 @@ public class MyApplication : MonoBehaviour
             if (firebaseInitialized)
             {
                 Debug.Log($"Firebase running");
-                return firebaseSdk;
+                return firebaseInitialized;
             }
             else
             {
                 // Handle the exception where Firebase initialization failed.
                 Debug.Log($"Firebase initialization it's false");
-                throw new Exception("Firebase initialization it's false");
+                return false;
             }
         }
         catch (Exception ex)
         {
             // Handle the exception where Firebase initialization failed.
             Debug.Log($"Firebase initialization error: {ex.Message}");
-            throw new Exception($"Firebase initialization error: {ex.Message}");
+            return false;
         }
-
     }
 
 }

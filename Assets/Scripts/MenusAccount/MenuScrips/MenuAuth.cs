@@ -12,15 +12,47 @@ public class MenuAuth : MonoBehaviour
     /// Establece el texto del resultado de la autenticación.
     /// </summary>
     /// <param name="result"></param>
-    public virtual void SetResult(AccountAuthResult result) {
+    public virtual void SetResult(AccountAuthResult result)
+    {
 
         if (resultMsj != null)
         {
+
             resultMsj.SetText(result.Message);
-            resultMsj.color = result.MessageColor;
-            if(result.IsSuccessed)
+
+            switch (result.AuthType)
             {
-                GoMenuUserAccount();
+                case AuthType.LOGOUT:
+                    resultMsj.color = Color.gray;
+                    break;
+                case AuthType.LOGIN_SUCCESS:
+                    resultMsj.color = Color.green;
+                    GoMenuUserAccount();
+                    break;
+                case AuthType.LOGIN_FAILURE:
+                    resultMsj.color = Color.red;
+                    break;
+                case AuthType.LOGIN_CANCEL:
+                    resultMsj.color = Color.gray;
+                    break;
+                case AuthType.CREATE_ACCOUNT_SUCCESS:
+                    resultMsj.color = Color.green;
+                    GoMenuUserAccount();
+                    break;
+                case AuthType.CREATE_ACCOUNT_FAILURE:
+                    resultMsj.color = Color.red;
+                    break;
+                case AuthType.CREATE_ACCOUNT_CANCEL:
+                    resultMsj.color = Color.gray;
+                    break;
+                case AuthType.MAIL_VERIFICATION_SUCCESS:
+                    resultMsj.color = Color.green;
+                    break;
+                case AuthType.MAIL_VERIFICATION_FAILURE:
+                    resultMsj.color = Color.red;
+                    break;
+                default:
+                    break;
             }
         }
         else
@@ -52,7 +84,8 @@ public class MenuAuth : MonoBehaviour
         if (menuManager != null)
         {
             menuManager.ShowMenuByName("MenuUserAccount");
-        } else
+        }
+        else
         {
             Debug.LogWarning("MenuManager no existe en el menú padre");
         }
@@ -79,5 +112,5 @@ public class MenuAuth : MonoBehaviour
     {
         DesuscribeEvent();
     }
-  
+
 }

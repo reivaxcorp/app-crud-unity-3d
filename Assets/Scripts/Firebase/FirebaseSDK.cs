@@ -3,8 +3,11 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using Firebase.Storage;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using UnityEngine.tvOS;
 
 public class FirebaseSDK
 {
@@ -72,8 +75,6 @@ public class FirebaseSDK
                 this.firebaseStorage = FirebaseStorage.DefaultInstance;
 
                 this.auth = FirebaseAuth.DefaultInstance;
-                this.user = auth.CurrentUser;
-
                 this.auth.StateChanged += AuthStateChanged;
 
                 isFirebaseReady = true;
@@ -85,12 +86,19 @@ public class FirebaseSDK
                   "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
                 // Firebase Unity SDK is not safe to use here.
                 isFirebaseReady = false;
+                throw new Exception(System.String.Format(
+                  "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
             }
         });
        
         return isFirebaseReady;
     }
 
+    /// <summary>
+    ///   La primera vez que entre el usuario, sera null.
+    ///   Una vez que inicie sesión, tendremos un usuario, y podremos setear 
+    ///   las propiedades de neustras base de datos y la app, para guardar lo datos.
+    /// </summary>
     void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
         if (auth.CurrentUser != user)
@@ -110,6 +118,8 @@ public class FirebaseSDK
                 Debug.Log("Signed in " + user.UserId);
             }
         }
+
+        InitUidUserToApp(); // podemos inicializar ahora los datos principales.
     }
 
     public static FirebaseSDK GetInstance()
@@ -126,6 +136,26 @@ public class FirebaseSDK
         if (auth != null)
         {
             auth.SignOut();
+        }
+    }
+
+    /// <summary>
+    /// Inicializamos el uid del usuario en la base de datos remota y local, asi como tambien
+    /// en el Texture manager, ya que necesitamos para acceder a los datos de dicho usuario logeado
+    /// </summary>
+    private void InitUidUserToApp()
+    {
+        if (user != null && MyApplication.repository != null)
+        {
+            MyApplication.repository.GetRemoteDb().SetUserUid(user.UserId);
+            MyApplication.repository.GetLocalDb().SetUserUidFolder(user.UserId);
+            MyApplication.repository.GetTextureManager().SetUserUidFolder(user.UserId);
+        } else
+        {
+            MyApplication.repository.GetRemoteDb().SetUserUid(null);
+            MyApplication.repository.GetLocalDb().SetUserUidFolder(null);
+            MyApplication.repository.GetTextureManager().SetUserUidFolder(null);
+            Debug.Log("Usuario inexistente por ahora..");
         }
     }
 

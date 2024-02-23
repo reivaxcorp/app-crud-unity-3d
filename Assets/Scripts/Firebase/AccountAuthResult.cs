@@ -3,8 +3,8 @@ using UnityEngine;
 
 public enum AuthType
 {
-    LOGIN, LOGOUT, LOGIN_SUCCESS, LOGIN_FAILURE, 
-    CREATE_ACCOUNT, CREATE_ACCOUNT_FAILURE,
+    LOGOUT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGIN_CANCEL,
+    CREATE_ACCOUNT_SUCCESS, CREATE_ACCOUNT_FAILURE, CREATE_ACCOUNT_CANCEL,
     MAIL_VERIFICATION_SUCCESS, MAIL_VERIFICATION_FAILURE,
 }
 
@@ -15,17 +15,14 @@ public class AccountAuthResult
 {
 
     public string Message { get => _message; private set => _message = value; }
-    public Color MessageColor { get => _messageColor; private set => _messageColor = value; }
-    public bool IsSuccessed { get => _isSuccessd; private set => _isSuccessd = value; }
-   
-    private string _message;
-    private Color _messageColor;
-    private bool _isSuccessd;
+    public AuthType AuthType { get => _authType; private set => _authType = value; }
 
-    public AccountAuthResult(string message, Color messageColor, bool isSuccessed)
+    private string _message;
+    private AuthType _authType;
+
+    public AccountAuthResult(AuthType authType, string message)
     {
         Message = message;
-        MessageColor = messageColor;
-        IsSuccessed = isSuccessed;
+        AuthType = authType;
     }
 }

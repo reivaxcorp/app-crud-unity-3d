@@ -18,15 +18,34 @@ public class MenuUserAccount : MenuAuth
     {
         if (resultMsj != null)
         {
-            if(result.IsSuccessed)
+
+            resultMsj.SetText(result.Message);
+
+            switch (result.AuthType)
             {
-                resultMsj.SetText(result.Message);
-                resultMsj.color = result.MessageColor;
-                ShowButtonsSessionOn();
-            } else
-            {
-                HideButtonsSessionOn();
+                case AuthType.LOGOUT:
+                    resultMsj.color = Color.gray;
+                    HideButtonsSessionOn();
+                    break;
+                case AuthType.LOGIN_SUCCESS:
+                    resultMsj.color = Color.green;
+                    ShowButtonsSessionOn();
+                    break;
+                case AuthType.LOGIN_FAILURE:
+                    resultMsj.color = Color.red;
+                    HideButtonsSessionOn();
+                    break;
+                case AuthType.LOGIN_CANCEL:
+                    resultMsj.color = Color.gray;
+                    HideButtonsSessionOn();
+                    break;
+                default:
+                    break;
             }
+        }
+        else
+        {
+            Debug.LogWarning("msj result menu es null");
         }
     }
 
@@ -48,7 +67,7 @@ public class MenuUserAccount : MenuAuth
         {
             if (!getUserStatus && FirebaseSDK.GetInstance().auth.CurrentUser != null)
             {
-                AccountAuthResult result = new AccountAuthResult("Logeado con email: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email, Color.green, true);
+                AccountAuthResult result = new AccountAuthResult(AuthType.LOGIN_SUCCESS, "Logeado con email: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email);
                 SetResult(result);
                 getUserStatus = true;
             }

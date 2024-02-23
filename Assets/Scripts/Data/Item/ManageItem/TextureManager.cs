@@ -4,22 +4,19 @@ using System;
 
 public class TextureManager : IDataTextureLocalSaved
 {
-    private string folderUidUser;
+    private string folderNameUser;
 
-    public TextureManager()
+
+    public void SetUserUidFolder(string folderNameUser)
     {
-        if(FirebaseSDK.GetInstance().auth != null)
-        {
-            this.folderUidUser = FirebaseSDK.GetInstance().user.UserId;
-        } else
-        {
-            Debug.LogWarning("Firebase auth no esta inicializado");
-        }
+        this.folderNameUser = folderNameUser;
     }
 
     public Texture2D LoadTextureAsPNG(string imageName)
     {
-        string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
+        if (!IsUserFolderNameUid()) return null;
+
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
         string filePath = Path.Combine(folderPath, imageName + ".png");
 
         // Verificar si la carpeta existe, si no, crearla
@@ -43,7 +40,9 @@ public class TextureManager : IDataTextureLocalSaved
 
     public void RemoveLocalTexture(string imageName)
     {
-        string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
+        if (!IsUserFolderNameUid()) return;
+
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
         string filePath = Path.Combine(folderPath, imageName + ".png");
 
         // Verificar si la carpeta existe, si no, crearla
@@ -65,8 +64,10 @@ public class TextureManager : IDataTextureLocalSaved
 
     public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)
     {
+        if (!IsUserFolderNameUid()) return;
+
         byte[] bytes = textureToSave.EncodeToPNG(); // Convierte la textura en formato PNG
-        string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
         string filePath = Path.Combine(folderPath, imageName + ".png");
 
         // Verificar si la carpeta existe, si no, crearla
@@ -77,5 +78,15 @@ public class TextureManager : IDataTextureLocalSaved
 
         // Escribir los bytes en un archivo PNG
         File.WriteAllBytes(filePath, bytes); // Escribe los bytes en un archivo PNG
+    }
+
+    private bool IsUserFolderNameUid()
+    {
+        if (folderNameUser == null)
+        {
+            Debug.LogWarning("No hay un userUid para nombre de la carpeta de usuario!!!");
+            return false;
+        }
+        return true;
     }
 }

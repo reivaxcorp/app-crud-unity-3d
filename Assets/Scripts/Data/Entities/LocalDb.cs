@@ -8,18 +8,11 @@ using UnityEngine;
 public class LocalDb : IRepositoryLocal
 {
     private const string SAVE_FILE_NAME = "items.crud";
-    private string folderUidUser;
+    private string folderNameUser;
 
-    public LocalDb()
+    public void SetUserUidFolder(string folderNameUser)
     {
-        if (FirebaseSDK.GetInstance().auth != null)
-        {
-            this.folderUidUser = FirebaseSDK.GetInstance().user.UserId;
-        }
-        else
-        {
-            Debug.LogWarning("Firebase auth no esta inicializado");
-        }
+        this.folderNameUser = folderNameUser;
     }
 
     public async Task<ItemLocal> GetLocalItemById(string id)
@@ -37,7 +30,9 @@ public class LocalDb : IRepositoryLocal
 
     public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
-        string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
+        if (!IsUserFolderNameUid()) return new List<ItemLocal>();
+
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
         // Verificar si la carpeta existe, si no, crearla
@@ -64,7 +59,9 @@ public class LocalDb : IRepositoryLocal
 
     public async Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal)
     {
-        string folderPath = Path.Combine(Application.persistentDataPath, folderUidUser);
+        if (!IsUserFolderNameUid()) return;
+
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
         // Verificar si la carpeta existe, si no, crearla
@@ -84,4 +81,13 @@ public class LocalDb : IRepositoryLocal
         });
     }
 
+    private bool IsUserFolderNameUid()
+    {
+        if (folderNameUser == null)
+        {
+            Debug.LogWarning("No hay un userUid para nombre de la carpeta de usuario!!!");
+            return false;
+        }
+        return true;
+    }
 }

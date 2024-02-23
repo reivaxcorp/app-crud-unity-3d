@@ -1,6 +1,5 @@
 using Firebase.Auth;
 using Firebase.Extensions;
-using System.Threading.Tasks;
 using UnityEngine;
 using Color = UnityEngine.Color;
 
@@ -31,13 +30,13 @@ public class FirebaseAuthManager
                 if (task.IsCanceled)
                 {
                     Debug.LogError("Was canceled.");
-                    authResult = new AccountAuthResult("Fue cancelado!", Color.red, false);
+                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_CANCEL, "Fue cancelado!");
                     OnAccountAuthResult?.Invoke(authResult);
                     return;
                 }
                 if (task.IsFaulted)
                 {
-                    authResult = new AccountAuthResult(exceptionManager.ManageExceptionForm(task), Color.red, false);
+                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_FAILURE, exceptionManager.ManageExceptionForm(task));
                     OnAccountAuthResult?.Invoke(authResult);
                     return;
                 }
@@ -47,7 +46,7 @@ public class FirebaseAuthManager
                 Debug.LogFormat("Firebase user created successfully: {0} ({1})",
                     result.User.DisplayName, result.User.UserId);
 
-                authResult = new AccountAuthResult("Cuenta creada", Color.green, true);
+                authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_SUCCESS, "Cuenta creada");
                 OnAccountAuthResult?.Invoke(authResult); // we need TaskScheduler.FromCurrentSync.... to set text
             });
 
@@ -75,13 +74,13 @@ public class FirebaseAuthManager
                     if (task.IsCanceled)
                     {
                         Debug.LogError("Was canceled.");
-                        authResult = new AccountAuthResult("Fue cancelado!", Color.red, false);
+                        authResult = new AccountAuthResult(AuthType.LOGIN_CANCEL, "Login cancelado!");
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
                     if (task.IsFaulted)
                     {
-                        authResult = new AccountAuthResult(exceptionManager.ManageExceptionForm(task), Color.red, false);
+                        authResult = new AccountAuthResult(AuthType.LOGIN_FAILURE, exceptionManager.ManageExceptionForm(task));
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
@@ -90,7 +89,7 @@ public class FirebaseAuthManager
                     Debug.LogFormat("User signed in successfully: {0} ({1})",
                     result.User.DisplayName, result.User.UserId);
 
-                    authResult = new AccountAuthResult("Logeado como: \n" + result.User.Email, Color.green, true); // we need TaskScheduler.FromCurrentSync.... to set text
+                    authResult = new AccountAuthResult(AuthType.LOGIN_SUCCESS,"Logeado como: \n" + result.User.Email);
                     OnAccountAuthResult?.Invoke(authResult);
                 });
         }
@@ -123,7 +122,7 @@ public class FirebaseAuthManager
     public void LogOut()
     {
         FirebaseSDK.GetInstance().LogOut();
-        AccountAuthResult result = new AccountAuthResult("", Color.white, false);
+        AccountAuthResult result = new AccountAuthResult(AuthType.LOGOUT, "Deslogeado");
         OnAccountAuthResult?.Invoke(result);
     }
 

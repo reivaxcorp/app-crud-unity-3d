@@ -206,7 +206,8 @@ public class ManageItems : MonoBehaviour
         }
         else
         {
-            // Estamos sin conexión a internet, cargamos los datos locales
+            // No hay cambios con la base de datos remota, cargamos la local. 
+            // tambien si no hay conexion a internet.
             foreach (ItemLocal itemLocal in itemsLocalList)
             {
                 Task task = Task.CompletedTask;
@@ -375,10 +376,10 @@ public class ManageItems : MonoBehaviour
     private bool CheckDependenciesInitialize()
     {
 
-        return    MyApplication.repository != null &&
+        return    
+                  MyApplication.repository != null &&
                   FirebaseSDK.GetInstance().isFirebaseReady &&
-                  FirebaseSDK.GetInstance().firebaseStorage != null &&
-                  FirebaseSDK.GetInstance().defaultInstance != null;
+                  FirebaseSDK.GetInstance().user != null;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.
