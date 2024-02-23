@@ -66,7 +66,7 @@ public class RemoteDb : IRepositoryRemote
             itemsRemoteList.Add(item);
         }
 
-        Debug.Log("handled itemsRemoteList " + itemsRemoteList.Count);
+       // Debug.Log("handled itemsRemoteList " + itemsRemoteList.Count);
         handleValueResult?.Invoke(itemsRemoteList);
     }
 

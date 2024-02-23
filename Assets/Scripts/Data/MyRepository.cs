@@ -32,11 +32,6 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         return await localDb.GetLocalItemsAsync();
     }
 
-    public async Task<List<ItemRemote>> GetItemsRemote()
-    {
-         return await remoteDb.GetItemsRemote();
-    }
-
     public async Task SaveLocalItemsAsync(List<ItemLocal> listItemsLocal)
     {
         await localDb.SaveLocalItemsAsync(listItemsLocal);
