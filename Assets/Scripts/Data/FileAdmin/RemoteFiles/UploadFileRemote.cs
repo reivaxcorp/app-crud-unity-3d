@@ -40,7 +40,9 @@ public class UploadFileRemote
             StorageReference userRef = storageRef
                 .Child("users")
                 .Child("images")
-                .Child(_folderUserUid).Child(generateImageName + ".png");
+                .Child(_folderUserUid)
+                .Child("imageItems")
+                .Child(generateImageName + ".png");
 
             // Crear metadatos de archivo incluyendo el tipo de contenido
             var newMetadata = new MetadataChange();

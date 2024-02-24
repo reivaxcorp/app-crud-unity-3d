@@ -25,7 +25,7 @@ public class MyApplication : MonoBehaviour
 
         RemoteDb remoteDb = new RemoteDb();
         LocalDb localDb = new LocalDb();
-        TextureManager textureManager = new TextureManager();
+        ManageTextureLocal textureManager = new ManageTextureLocal();
 
         repository = new MyRepository(localDb, remoteDb, textureManager);
 

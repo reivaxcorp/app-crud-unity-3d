@@ -8,10 +8,10 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
 
     private IRepositoryRemote remoteDb;
 
-    private TextureManager textureManager;
+    private ManageTextureLocal textureManager;
 
     public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb, 
-        TextureManager textureManager)
+        ManageTextureLocal textureManager)
     {
         this.textureManager = textureManager;
         this.localDb = localDb;
@@ -73,7 +73,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         return localDb as LocalDb;
     }
 
-    public TextureManager GetTextureManager()
+    public ManageTextureLocal GetTextureManager()
     {
         return textureManager;
     }

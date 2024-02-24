@@ -2,10 +2,13 @@ using UnityEngine;
 using System.IO;
 using System;
 
-public class TextureManager : IDataTextureLocalSaved
+/// <summary>
+/// Salvamos las texturas en la carpeta image_items
+/// </summary>
+public class ManageTextureLocal : IDataTextureLocalSaved
 {
     private string folderNameUser;
-
+    private const string FOLDER_IMAGE_ITEM = "image_items";
 
     public void SetUserUidFolder(string folderNameUser)
     {
@@ -16,14 +19,7 @@ public class TextureManager : IDataTextureLocalSaved
     {
         if (!IsUserFolderNameUid()) return null;
 
-        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
-        string filePath = Path.Combine(folderPath, imageName + ".png");
-
-        // Verificar si la carpeta existe, si no, crearla
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
+        string filePath = GetFilePath(imageName + ".png");
 
         if (File.Exists(filePath))
         {
@@ -42,14 +38,7 @@ public class TextureManager : IDataTextureLocalSaved
     {
         if (!IsUserFolderNameUid()) return;
 
-        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
-        string filePath = Path.Combine(folderPath, imageName + ".png");
-
-        // Verificar si la carpeta existe, si no, crearla
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
+        string filePath = GetFilePath(imageName + ".png");
 
         if (File.Exists(filePath))
         {
@@ -67,8 +56,16 @@ public class TextureManager : IDataTextureLocalSaved
         if (!IsUserFolderNameUid()) return;
 
         byte[] bytes = textureToSave.EncodeToPNG(); // Convierte la textura en formato PNG
+        string filePath = GetFilePath(imageName + ".png");
+        // Escribir los bytes en un archivo PNG
+        File.WriteAllBytes(filePath, bytes); // Escribe los bytes en un archivo PNG
+    }
+
+    private string GetFilePath(string imageName)
+    {
         string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
-        string filePath = Path.Combine(folderPath, imageName + ".png");
+        string folderItems = Path.Combine(folderPath, FOLDER_IMAGE_ITEM);
+        string filePath = Path.Combine(folderItems, imageName);
 
         // Verificar si la carpeta existe, si no, crearla
         if (!Directory.Exists(folderPath))
@@ -76,9 +73,14 @@ public class TextureManager : IDataTextureLocalSaved
             Directory.CreateDirectory(folderPath);
         }
 
-        // Escribir los bytes en un archivo PNG
-        File.WriteAllBytes(filePath, bytes); // Escribe los bytes en un archivo PNG
+        if (!Directory.Exists(folderItems))
+        {
+            Directory.CreateDirectory(folderItems);
+        }
+
+        return filePath;
     }
+
 
     private bool IsUserFolderNameUid()
     {

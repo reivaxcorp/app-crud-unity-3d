@@ -8,7 +8,6 @@ using UnityEngine;
 public class LocalDb : IRepositoryLocal
 {
     private const string SAVE_FILE_NAME = "items.crud";
-    private const string FOLDER_IMAGE_ITEM = "image_items";
     private string folderNameUser;
 
     public void SetUserUidFolder(string folderNameUser)
@@ -29,11 +28,22 @@ public class LocalDb : IRepositoryLocal
         throw new Exception("El item local fue borrado o no existe");
     }
 
+    /// <summary>
+    /// Salvamos los datos de los items en {userUid} en el dispositovo
+    /// </summary>
     public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
         if (!IsUserFolderNameUid()) return new List<ItemLocal>();
 
-        string filePath = GetFilePath();
+
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
+        string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
+
+        // Verificar si la carpeta existe, si no, crearla
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
 
         if (File.Exists(filePath))
         {
@@ -55,7 +65,14 @@ public class LocalDb : IRepositoryLocal
     {
         if (!IsUserFolderNameUid()) return;
 
-        string filePath = GetFilePath();
+        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
+        string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
+
+        // Verificar si la carpeta existe, si no, crearla
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
 
         await Task.Run(() =>
         {
@@ -67,27 +84,6 @@ public class LocalDb : IRepositoryLocal
             }
         });
     }
-
-    private string GetFilePath()
-    {
-        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
-        string folderItems = Path.Combine(folderPath, FOLDER_IMAGE_ITEM);
-        string filePath = Path.Combine(folderItems, SAVE_FILE_NAME);
-
-        // Verificar si la carpeta existe, si no, crearla
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
-
-        if (!Directory.Exists(folderItems))
-        {
-            Directory.CreateDirectory(folderItems);
-        }
-
-        return filePath;
-    }
-
 
     private bool IsUserFolderNameUid()
     {
