@@ -14,7 +14,10 @@ public class MyApplication : MonoBehaviour
 
     private async void Start()
     {
-        await CreateRepositoryAsync();
+        if(repository == null)
+        {
+            await CreateRepositoryAsync();
+        }
     }
 
     private async Task<MyRepository> CreateRepositoryAsync()

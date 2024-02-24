@@ -238,7 +238,7 @@ public class ManageItems : MonoBehaviour
                     if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
                     {
                         textMeshProChildren[0].text = item.Name;
-                        textMeshProChildren[1].text = TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
+                        textMeshProChildren[1].text = "Creado:\n" + TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
                     }
 
                     itemToCreate.name = item.Id;
