@@ -260,8 +260,8 @@ public class ManageItems : MonoBehaviour
         MyApplication.repository.RemoveLocalTexture(oldImageName);
 
         // imagén de firebase storage
-        ManageMaterialRemote manageMaterialRemote =
-                     new ManageMaterialRemote(oldImageName);
+        ManageTextureRemote manageMaterialRemote =
+                     new ManageTextureRemote(oldImageName);
         await manageMaterialRemote.DeleteImageRemote();
     }
 

@@ -18,7 +18,7 @@ public class BuildItem: MonoBehaviour
 
         if(texture2D == null)
         {
-            ManageMaterialRemote createMaterial = new ManageMaterialRemote(imageName);
+            ManageTextureRemote createMaterial = new ManageTextureRemote(imageName);
             texture2D = await createMaterial.DownloadImage();
             MyApplication.repository.SaveTextureAsPNG(texture2D, imageName);
         }

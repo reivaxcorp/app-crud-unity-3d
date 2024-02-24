@@ -2,13 +2,13 @@ using Firebase.Extensions;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ManageMaterialRemote
+public class ManageTextureRemote
 {
     private string _storageUrl = "gs://appcrudunity3d.appspot.com/users/images/"; // Reemplaza con la URI pública de tu imagen.
                                                                                // public Material materialToUpdate; // El material que se actualizará con la imagen descargada.
-    public ManageMaterialRemote(string imageName)
+    public ManageTextureRemote(string imageName)
     {
-        _storageUrl += FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/" + imageName + ".png";
+        _storageUrl += FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/imageItems/" + imageName + ".png";
     }
 
     public async Task<Texture2D> DownloadImage()

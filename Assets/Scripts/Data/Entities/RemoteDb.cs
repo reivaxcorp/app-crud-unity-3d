@@ -29,8 +29,8 @@ public class RemoteDb : IRepositoryRemote
 
         FirebaseSDK.GetInstance().defaultInstance
             .GetReference("users")
-            .Child("items")
             .Child(userUid)
+            .Child("items")
             .ValueChanged += HandleValueChanged;
 
         // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
@@ -78,8 +78,9 @@ public class RemoteDb : IRepositoryRemote
 
         FirebaseSDK.GetInstance().defaultInstance
          .GetReference("users")
+         .Child(userUid)
          .Child("items")
-         .Child(userUid).ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
+         .ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
     }
 
     public async Task<List<ItemRemote>> GetItemsRemote()
@@ -92,8 +93,9 @@ public class RemoteDb : IRepositoryRemote
         // Obtén la referencia a la ubicación de los items para el usuario actual
         await FirebaseSDK.GetInstance().defaultInstance
             .GetReference("users")
+            .Child(userUid)
             .Child("items")
-            .Child(userUid).GetValueAsync().ContinueWithOnMainThread(task =>
+            .GetValueAsync().ContinueWithOnMainThread(task =>
             {
                 if (task.IsFaulted)
                 {
@@ -144,7 +146,7 @@ public class RemoteDb : IRepositoryRemote
 
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 
-        rootRef.Child("users").Child("items").Child(userUid).Child(key).SetValueAsync(entryValues).ContinueWithOnMainThread(task =>
+        rootRef.Child("users").Child(userUid).Child("items").Child(key).SetValueAsync(entryValues).ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
@@ -168,8 +170,8 @@ public class RemoteDb : IRepositoryRemote
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
         rootRef
             .Child("users")
-            .Child("items")
             .Child(userUid)
+            .Child("items")
             .Child(itemRemote.Id)
             .UpdateChildrenAsync(itemRemote.ToDictionary()).ContinueWithOnMainThread(task =>
             {
@@ -201,8 +203,8 @@ public class RemoteDb : IRepositoryRemote
 
         await rootRef
              .Child("users")
-             .Child("items")
              .Child(userUid)
+             .Child("items")
              .Child(id)
              .RemoveValueAsync().ContinueWithOnMainThread(task =>
              {
@@ -241,7 +243,7 @@ public class RemoteDb : IRepositoryRemote
     /// </summary>
     private async void RemoveFailedImageUploaded(string imageNameToRemove)
     {
-        ManageMaterialRemote manageMaterialRemote = new ManageMaterialRemote(imageNameToRemove);
+        ManageTextureRemote manageMaterialRemote = new ManageTextureRemote(imageNameToRemove);
         await manageMaterialRemote.DeleteImageRemote();
     }
 }
