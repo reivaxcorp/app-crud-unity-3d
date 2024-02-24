@@ -39,7 +39,6 @@ public class UploadFileRemote
             StorageReference storageRef = firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
             StorageReference userRef = storageRef
                 .Child("users")
-                .Child("images")
                 .Child(_folderUserUid)
                 .Child("imageItems")
                 .Child(generateImageName + ".png");

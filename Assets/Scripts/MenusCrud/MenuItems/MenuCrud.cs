@@ -7,9 +7,9 @@ using TMPro;
 
 public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
 {
-   
 
     [SerializeField] MenuManagerApp uiApp;
+    [SerializeField] GameObject ads;
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
@@ -285,5 +285,24 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         if (receiverMessagesFromAndroid == null) Debug.LogWarning("Por favor coloca el script ReceiverMeesagesFromAndroid desde el Manager (gameObject) en el inspector");
         if (resultMsj == null) Debug.LogWarning("ResultMsj no está colocado en el inspector");
         if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
+    }
+
+    public void ShowInterstitialAd()
+    {
+        if(ads != null)
+        {
+            InterstitialAd interstitialAd = ads.GetComponent<InterstitialAd>();
+            if (interstitialAd != null)
+            {
+                interstitialAd.ShowAd();
+            }
+            else
+            {
+                Debug.LogWarning("InterstitialAd no está en el UiAppp GameObject del inspector");
+            }
+        } else
+        {
+            Debug.LogWarning("Por favor, coloca el Ads en el MenuAddItem, en su inspector");
+        }
     }
 }

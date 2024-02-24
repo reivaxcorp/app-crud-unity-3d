@@ -39,6 +39,8 @@ public class MenuAddItem : MenuCrud
         {
             ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, imageName: imageName);
             MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
+         
+            Invoke("ShowInterstitialAd", 3f);
         } else
         {
             Debug.LogWarning("El repositorio es Null");

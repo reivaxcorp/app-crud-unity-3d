@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ManageTextureRemote
 {
-    private string _storageUrl = "gs://appcrudunity3d.appspot.com/users/images/"; // Reemplaza con la URI pública de tu imagen.
+    private string _storageUrl = "gs://appcrudunity3d.appspot.com/users/"; // Reemplaza con la URI pública de tu imagen.
                                                                                // public Material materialToUpdate; // El material que se actualizará con la imagen descargada.
     public ManageTextureRemote(string imageName)
     {

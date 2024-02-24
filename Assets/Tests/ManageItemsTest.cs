@@ -237,7 +237,6 @@ public class ManageItemsTest : IResult
 
             foreach (ItemUpdateTest itemToUpdate in itemListUpdates)
             {
-                Task task = Task.CompletedTask; // Inicializar una tarea completada
 
                 if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
                 {
@@ -245,7 +244,7 @@ public class ManageItemsTest : IResult
                         .ItemRemoteToItemLocal();
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     SyncTextures(itemOld.ImageName);
-                    task = CreateItemInScene(itemLocalUptated);
+                    CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsFieldsUpdated)
@@ -254,7 +253,7 @@ public class ManageItemsTest : IResult
                         itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     SyncTextures(itemOld.ImageName);
-                    task = CreateItemInScene(itemLocalUptated);
+                    CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsImageUpdated)
@@ -264,7 +263,7 @@ public class ManageItemsTest : IResult
                     MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     SyncTextures(itemOld.ImageName);
-                    task = CreateItemInScene(itemLocalUptated);
+                    CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
@@ -278,17 +277,16 @@ public class ManageItemsTest : IResult
                     // Nuevo item añadido
                     ItemLocalTest itemLocalToAdd = 
                         itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    task = CreateItemInScene(itemLocalToAdd);
+                    CreateItemInScene(itemLocalToAdd);
                     itemsToSave.Add(itemLocalToAdd);
                 }
                 else
                 {
                     // sin cambios el ítem local con el ítem remoto
                     ItemLocalTest itemLocal = itemsLocalList.Find(item => item.Id == itemToUpdate.Id);
-                    task = CreateItemInScene(itemLocal);
+                    CreateItemInScene(itemLocal);
                     itemsToSave.Add(itemLocal);
                 }
-                tasks.Add(task); // Agregar la tarea a la lista de tareas
             }
         } 
         else
@@ -296,9 +294,7 @@ public class ManageItemsTest : IResult
             // Estamos sin sin conexión a internet, cargamos los datos locales
             foreach (ItemLocalTest itemLocal in itemsLocalList)
             {
-                Task task = Task.CompletedTask;
-                task = CreateItemInScene(itemLocal);
-                tasks.Add(task);
+                CreateItemInScene(itemLocal);
             }
         }
 
@@ -342,9 +338,8 @@ public class ManageItemsTest : IResult
 
     // Metodos await no funciona en Test,
     // asi que lo omitimos y lo dejamos lo mas parecido a la implementacion final
-    private async Task<bool> CreateItemInScene(ItemLocalTest itemLocalTest)
+    private bool CreateItemInScene(ItemLocalTest itemLocalTest)
     {
-        //await Task.Delay(500); 
         Debug.Log("Item created id: " + itemLocalTest.Id);
         return true;
     }

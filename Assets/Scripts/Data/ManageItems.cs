@@ -44,13 +44,12 @@ public class ManageItems : MonoBehaviour
             if (CheckDependenciesInitialize())
             {
                 waitToFirebaseInitialized = false;
-
                 LoadLocalData();
             }
         }
     }
 
-    // cargamos la base de datos local, y si hay internet luego la remota
+    // cargamos la base de datos local primero, y si hay internet luego la remota
     private async void LoadLocalData()
     {
 
@@ -70,18 +69,25 @@ public class ManageItems : MonoBehaviour
 
         SetLoadingMsj(false);
 
-        StartCoroutine(CheckInternetConection());
+        StartCoroutine(WaitToLoadLocalItems());
+    }
+
+    IEnumerator WaitToLoadLocalItems()
+    {
+        // Esperar 3 segundos, para esperar que se cargen los items locales primero
+        yield return new WaitForSeconds(3.0f);
+
+        // una vez cargado los items locales, procedemos a verificar si hay conexion a internet.
+        CheckInternetConection();
     }
 
     /// <summary>
     /// Primero nos fijamos si tenemos conexion a internet, luego nos conectamos
-    /// a la base de datos remota.
+    /// a la base de datos remota. Para luego sincronizar los cambios.
     /// </summary>
     /// <returns></returns>
-    IEnumerator CheckInternetConection()
+    private void CheckInternetConection()
     {
-        // Esperar 3 segundos
-        yield return new WaitForSeconds(1.0f);
 
         this.networkManager = GetComponent<NetworkManager>();
 
@@ -134,9 +140,12 @@ public class ManageItems : MonoBehaviour
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
-        Debug.Log("Is somoe list equals " + isSomeListDbEquals + " " + 
-            " Lista local " + 
-            itemsLocalList.Count + " lista remota " + itemsRemoteList.Count);
+
+        Debug.Log("Is somoe list equals " + isSomeListDbEquals + " " +
+       " Lista local " +
+       itemsLocalList.Count + " lista remota " + itemsRemoteList.Count);
+
+
         if (!isSomeListDbEquals)
         {
 
@@ -206,6 +215,7 @@ public class ManageItems : MonoBehaviour
         }
         else
         {
+            /*
             // No hay cambios con la base de datos remota, cargamos la local. 
             // tambien si no hay conexion a internet.
             foreach (ItemLocal itemLocal in itemsLocalList)
@@ -217,7 +227,7 @@ public class ManageItems : MonoBehaviour
             }
 
             // Esperar a que todas las tareas se completen
-            OrderItem(itemsLocalList);
+            OrderItem(itemsLocalList);*/
         }
 
         syncStarted = false;
@@ -375,7 +385,6 @@ public class ManageItems : MonoBehaviour
 
     private bool CheckDependenciesInitialize()
     {
-
         return    
                   MyApplication.repository != null &&
                   FirebaseSDK.GetInstance().isFirebaseReady &&

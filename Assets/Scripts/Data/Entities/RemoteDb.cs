@@ -136,7 +136,7 @@ public class RemoteDb : IRepositoryRemote
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
 
         // key generada con Push()
-        string key = rootRef.Child("users").Child("items").Child(userUid).Push().Key;
+        string key = rootRef.Child("users").Child(userUid).Child("items").Push().Key;
 
         // Obtener la marca de tiempo del servidor en formato Unix
         long timestampUnix = TimeUtils.GetTimeStampUnix();

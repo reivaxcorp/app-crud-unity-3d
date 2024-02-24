@@ -87,3 +87,4 @@ crashlytics-build.properties
 
 # Ignorar el archivo google-services.json en la carpeta Assets
 Assets/google-services.json
+Assets/google-services.json.meta

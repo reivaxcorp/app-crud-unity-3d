@@ -6,8 +6,6 @@ using Firebase.Storage;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.tvOS;
 
 public class FirebaseSDK
 {
