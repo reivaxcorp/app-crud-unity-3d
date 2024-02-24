@@ -1,10 +1,9 @@
 using Firebase.Auth;
 using Firebase.Extensions;
 using UnityEngine;
-using Color = UnityEngine.Color;
 
 /// <summary>
-/// Manage account actions.
+/// Manejar las acciones de auntentificación.
 /// </summary>
 public class FirebaseAuthManager
 {
@@ -30,7 +29,7 @@ public class FirebaseAuthManager
                 if (task.IsCanceled)
                 {
                     Debug.LogError("Was canceled.");
-                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_CANCEL, "Fue cancelado!");
+                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_CANCEL, "¡Creación de cuenta cancelada!");
                     OnAccountAuthResult?.Invoke(authResult);
                     return;
                 }
@@ -74,7 +73,7 @@ public class FirebaseAuthManager
                     if (task.IsCanceled)
                     {
                         Debug.LogError("Was canceled.");
-                        authResult = new AccountAuthResult(AuthType.LOGIN_CANCEL, "Login cancelado!");
+                        authResult = new AccountAuthResult(AuthType.LOGIN_CANCEL, "¡Login cancelado!");
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
@@ -99,21 +98,28 @@ public class FirebaseAuthManager
     {
         if (FirebaseSDK.GetInstance().isFirebaseReady)
         {
-            FirebaseSDK.GetInstance().user.SendEmailVerificationAsync()
+            FirebaseSDK.GetInstance().auth.CurrentUser.SendEmailVerificationAsync()
                 .ContinueWithOnMainThread(task =>
                 {
+                    AccountAuthResult authResult;
 
                     if (task.IsCanceled)
                     {
                         Debug.LogError("SendEmailVerificationAsync was canceled.");
+                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_CANCEL, "Email de verificación cancelado");
+                        OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
                     if (task.IsFaulted)
                     {
                         Debug.LogError("SendEmailVerificationAsync encountered an error: " + task.Exception);
+                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_FAILURE, "Error al enviar el email de verificación");
+                        OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
 
+                    authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_SUCCESS, "Se acaba de enviar el email de verificación\nVerifica tu mail e inicia sesión");
+                    OnAccountAuthResult?.Invoke(authResult);
                     Debug.Log("Email sent successfully.");
                 });
         }

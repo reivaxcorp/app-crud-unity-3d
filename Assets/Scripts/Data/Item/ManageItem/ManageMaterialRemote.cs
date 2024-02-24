@@ -8,7 +8,7 @@ public class ManageMaterialRemote
                                                                                // public Material materialToUpdate; // El material que se actualizará con la imagen descargada.
     public ManageMaterialRemote(string imageName)
     {
-        _storageUrl += FirebaseSDK.GetInstance().user.UserId + "/" + imageName + ".png";
+        _storageUrl += FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/" + imageName + ".png";
     }
 
     public async Task<Texture2D> DownloadImage()

@@ -15,12 +15,24 @@ public class MenuCreateAccount : MenuAuth
             {
                 if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputRePassword, resultMsj))
                 {
+                    string mail = inputMail.text;
+                    string password = inputPassword.text;
+
                     firebaseAuthManager.OnAccountAuthResult += SetResult;
-                    firebaseAuthManager.CreateAccountWithMailAndPassword(inputMail.text, inputPassword.text);
+                    firebaseAuthManager.CreateAccountWithMailAndPassword(mail, password);
+                    ClearInputs();
                 }
             }
         }
     }
+
+    private void ClearInputs()
+    {
+       inputMail.text = "";
+       inputPassword.text = "";
+       inputRePassword.text = "";
+    }
+
 
     private bool IsInputsSetted()
     {

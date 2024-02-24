@@ -379,7 +379,7 @@ public class ManageItems : MonoBehaviour
         return    
                   MyApplication.repository != null &&
                   FirebaseSDK.GetInstance().isFirebaseReady &&
-                  FirebaseSDK.GetInstance().user != null;
+                  FirebaseSDK.GetInstance().auth.CurrentUser != null;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.

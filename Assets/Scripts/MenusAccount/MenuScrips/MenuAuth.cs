@@ -45,12 +45,6 @@ public class MenuAuth : MonoBehaviour
                 case AuthType.CREATE_ACCOUNT_CANCEL:
                     resultMsj.color = Color.gray;
                     break;
-                case AuthType.MAIL_VERIFICATION_SUCCESS:
-                    resultMsj.color = Color.green;
-                    break;
-                case AuthType.MAIL_VERIFICATION_FAILURE:
-                    resultMsj.color = Color.red;
-                    break;
                 default:
                     break;
             }

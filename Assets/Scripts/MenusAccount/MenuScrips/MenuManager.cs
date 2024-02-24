@@ -1,11 +1,15 @@
 using UnityEditor;
 using UnityEngine;
 
+
+/// <summary>
+/// Mostramos los menus según corresponnda.
+/// </summary>
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] private MenuAuth[] menus;
     private const string MENU_LOGIN_NAME = "MenuLogin";
-    private const string MENU_USER_SESION = "MenuUserAccount";
+    private const string MENU_USER_ACCOUNT = "MenuUserAccount";
     
     private bool menuSet = false;
 
@@ -25,7 +29,7 @@ public class MenuManager : MonoBehaviour
             }
         }
 
-        if(!menuIsShowed) { Debug.LogWarning("Menu doesn't exist, please verify name menu in params"); }
+        if(!menuIsShowed) { Debug.LogWarning("El menu no existe, compruebe el nombre del menu"); }
     }
 
     private void Start()
@@ -37,9 +41,10 @@ public class MenuManager : MonoBehaviour
     {
         if (!menuSet && FirebaseSDK.GetInstance().isFirebaseReady)
         {
-            if (FirebaseSDK.GetInstance().auth.CurrentUser != null)
+            if (FirebaseSDK.GetInstance().auth.CurrentUser
+                != null)
             {
-                ShowMenuByName(MENU_USER_SESION);
+                ShowMenuByName(MENU_USER_ACCOUNT);
             }
             else
             {
