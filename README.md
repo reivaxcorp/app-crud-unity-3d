@@ -31,7 +31,7 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 
 ## Uso del Código
 
-Eres libre de utilizar, modificar y distribuir el código proporcionado en este repositorio con fines educativos y comerciales. Si encuentras los tutoriales útiles, ¡considera darle una estrella a este repositorio!
+Eres libre de utilizar, modificar y distribuir el código proporcionado en este repositorio con fines educativos y no comerciales. Si encuentras los tutoriales útiles, ¡considera darle una estrella a este repositorio!
 
 ## Conéctate Conmigo
 
