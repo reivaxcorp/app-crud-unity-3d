@@ -31,13 +31,13 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 
 ## Uso del Código
 
-Eres libre de utilizar, modificar y distribuir el código proporcionado en este repositorio con fines educativos y comerciales. Si encuentras los tutoriales útiles, ¡considera darle una estrella a este repositorio!
+Eres libre de utilizar, modificar y distribuir el código proporcionado en este repositorio con fines educativos y no comerciales. Si encuentras los tutoriales útiles, ¡considera darle una estrella a este repositorio!
 
 ## Conéctate Conmigo
 
 Si tienes alguna pregunta, comentario o sugerencia, no dudes en ponerte en contacto:
 
-- Correo electrónico: [reivaxcorp@email.com](mailto:reivaxcorp@email.com)
+- Correo electrónico: [reivaxcorp@email.com](mailto:reivaxcorp@gmail.com)
 - LinkedIn: [Javier Monzón](https://www.linkedin.com/in/javier-monzón-a527952b5)
 - YouTube: [ReivaxCorp.](https://www.youtube.com/channel/UCFaeV4z3zCTvF48ay6q7MtQ)
 - Google Play: [ReivaxCorp](https://play.google.com/store/apps/dev?id=6165909766232622777)
