@@ -37,7 +37,7 @@ Eres libre de utilizar, modificar y distribuir el código proporcionado en este 
 
 Si tienes alguna pregunta, comentario o sugerencia, no dudes en ponerte en contacto:
 
-- Correo electrónico: [reivaxcorp@email.com](mailto:reivaxcorp@email.com)
+- Correo electrónico: [reivaxcorp@email.com](mailto:reivaxcorp@gmail.com)
 - LinkedIn: [Javier Monzón](https://www.linkedin.com/in/javier-monzón-a527952b5)
 - YouTube: [ReivaxCorp.](https://www.youtube.com/channel/UCFaeV4z3zCTvF48ay6q7MtQ)
 - Google Play: [ReivaxCorp](https://play.google.com/store/apps/dev?id=6165909766232622777)
