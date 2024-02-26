@@ -22,7 +22,7 @@ public class RemoteDb : IRepositoryRemote
         return this;
     }
 
-    public void FirebaseValueChanged()
+    public async Task FirebaseValueChanged()
     {
 
         if (!IsUserUid()) return;
@@ -32,6 +32,9 @@ public class RemoteDb : IRepositoryRemote
             .Child(userUid)
             .Child("items")
             .ValueChanged += HandleValueChanged;
+
+        // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
+        await Task.Delay(1000);
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -149,13 +152,13 @@ public class RemoteDb : IRepositoryRemote
             {
                 // Manejar error
                 Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                resultUi.SetResultCrudUi(EResultMenuAction.DocumentFailedCreated, "Error al escribir en la base de datos");
+                resultUi.SetResultCrudUi("Error", "Error al escribir en la base de datos");
             }
             else
             {
                 // Operación exitosa
                 Debug.Log("Datos escritos exitosamente en la base de datos");
-                resultUi.SetResultCrudUi(EResultMenuAction.DocumentSuccessCreated, "Nuevo ítem agregado");
+                resultUi.SetResultCrudUi("Completado", "Nuevo ítem agregado");
             }
         });
     }
@@ -177,13 +180,13 @@ public class RemoteDb : IRepositoryRemote
 
                     // Manejar error
                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                    iResult.SetResultCrudUi(EResultMenuAction.DocumentFailedUpdate, "Error al actualizar la base de datos");
+                    iResult.SetResultCrudUi("Error", "Error al actualizar");
                 }
                 else
                 {
                     // Operación exitosa
                     Debug.Log("Datos escritos exitosamente en la base de datos");
-                    iResult.SetResultCrudUi(EResultMenuAction.DocumentSuccessUpdate, "Datos actualizados exitosamente en la base de datos");
+                    iResult.SetResultCrudUi("Actualización", "Datos actualizados exitosamente");
                 }
             });
     }
@@ -209,14 +212,14 @@ public class RemoteDb : IRepositoryRemote
 
                      // Manejar error
                      Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
-                     iResult.SetResultCrudUi(EResultMenuAction.DocumentFailedDeleted, "Error al borrar el ítem remoto de la base de datos");
+                     iResult.SetResultCrudUi("Error", "Error al borrar el ítem remoto de la base de datos");
                      deleteSuccess = false;
                  }
                  else
                  {
                      // Operación exitosa
                      Debug.Log("Ítem remoto borrado correctamente");
-                     iResult.SetResultCrudUi(EResultMenuAction.DocumentSuccessDeleted, "Ítem remoto borrado correctamente");
+                     iResult.SetResultCrudUi("Borrado", "Ítem remoto borrado correctamente");
                      deleteSuccess = true;
                  }
              });

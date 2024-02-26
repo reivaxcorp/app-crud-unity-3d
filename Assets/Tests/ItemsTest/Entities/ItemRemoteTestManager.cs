@@ -24,7 +24,7 @@ public class ItemRemoteTestManager
     public void SaveItemRemote(ItemRemoteTest itemRemote, IResultTest resultUi)
     {
         itemRemoteList.Add(itemRemote);
-        resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentSuccessCreated, "Ítem guardado");
+        resultUi.SetResultCrudUi("Ítem salvado", "Ítem guardado");
     }
 
     public void DeleteItemRemoteById(string id)
@@ -47,10 +47,10 @@ public class ItemRemoteTestManager
             // Si el item existe, eliminarlo de la lista
             itemRemoteList.RemoveAt(existingIndex);
             itemRemoteList.Add(itemRemoteTest);
-            resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentSuccessUpdate, "Se actualizo el documento");
+            resultUi.SetResultCrudUi("Actualización", "Se actualizo el documento");
             return;
         }
-        resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentFailedUpdate, "No se encuentra el documento");
+        resultUi.SetResultCrudUi("Aviso", "No se encuentra el documento");
     }
 
     public void ClearAllData()

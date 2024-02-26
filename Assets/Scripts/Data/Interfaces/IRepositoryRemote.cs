@@ -4,7 +4,7 @@ using static RemoteDb;
 
 public interface IRepositoryRemote {
     void SaveItemRemote(ItemRemote itemRemote, IResult resultUi);
-    void UpdateItemRemote(ItemRemote itemRemote, IResult iResult);
-    Task<bool> DeleteItemRemoteById(string id, IResult iResult);
+    void UpdateItemRemote(ItemRemote itemRemote, IResult resultUi);
+    Task<bool> DeleteItemRemoteById(string id, IResult resultUi);
     RemoteDb GetRemoteDb();
 }

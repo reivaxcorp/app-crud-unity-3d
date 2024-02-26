@@ -344,16 +344,9 @@ public class ManageItemsTest : IResultTest
         return true;
     }
 
-    public void SetResultCrudUi(EResultMenuActionTest result, string msj)
+    public void SetResultCrudUi(string title, string msj)
     {
-        if (result == EResultMenuActionTest.DocumentSuccessCreated)
-        {
-            Debug.Log("Documento escrito");
-        }
-        else
-        {
-            Debug.Log("Error al escribir el documento");
-        }
+        Debug.Log("Documento escrito " + title + " " + msj);
     }
 
     private ItemLocalTest CreateItemLocalTest()

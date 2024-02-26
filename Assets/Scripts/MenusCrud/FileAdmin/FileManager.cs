@@ -161,9 +161,12 @@ public class FileManager
         return null;
     }
 
-    // Cambiamos el nombre de la imagen copiada en nuestro dispositivo interno,
-    // por la que se subio a firebase storage, asi no la bajamos ahorrando una bajada
-    // innecesaria de firebase storage.
+    /// <summary>
+    /// Cambiamos el nombre de la imagen copiada en nuestro dispositivo interno,
+    /// por la que se subio a firebase storage, asi no la bajamos ahorrando una bajada
+    /// innecesaria de firebase storage.
+    /// </summary>
+    /// <param name="generateImageName">Nombre de archivo generado aleatoreamente, para guardarlo en el documento de firebase realtime database</param>
     public void ChangeNameImageCopySelected(string generateImageName)
     {
         if (generateImageName != null)

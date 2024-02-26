@@ -1,5 +1,5 @@
 
 public interface IResult
 {
-    public void SetResultCrudUi(EResultMenuAction result, string msj);
+    public void SetResultCrudUi(string title, string msj);
 }

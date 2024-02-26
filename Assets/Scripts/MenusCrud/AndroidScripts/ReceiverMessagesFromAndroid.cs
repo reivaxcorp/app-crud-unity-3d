@@ -48,7 +48,6 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             if (currentMenu != null)
             {
                 currentMenu.SetImagePreview(texture);
-                currentMenu.SetImageName(fileName);
                 currentMenu.SetImageChange(true);
                 currentMenu.fileManager.DeletePreviousCopyImage(); // borramos la imagén anterior seleccionada
                 currentMenu.fileManager.SetCurrentImageName(fileName);

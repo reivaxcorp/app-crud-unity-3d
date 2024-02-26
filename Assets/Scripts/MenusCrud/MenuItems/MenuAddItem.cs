@@ -5,50 +5,11 @@ public class MenuAddItem : MenuCrud, IResult
 {
     private string generateImageName;
 
-    public void SetResultCrudUi(EResultMenuAction result, string msj)
+    public void SetResultCrudUi(string title, string msj)
     {
         progressText?.StopProgressTextAnimation();
-
-        if (resultMsj != null)
-        {
-            switch (result)
-            {
-                case EResultMenuAction.FileSuccessUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    fileManager.ChangeNameImageCopySelected(generateImageName);
-                    WriteDocument(generateImageName);
-                    break;
-                case EResultMenuAction.FileFailedUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.FileCancelUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                case EResultMenuAction.DocumentSuccessCreated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    OpenDialog("ItemCreado", "Ítem creado correctamente");
-                    uiApp.HideMenu();
-                    break;
-                case EResultMenuAction.DocumentFailedCreated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.DocumentCancelCreated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
-        }
+        uiApp.MenuSetActive(false);
+        OpenDialog(title, msj);   
     }
   
     /// <summary>
@@ -61,57 +22,13 @@ public class MenuAddItem : MenuCrud, IResult
         {
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser, iResult: this);
+                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
                 generateImageName = Guid.NewGuid().ToString();
                 uploadFileRemote.SetImageNameGenerate(generateImageName);
                 await uploadFileRemote.UploadFileFirebaseStorage();
+                fileManager.ChangeNameImageCopySelected(generateImageName);
+                WriteDocument(generateImageName);
         }
-    }
-
-    public bool IsDataSetted()
-    {
-        ClearResultCrud();
-
-        if (inputFieldName == null)
-        {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-            return false;
-        }
-
-        // Sanitizar el nombre de la imagen utilizando la expresión regular
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-
-        if (string.IsNullOrEmpty(sanitizedFileName))
-        {
-            LogWarningAndSetResult("Ingrese el nombre de la imagén");
-            return false;
-        }
-
-        if (sanitizedFileName.Length > 30)
-        {
-            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
-            return false;
-        }
-
-        if (menuImagePreview == null)
-        {
-            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
-            return false;
-        }
-
-        if (menuImagePreview.sprite == null)
-        {
-            LogWarningAndSetResult("Seleccione una imagen");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void LogWarningAndSetResult(string mensajeAdvertencia)
-    {
-        Debug.LogWarning(mensajeAdvertencia);
-        SetResultCrudUi(EResultMenuAction.FileFailedUploated, mensajeAdvertencia);
     }
  
     /// <summary>

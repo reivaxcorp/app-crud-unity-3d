@@ -64,12 +64,12 @@ public class ManageItems : MonoBehaviour
             Task task = CreateItemInScene(itemLocal);
             tasks.Add(task);
         }
-        OrderItem(itemsLocalList);
         await Task.WhenAll(tasks);
 
+        OrderItem(itemsLocalList);
         SetLoadingMsj(false); // Ocultar Cargando..
 
-        CheckInternetConection();
+        StartCoroutine(CheckInternetConection());
     }
 
     /// <summary>
@@ -77,8 +77,9 @@ public class ManageItems : MonoBehaviour
     /// a la base de datos remota. Para luego sincronizar los cambios.
     /// </summary>
     /// <returns></returns>
-    private void CheckInternetConection()
+    IEnumerator CheckInternetConection()
     {
+        yield return new WaitForSeconds(1.0f);
 
         this.networkManager = GetComponent<NetworkManager>();
 
@@ -108,11 +109,11 @@ public class ManageItems : MonoBehaviour
     }
 
     // Escuchamos los cambios en la base de datos remota, al suscribirnos a los cambios
-    private void ListeningDbRemote()
+    private async void ListeningDbRemote()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
         remoteDbRef.handleValueResult += SyncronizeData;
-        remoteDbRef.FirebaseValueChanged();
+        await remoteDbRef.FirebaseValueChanged();
     }
 
     /// <summary>
@@ -190,19 +191,22 @@ public class ManageItems : MonoBehaviour
                 }
                 else
                 {
+                    // es necesario agregar los que no fueron cambiados tambien
                     // sin cambios el ítem local con el ítem remoto
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     task = CreateItemInScene(itemLocal);
                     itemsToSave.Add(itemLocal);
                 }
-                tasks.Add(task); // Agregar la tarea a la lista de tareas
+                tasks.Add(task); // Agregar la tarea a la lista de tareas*/
             }
 
             // Esperar a que todas las tareas se completen
             await Task.WhenAll(tasks);
             OrderItem(itemsToSave);
             // actualizamos la lista local con la remota
-            await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
+
+            itemsLocalList = itemsToSave;
+            await MyApplication.repository.SaveLocalItemsAsync(itemsLocalList);
         }
 
         syncStarted = false;

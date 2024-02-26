@@ -31,7 +31,7 @@ public class MenuManagerApp : MonoBehaviour
         {
             menuAddItem.transform.parent.gameObject.SetActive(true);
             menuAddItem.SetActive(true);
-            HideUiButtons(false);
+            HideUiButtons(true);
         }
     }
 
@@ -41,7 +41,7 @@ public class MenuManagerApp : MonoBehaviour
         {
             menuUpdateItem.transform.parent.gameObject.SetActive(true);
             menuUpdateItem.SetActive(true);
-            HideUiButtons(false);
+            HideUiButtons(true);
             menuUpdateItem.GetComponent<MenuUpdateItem>().InitMenu(idItem);
         }
     }
@@ -51,7 +51,7 @@ public class MenuManagerApp : MonoBehaviour
         if(!menuCompany.activeSelf)
         {
             menuCompany.SetActive(true);
-            HideUiButtons(false);
+            HideUiButtons(true);
         }
     }
 
@@ -72,25 +72,24 @@ public class MenuManagerApp : MonoBehaviour
 
     public void ShowMenu()
     {
-        HideUiButtons(false);
+        HideUiButtons(true);
         MenuSetActive(true);
     }
 
     public void HideMenu()
     {
-        Debug.Log("NO ide");
         MenuSetActive(false);
-        HideUiButtons(true);
+        HideUiButtons(false);
     }
 
     public void HideUiButtons(bool isActive)
     {
-        addItemBtn.SetActive(isActive);
-        backBtn.SetActive(isActive);
-        menuCompanyBtn.SetActive(isActive);
+        addItemBtn.SetActive(!isActive);
+        backBtn.SetActive(!isActive);
+        menuCompanyBtn.SetActive(!isActive);
     }
 
-    private void MenuSetActive(bool isActive)
+    public void MenuSetActive(bool isActive)
     {
         if (menu != null)
         {

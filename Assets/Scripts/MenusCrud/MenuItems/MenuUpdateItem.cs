@@ -1,19 +1,25 @@
 using System;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.Networking.UnityWebRequest;
 
 /// <summary>
 /// Comprobamos la actulización de los items cuando hacemos touch en alguno
 /// Si el usuario eligio una nueva imagen se actualizará en cambio no lo hará
 /// </summary>
-public class MenuUpdateItem : MenuCrud, IResult
+public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
 {
+    [SerializeField] DialogDeleteConfirm dialogDeleteConfirm;
     private ItemLocal currentItemSelected;
     private string oldImageName;
-    private bool isDelteItem;
     private string generateImageName;
+
+    public void SetResultCrudUi(string title, string msj)
+    {
+        progressText?.StopProgressTextAnimation();
+        uiApp.MenuSetActive(false);
+        OpenDialog(title, msj);
+    }
+
     /// <summary>
     /// Cuando abrimos el menu, seteamos los valores.
     /// </summary>
@@ -28,7 +34,7 @@ public class MenuUpdateItem : MenuCrud, IResult
                 this.currentItemSelected = itemLocal;
                 FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
                 Texture2D texture2D = fileManager.LoadFileAsTexture2D(itemLocal.ImageName); 
-                SetImageName(itemLocal.Name);
+                SetImageNameInInput(itemLocal.Name);
                 SetImagePreview(texture2D);
                 this.oldImageName = itemLocal.ImageName;
             }
@@ -40,86 +46,6 @@ public class MenuUpdateItem : MenuCrud, IResult
         else
         {
             Debug.LogWarning("El repositorio es null");
-        }
-    }
-
-    public async void SetResultCrudUi(EResultMenuAction result, string msj)
-    {
-        progressText?.StopProgressTextAnimation();
-
-        if (resultMsj != null)
-        {
-            switch (result)
-            {
-                case EResultMenuAction.FileSuccessUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    fileManager.ChangeNameImageCopySelected(generateImageName);
-                    UpdateDocumentRemote();
-                    break;
-                case EResultMenuAction.FileFailedUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.FileCancelUploated:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                case EResultMenuAction.FileSuccessDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    uiApp.HideMenu();
-                    break;
-                case EResultMenuAction.FileFailedDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.DocumentSuccessUpdate: 
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    uiApp.HideMenu();
-                    break;
-                case EResultMenuAction.DocumentFailedUpdate:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.DocumentCancelUpdate:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                case EResultMenuAction.DocumentSuccessDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    uiApp.HideMenu();
-                    break;
-                case EResultMenuAction.DocumentFailedDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                case EResultMenuAction.FileRemoteSuccessDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, this);
-                    break;
-                case EResultMenuAction.FileRemoteFailedDeleted:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
-        }
-    }
-
-    public void SetResultWriteDocument(EResultMenuAction result, string title, string body)
-    {
-        if (result == EResultMenuAction.FileSuccessUploated)
-        {
-            OpenDialog(title, body);
         }
     }
  
@@ -150,120 +76,83 @@ public class MenuUpdateItem : MenuCrud, IResult
                 }
                 catch (Exception excepcion)
                 {
-                    SetResultCrudUi(EResultMenuAction.FileFailedUploated, "Error - " + excepcion.Message);
+                    SetResultCrudUi("Error", "Error - " + excepcion.Message);
                 }
             }
             else
             {
-                SetResultCrudUi(EResultMenuAction.DocumentCancelCreated, "Nada ha cambiado....");
-            }
-        }
-    }
-
-    public bool IsDataSetted()
-    {
-        ClearResultCrud();
-
-        if (inputFieldName == null)
-        {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-            return false;
-        }
-
-        // Sanitizar el nombre de la imagen utilizando la expresión regular
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-
-        if (string.IsNullOrEmpty(sanitizedFileName))
-        {
-            LogWarningAndSetResult("Ingrese el nombre de la imagén");
-            return false;
-        }
-
-        if (sanitizedFileName.Length > 30)
-        {
-            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
-            return false;
-        }
-
-        if (menuImagePreview == null)
-        {
-            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
-            return false;
-        }
-
-        if (menuImagePreview.sprite == null)
-        {
-            LogWarningAndSetResult("Seleccione una imagen");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void LogWarningAndSetResult(string mensajeAdvertencia)
-    {
-        Debug.LogWarning(mensajeAdvertencia);
-        SetResultCrudUi(EResultMenuAction.FileFailedUploated, mensajeAdvertencia);
-    }
-
-    public async override void ConfirmButtonDialogPressed(bool isDialogConfirm)
-    {
-        if(isDialogConfirm)
-        {
-            if(MyApplication.repository != null)
-            {
-                if(isDelteItem)
-                {
-                    // imagén de firebase storage
-                    ManageStorageRemote manageMaterialRemote =
-                                 new ManageStorageRemote(currentItemSelected.ImageName);
-                    await manageMaterialRemote.DeleteImageRemote(this);
-                }
+                SetResultCrudUi("Todo igual", "Nada ha cambiado....");
             }
         }
     }
 
     public void DeleteItem()
     {
-        if(currentItemSelected != null)
+        if(dialogDeleteConfirm != null)
         {
-            SetItemToDelete(true);
-            OpenDialog("Eliminar ítem", "¿Desea eliminar el ítem?");
+            dialogDeleteConfirm.ShowDialog("Borrar ítem" , "Deseas eliminar el ítem", this);
+        } else
+        {
+            Debug.LogWarning("DialogDeleteConfirm es null, colocalo en el inspector");
         }
+    }
+     
+    private async Task<bool> UpdateImageRemote()
+    {
+        byte[] fileBytes = fileManager.GetBytesImageSelected();
+        UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
+        generateImageName = Guid.NewGuid().ToString();
+        uploadFileRemote.SetImageNameGenerate(generateImageName);
+        bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
+        fileManager.ChangeNameImageCopySelected(generateImageName);
+        await DeleteImageRemote();
+        UpdateDocumentRemote();
+        return resultUpload;
     }
 
     private void UpdateDocumentRemote()
     {
         // Ítem a actualizar
         ItemRemote itemRemote = new ItemRemote(
-            id: currentItemSelected.Id, 
+            id: currentItemSelected.Id,
             name: inputFieldName.text,
-            imageName: isImageChanged ? generateImageName : oldImageName, 
+            imageName: isImageChanged ? generateImageName : oldImageName,
             creationDate: currentItemSelected.CreationDate);
 
         // actualizamos el documente de firebase realtimadatabase
-        MyApplication.repository.UpdateItemRemote(itemRemote, this);
+        MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
+    }
+
+    /// <summary>
+    /// borramos imagen desactualiza de firebase storage
+    /// </summary>
+    private async Task<bool> DeleteImageRemote()
+    {
+        // imagén de firebase storage
+        ManageStorageRemote manageMaterialRemote =
+                     new ManageStorageRemote(currentItemSelected.ImageName);
+        await manageMaterialRemote.DeleteImageRemote(resultUi: this);
+        return true;
     }
  
-
-    private async Task<bool> UpdateImageRemote()
-    {
-        byte[] fileBytes = fileManager.GetBytesImageSelected();
-        UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser, iResult: this);
-        generateImageName = Guid.NewGuid().ToString();
-        uploadFileRemote.SetImageNameGenerate(generateImageName);
-        bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
-        return resultUpload;
-    }
-
-    private void SetItemToDelete(bool isItemToDelete)
-    {
-        this.isDelteItem = isItemToDelete;
-    }
-
+    /// <summary>
+    /// Verificamos si el usuario cambio algo en la Ui
+    /// </summary>
+    /// <returns></returns>
     private bool IsSomeDatachanged()
     {
         string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        return isImageChanged || !sanitizedFileName.Equals(oldImageName);
+        return isImageChanged || !sanitizedFileName.Equals(currentItemSelected.Name);
     }
+
+    public async void ConfirmDialogDelete(bool isDeleteConfirm)
+    {
+        if(isDeleteConfirm)
+        {
+            SetItemToDelete(true);
+            await DeleteImageRemote();
+            await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
+        }
+    }
+
 }

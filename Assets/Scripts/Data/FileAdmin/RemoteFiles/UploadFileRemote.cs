@@ -20,13 +20,11 @@ public class UploadFileRemote
 
     public UploadFileRemote(
         byte[] fileBytes,
-        string folderUserUid,
-        IResult iResult
+        string folderUserUid
         )
     {
         _fileBytes = fileBytes;
         _folderUserUid = folderUserUid;
-        _iResult = iResult;
     }
 
     public void SetImageNameGenerate(string imageName)
@@ -65,7 +63,6 @@ public class UploadFileRemote
                         if (task.IsFaulted || task.IsCanceled)
                         {
                             Debug.Log(task.Exception.ToString());
-                            _iResult.SetResultCrudUi(EResultMenuAction.FileFailedUploated, "Tarea fallida ó cancelada");
                             result = false;
                         }
                         else
@@ -75,7 +72,6 @@ public class UploadFileRemote
                             string md5Hash = metadata.Md5Hash;
                             Debug.Log("¡Subida finalizada!" + metadata.Path);
                             Debug.Log("Hash MD5 = " + md5Hash);
-                            _iResult.SetResultCrudUi(EResultMenuAction.FileSuccessUploated, "¡Archivo subido correctamente!");
                             result = true; // Se ha iniciado correctamente la operación de subida
                         }
                     });
@@ -90,7 +86,6 @@ public class UploadFileRemote
         else
         {
             Debug.LogWarning("FirebaseStorage es null");
-            _iResult.SetResultCrudUi(EResultMenuAction.FileFailedUploated, "Error en FirebaseStorage \n(Recargando dependencias..)");
             return result; // No se ha podido iniciar la operación de subida
         }
     }

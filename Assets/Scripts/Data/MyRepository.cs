@@ -15,9 +15,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         this.remoteDb = remoteDb;
     }
 
-    public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
+    public async Task<bool> DeleteItemRemoteById(string id, IResult iResultUi)
     {
-        return await remoteDb.DeleteItemRemoteById(id, iResult);
+        return await remoteDb.DeleteItemRemoteById(id, iResultUi);
     }
    
     public async Task<List<ItemLocal>> GetLocalItemsAsync()
@@ -35,9 +35,9 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
+    public void UpdateItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        remoteDb.UpdateItemRemote(itemRemote, iResult);
+        remoteDb.UpdateItemRemote(itemRemote, resultUi);
     }
 
     public async Task<ItemLocal> GetLocalItemById(string id)

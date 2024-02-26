@@ -1,10 +1,10 @@
 using System.IO;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class MenuCrud : MonoBehaviour, IResultDialog
+public class MenuCrud : MonoBehaviour
 {
     
     [SerializeField] GameObject ads;
@@ -18,6 +18,7 @@ public class MenuCrud : MonoBehaviour, IResultDialog
     [SerializeField] protected TMP_InputField inputFieldName;
     protected ProgressText progressText;
     protected bool isImageChanged;
+    protected bool isDelteItem;
 
     public FileManager fileManager
     {
@@ -31,7 +32,7 @@ public class MenuCrud : MonoBehaviour, IResultDialog
 
     public void OpenDialog(string title, string body)
     {
-        dialogMsj.ShowDialog(title, body, this);
+        dialogMsj.ShowDialog(title, body);
     }
  
     public void SetImagePreview(Texture2D texture)
@@ -42,24 +43,126 @@ public class MenuCrud : MonoBehaviour, IResultDialog
         menuImagePreview.sprite = sprite;
     }
 
+    /// <summary>
+    /// Cuando el usuario elige una imagén
+    /// </summary>
+    /// <param name="isImageChanged"></param>
     public void SetImageChange(bool isImageChanged)
     {
         this.isImageChanged = isImageChanged;
     }
 
-    public void SetImageName(string imageName)
+    /// <summary>
+    /// Cuando el usuario quiere borrar un item
+    /// </summary>
+    /// <param name="isItemToDelete"></param>
+    public void SetItemToDelete(bool isItemToDelete)
+    {
+        this.isDelteItem = isItemToDelete;
+    }
+
+    public void SetImageNameInInput(string imageName)
     {
         inputFieldName.text = imageName;
     }
-     
+
+
+    /// <summary>
+    /// Verificamos que los datos hayan sido llenado
+    /// </summary>
+    /// <returns></returns>
+    public bool IsDataSetted()
+    {
+        ClearResultCrud();
+
+        if (inputFieldName == null)
+        {
+            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
+            return false;
+        }
+
+        if (menuImagePreview == null)
+        {
+            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
+            return false;
+        }
+
+        // Sanitizar el nombre de la imagen utilizando la expresión regular
+        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
+
+        if (string.IsNullOrEmpty(sanitizedFileName))
+        {
+            LogWarningAndSetResult("Ingrese el nombre de la imagén");
+            SetMsjInfoUI("Ingrese el nombre de la imagén");
+            return false;
+        }
+
+        if (sanitizedFileName.Length > 30)
+        {
+            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
+            SetMsjInfoUI("Nombre debe ser menor a 30 caracteres");
+            return false;
+        }
+
+        if (menuImagePreview.sprite == null)
+        {
+            LogWarningAndSetResult("Seleccione una imagén");
+            SetMsjInfoUI("Seleccione una imagén");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void LogWarningAndSetResult(string mesageWaring)
+    {
+        Debug.LogWarning(mesageWaring);
+    }
+
+    private void SetMsjInfoUI(string msj)
+    {
+        if (resultMsj != null)
+        {
+            resultMsj.text = msj;
+            resultMsj.color = Color.cyan;
+        }
+        else
+        {
+            Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
+        }
+    }
+
     public void CloseMenu()
     {
         if(isImageChanged)
         {
             fileManager.DeletePreviousCopyImage();
         }
-        ClearMenu();
         uiApp.HideMenu();
+    }
+
+    /// <summary>
+    /// Cuando el usuario hace click en aceptar en el botón del dialogo,
+    /// cuando completamos una accion
+    /// </summary>
+    public void ConfirmDialogInfo()
+    {
+        uiApp.HideMenu();
+    }
+
+    public void ResetMenu()
+    {
+        ClearInputs();
+        WaitForFirebase(true);
+        SetImageChange(false);
+        SetItemToDelete(false);
+        ClearResultCrud();
+        SetCurrentMenu(null);
+    }
+
+    public void ClearResultCrud()
+    {
+        resultMsj.text = string.Empty;
     }
 
     public void ShowInterstitialAd()
@@ -80,33 +183,6 @@ public class MenuCrud : MonoBehaviour, IResultDialog
         {
             Debug.LogWarning("Por favor, coloca el Ads en el MenuAddItem, en su inspector");
         }
-    }
-
-    public virtual void ConfirmButtonDialogPressed(bool isDialogConfirm)
-    {
-        if (isDialogConfirm) // cerro con el botón "Aceptar"
-        {
-            ClearMenu();
-            uiApp.HideMenu();
-        }
-        else
-        {
-            ClearMenu(); // cerro con el botón "X". 
-        }
-    }
-
-    public void ResetMenu()
-    {
-        ClearInputs();
-        WaitForFirebase(true);
-        SetImageChange(false);
-        ClearResultCrud();
-        SetCurrentMenu(null);
-    }
-
-    public void ClearResultCrud()
-    {
-        resultMsj.text = string.Empty;
     }
 
     private void OpenImageAndroid()
@@ -162,13 +238,6 @@ public class MenuCrud : MonoBehaviour, IResultDialog
         uiApp.SetCurrentMenu(menu);
     }
  
-    private void ClearMenu()
-    {
-        ClearInputs();
-        SetImageChange(false);
-        ClearResultCrud();
-    }
-
     private void ClearInputs()
     {
         menuImagePreview.sprite = null;

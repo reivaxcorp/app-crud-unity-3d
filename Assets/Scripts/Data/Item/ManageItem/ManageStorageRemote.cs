@@ -65,13 +65,11 @@ public class ManageStorageRemote
         await storageReference.DeleteAsync().ContinueWithOnMainThread(task => {
             if (task.IsCompleted)
             {
-                resultUi.SetResultCrudUi(EResultMenuAction.FileRemoteSuccessDeleted, "Archivo remoto borrado correctamente.");
                 Debug.Log("Archivo remoto borrado correctamente.");
                 deleteSuccess = true;
             }
             else
             {
-                resultUi.SetResultCrudUi(EResultMenuAction.FileRemoteFailedDeleted, "Archivo remoto anterior no encontrado");
                 Debug.LogWarning("Archivo remoto anterior no encontrado.");
                 deleteSuccess = false;
             }
