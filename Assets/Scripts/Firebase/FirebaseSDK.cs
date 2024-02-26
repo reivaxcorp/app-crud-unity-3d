@@ -147,12 +147,10 @@ public class FirebaseSDK
         {
             MyApplication.repository.GetRemoteDb().SetUserUid(user.UserId);
             MyApplication.repository.GetLocalDb().SetUserUidFolder(user.UserId);
-            MyApplication.repository.GetTextureManager().SetUserUidFolder(user.UserId);
         } else
         {
             MyApplication.repository.GetRemoteDb().SetUserUid(null);
             MyApplication.repository.GetLocalDb().SetUserUidFolder(null);
-            MyApplication.repository.GetTextureManager().SetUserUidFolder(null);
             Debug.Log("Usuario inexistente por ahora..");
         }
     }

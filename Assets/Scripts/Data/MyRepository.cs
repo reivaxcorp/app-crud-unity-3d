@@ -2,18 +2,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLocalSaved
+public class MyRepository : IRepositoryLocal, IRepositoryRemote
 {
     private readonly IRepositoryLocal localDb;
 
     private IRepositoryRemote remoteDb;
 
-    private ManageTextureLocal textureManager;
 
-    public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb, 
-        ManageTextureLocal textureManager)
+    public MyRepository(IRepositoryLocal localDb, IRepositoryRemote remoteDb)
     {
-        this.textureManager = textureManager;
         this.localDb = localDb;
         this.remoteDb = remoteDb;
     }
@@ -43,21 +40,6 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
         remoteDb.UpdateItemRemote(itemRemote, iResult);
     }
 
-    public void SaveTextureAsPNG(Texture2D textureToSave, string imageName)
-    {
-        textureManager.SaveTextureAsPNG(textureToSave, imageName);
-    }
-
-    public void RemoveLocalTexture(string imageId)
-    {
-        textureManager.RemoveLocalTexture(imageId);
-    }
-
-    public Texture2D LoadTextureAsPNG(string imageName)
-    {
-        return textureManager.LoadTextureAsPNG(imageName);
-    }
-
     public async Task<ItemLocal> GetLocalItemById(string id)
     {
         return await localDb.GetLocalItemById(id);
@@ -71,10 +53,5 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote, IDataTextureLoc
     public LocalDb GetLocalDb()
     {
         return localDb as LocalDb;
-    }
-
-    public ManageTextureLocal GetTextureManager()
-    {
-        return textureManager;
     }
 }

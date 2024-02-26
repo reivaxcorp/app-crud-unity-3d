@@ -1121,7 +1121,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1421400313}
         m_TargetAssemblyTypeName: MenuCrud, Assembly-CSharp
-        m_MethodName: OpenImage
+        m_MethodName: OpenFile
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1301,7 +1301,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _androidAdUnitId: Interstitial_Android
-  _iOsAdUnitId: Interstitial_iOS
 --- !u!114 &439825013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3183,7 +3182,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 326654716}
         m_TargetAssemblyTypeName: MenuCrud, Assembly-CSharp
-        m_MethodName: OpenImage
+        m_MethodName: OpenFile
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4117,7 +4116,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1421400313}
         m_TargetAssemblyTypeName: MenuAddItem, Assembly-CSharp
-        m_MethodName: OnUploadItem
+        m_MethodName: CreateDocumentRemote
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

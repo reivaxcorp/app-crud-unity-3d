@@ -25,9 +25,8 @@ public class MyApplication : MonoBehaviour
 
         RemoteDb remoteDb = new RemoteDb();
         LocalDb localDb = new LocalDb();
-        ManageTextureLocal textureManager = new ManageTextureLocal();
 
-        repository = new MyRepository(localDb, remoteDb, textureManager);
+        repository = new MyRepository(localDb, remoteDb);
 
         // FIRST wait to initialize Sdk Firebase
         bool isInitialize = await InicializeFirebase();

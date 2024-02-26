@@ -10,7 +10,8 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
         this.currentMenu = menu;    
     }
 
-    // El nombre de la función debe ser la misma que se llama desde la activity personalizada
+    // El nombre de la función debe ser la misma que se llama
+    // desde la activity personalizada "CrudUnityPlayerActivity"
     public void ReceiveDataFromAndroid(string fileNameWithBase64)
     {
         if (!string.IsNullOrEmpty(fileNameWithBase64))
@@ -44,8 +45,10 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             {
                 currentMenu.SetImagePreview(texture);
                 currentMenu.SetImageName(fileName);
-                currentMenu.fileManager.DeletePreviousCopyImage();
-                currentMenu.fileManager.SaveFileInternalExtorage(texture, fileName);
+                currentMenu.SetImageChange(true);
+                currentMenu.fileManager.DeletePreviousCopyImage(); // borramos la imagén anterior seleccionada
+                currentMenu.fileManager.SetCurrentImageName(fileName);
+                currentMenu.fileManager.SaveFileInternalExtorage(texture, fileName); // salvamos una copia la imagén que selecciono
             }
             else
             {

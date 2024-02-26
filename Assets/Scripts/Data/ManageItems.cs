@@ -69,7 +69,10 @@ public class ManageItems : MonoBehaviour
 
         SetLoadingMsj(false);
 
-        StartCoroutine(WaitToLoadLocalItems());
+       // StartCoroutine(WaitToLoadLocalItems());
+
+        // una vez cargado los items locales, procedemos a verificar si hay conexion a internet.
+        CheckInternetConection();
     }
 
     IEnumerator WaitToLoadLocalItems()
@@ -162,7 +165,8 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    await SyncTextures(itemOld.ImageName);
+                    FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+                    fileManager.DeleteOldImageAfterSyncronize(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
@@ -178,14 +182,14 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    await SyncTextures(itemOld.ImageName);
+                    FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+                    fileManager.DeleteOldImageAfterSyncronize(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: false, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
                 {
                     ItemLocal itemLocalToDelete = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    await SyncTextures(itemLocalToDelete.ImageName);
                     DeleteItemInScene(itemLocalToDelete);
                 }
                 else if (itemToUpdate.IsAdd)
@@ -212,22 +216,6 @@ public class ManageItems : MonoBehaviour
             OrderItem(itemsToSave);
             // actualizamos la lista local con la remota
             await MyApplication.repository.SaveLocalItemsAsync(itemsToSave);
-        }
-        else
-        {
-            /*
-            // No hay cambios con la base de datos remota, cargamos la local. 
-            // tambien si no hay conexion a internet.
-            foreach (ItemLocal itemLocal in itemsLocalList)
-            {
-                Task task = Task.CompletedTask;
-                task = CreateItemInScene(itemLocal);
-                itemsToSave.Add(itemLocal);
-                tasks.Add(task);
-            }
-
-            // Esperar a que todas las tareas se completen
-            OrderItem(itemsLocalList);*/
         }
 
         syncStarted = false;
@@ -262,17 +250,6 @@ public class ManageItems : MonoBehaviour
             return false;
         }
         return true;
-    }
-
-    private async Task SyncTextures(string oldImageName)
-    {
-        // imagén el el dispositivo
-        MyApplication.repository.RemoveLocalTexture(oldImageName);
-
-        // imagén de firebase storage
-        ManageTextureRemote manageMaterialRemote =
-                     new ManageTextureRemote(oldImageName);
-        await manageMaterialRemote.DeleteImageRemote();
     }
 
     private async Task<bool> UpdateItemInScene(

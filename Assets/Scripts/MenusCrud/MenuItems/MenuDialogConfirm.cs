@@ -23,16 +23,18 @@ public class MenuDialogConfirm : MonoBehaviour
     }
 
 
+    // el usuario cerro con el boton "Aceptar" del dialogo
     public void OnAccept()
     {
         HideDialog();
         iResultDialog.ConfirmButtonDialogPressed(true);
     }
 
+    // el usuario cerro con la "X" el dialogo de confirmacion
     public void OnClosed()
     {
-        gameObject.SetActive(false);
         iResultDialog.ConfirmButtonDialogPressed(false);
+        gameObject.SetActive(false);
     }
 
     public void ShowDialog()
@@ -52,7 +54,7 @@ public class MenuDialogConfirm : MonoBehaviour
 
     private void HideDialog()
     {
-        menuManager.HideBackButtons(true);
+        menuManager.HideUiButtons(true);
         gameObject.SetActive(false);
     }
 

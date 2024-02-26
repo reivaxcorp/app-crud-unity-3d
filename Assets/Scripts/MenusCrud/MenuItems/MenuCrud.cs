@@ -2,10 +2,9 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEditor;
 
-
-
-public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
+public class MenuCrud : MonoBehaviour, IResultDialog
 {
 
     [SerializeField] MenuManagerApp uiApp;
@@ -14,11 +13,12 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
     [SerializeField] ManageItems manageItems;
-    [SerializeField] Image menuImagePreview;
+    [SerializeField] protected Image menuImagePreview;
     [SerializeField] protected TextMeshProUGUI resultMsj;
     [SerializeField] protected TMP_InputField inputFieldName;
     protected ProgressText progressText;
     protected bool isImageChanged;
+    protected string imageNameGenerated;
 
     public FileManager fileManager
     {
@@ -29,58 +29,12 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
     private bool waitForFirebaseSdk;
     private FileManager _fileManager;
 
-    public void SetResultCrudUi(EResultMenuAction result, string msj)
-    {
-        progressText?.StopProgressTextAnimation();
-
-        if (resultMsj != null)
-        {
-            switch (result)
-            {
-                case EResultMenuAction.Success:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.green;
-                    break;
-                case EResultMenuAction.Failed:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.red;
-                    break;
-                case EResultMenuAction.Nothing:
-                    resultMsj.text = msj;
-                    resultMsj.color = Color.cyan;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
-        }
-    }
-
-    public void SetResultWriteDocument(EResultMenuAction result, string title, string body)
-    {
-        if (result == EResultMenuAction.Success)
-        {
-            OpenDialog(title, body);
-        }
-    }
 
     public void OpenDialog(string title, string body)
     {
         dialogMsj.ShowDialog(title, body, this);
     }
-
-    public void FileSelectedResultEditor(string path)
-    {
-        byte[] fileData = File.ReadAllBytes(path);
-        Texture2D texture = new Texture2D(2, 2);
-        texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
-        SetImagePreview(texture);
-        this.isImageChanged = true;
-    }
-
+ 
     public void SetImagePreview(Texture2D texture)
     {
         // Crea un sprite con la textura cargada
@@ -89,102 +43,78 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         menuImagePreview.sprite = sprite;
     }
 
+    public void SetImageChange(bool isImageChanged)
+    {
+        this.isImageChanged = isImageChanged;
+    }
+
     public void SetImageName(string imageName)
     {
         inputFieldName.text = imageName;
     }
 
-    public void OpenImage()
+    public void SetImageNameGenerate(string imageName)
     {
-        if (Application.isMobilePlatform)
-        {
-            OpenImageAndroid();
-        }
-        else if (Application.isEditor)
-        {
-            OpenImageEditor();
-        }
-        else
-        {
-            Debug.LogWarning("Plataforma no soportada");
-        }
+        this.imageNameGenerated = imageName;
     }
 
     public void HideMenu()
     {
+        fileManager.DeletePreviousCopyImage();
         uiApp.HideMenu();
     }
 
-    public bool IsDataSetted()
+    public void ShowInterstitialAd()
     {
-        ClearResultCrud();
-
-        if (inputFieldName == null)
+        if (ads != null)
         {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-            return false;
+            InterstitialAd interstitialAd = ads.GetComponent<InterstitialAd>();
+            if (interstitialAd != null)
+            {
+                interstitialAd.ShowAd();
+            }
+            else
+            {
+                Debug.LogWarning("InterstitialAd no está en el UiAppp GameObject del inspector");
+            }
         }
-
-        // Sanitizar el nombre de la imagen utilizando la expresión regular
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        if (string.IsNullOrEmpty(sanitizedFileName))
+        else
         {
-            LogWarningAndSetResult("Ingrese el nombre de la imagén");
-            return false;
+            Debug.LogWarning("Por favor, coloca el Ads en el MenuAddItem, en su inspector");
         }
-
-        if(sanitizedFileName.Length > 30)
-        {
-            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
-            return false;
-        }
-
-        if (menuImagePreview == null)
-        {
-            LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
-            return false;
-        }
-
-        if (menuImagePreview.sprite == null)
-        {
-            LogWarningAndSetResult("Seleccione una imagen");
-            return false;
-        }
-
-        return true;
     }
 
     public virtual void ConfirmButtonDialogPressed(bool isDialogConfirm)
     {
-        if (isDialogConfirm)
+        if (isDialogConfirm) // cerro con el botón "Aceptar"
         {
             uiApp.HideMenu();
         }
         else
         {
-            ClearMenu();
+            ClearMenu(); // cerro con el botón "X". 
         }
     }
+
     public void ResetMenu()
     {
-        menuImagePreview.sprite = null;
-        inputFieldName.text = "";
-        waitForFirebaseSdk = true;
-        isImageChanged = false;
+        ClearInputs();
+        WaitForFirebase(true);
+        SetImageChange(false);
         ClearResultCrud();
         SetCurrentMenu(null);
+    }
+
+    public void ClearResultCrud()
+    {
+        resultMsj.text = string.Empty;
     }
 
     private void OpenImageAndroid()
     {
         androidPermission.OnPermissionResult += HandlePermissionResult;
         androidPermission.RequestStoragePermission();
-    }
-
-    private void OpenImageEditor()
-    {
-        fileManager?.OpenFile();
-    }
+    }  
 
     private void HandlePermissionResult(PermissionStatus status)
     {
@@ -192,7 +122,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         {
             case PermissionStatus.Granted:
                 Debug.Log("¡Permiso concedido!");
-                fileManager?.OpenFile();
+                fileManager.CreateIntentFileAndroid();
                 break;
             case PermissionStatus.Denied:
                 Debug.LogWarning("Permiso denegado por el usuario.");
@@ -209,12 +139,7 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
             androidPermission.OnPermissionResult -= HandlePermissionResult;
         }
     }
-
-    private void ClearResultCrud()
-    {
-        resultMsj.text = string.Empty;
-    }
-
+     
     private void OnEnable()
     {
         ResetMenu();
@@ -232,24 +157,28 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         DesuscribeEvent();
     }
 
-    private void LogWarningAndSetResult(string mensajeAdvertencia)
-    {
-        Debug.LogWarning(mensajeAdvertencia);
-        SetResultCrudUi(EResultMenuAction.Failed, mensajeAdvertencia);
-    }
-
     private void SetCurrentMenu(MenuCrud menu)
     {
         receiverMessagesFromAndroid.SetCurrentMenu(menu);
         uiApp.SetCurrentMenu(menu);
     }
-
+ 
     private void ClearMenu()
+    {
+        ClearInputs();
+        SetImageChange(false);
+        ClearResultCrud();
+    }
+
+    private void ClearInputs()
     {
         menuImagePreview.sprite = null;
         inputFieldName.text = "";
-        isImageChanged = false;
-        ClearResultCrud();
+    }
+
+    private void WaitForFirebase(bool isWaitFirebase)
+    {
+        waitForFirebaseSdk = isWaitFirebase;
     }
 
     private void Awake()
@@ -260,20 +189,60 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
 
     private void Start()
     {
-        waitForFirebaseSdk = true;
-        fileManager = new FileManager(this);
+        WaitForFirebase(true);
+        fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
     }
 
     private void Update()
     {
         if (waitForFirebaseSdk)
         {
-            if (FirebaseSDK.GetInstance().isFirebaseReady)
+            if (FirebaseSDK.GetInstance().isFirebaseReady &&
+                FirebaseSDK.GetInstance().auth.CurrentUser != null)
             {
-                fileManager.SetFolderUidName();
-                waitForFirebaseSdk = false;
+                fileManager.SetFolderUidName(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+                WaitForFirebase(false);
             }
         }
+    }
+
+    public void OpenFile()
+    {
+        if (Application.isMobilePlatform)
+        {
+            OpenImageAndroid();
+        }
+        else if (Application.isEditor)
+        {
+            OpenFileEditor();
+        }
+        else
+        {
+            Debug.LogWarning("Plataforma no soportada");
+        }
+    }
+
+    private void OpenFileEditor()
+    {
+#if UNITY_EDITOR 
+        string path = EditorUtility.OpenFilePanel("Select Image", "", "png,jpg,jpeg,gif,bmp");
+        if (!string.IsNullOrEmpty(path))
+        {
+
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            fileManager.SetCurrentImageName(fileName);
+
+            byte[] fileData = File.ReadAllBytes(path);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
+            SetImagePreview(texture);
+
+            SetImageChange(true);
+            fileManager.DeletePreviousCopyImage(); // borramos la imagén anterior seleccionada
+            fileManager.SetCurrentImageName(fileName);
+            fileManager.SaveFileInternalExtorage(texture, fileName); // salvamos una copia la imagén que selecciono
+        }
+#endif
     }
 
     private void CheckReferences()
@@ -287,22 +256,4 @@ public class MenuCrud : MonoBehaviour, IFileSelected, IResult, IResultDialog
         if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
     }
 
-    public void ShowInterstitialAd()
-    {
-        if(ads != null)
-        {
-            InterstitialAd interstitialAd = ads.GetComponent<InterstitialAd>();
-            if (interstitialAd != null)
-            {
-                interstitialAd.ShowAd();
-            }
-            else
-            {
-                Debug.LogWarning("InterstitialAd no está en el UiAppp GameObject del inspector");
-            }
-        } else
-        {
-            Debug.LogWarning("Por favor, coloca el Ads en el MenuAddItem, en su inspector");
-        }
-    }
 }
