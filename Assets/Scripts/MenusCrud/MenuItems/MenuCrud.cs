@@ -302,11 +302,12 @@ public class MenuCrud : MonoBehaviour
 
             byte[] fileData = File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(2, 2);
-            texture.LoadImage(fileData); // Esta línea convierte los datos de la imagen en la textura
+            // Esta línea convierte los datos de la imagen en la textura
+            texture.LoadImage(fileData); 
             SetImagePreview(texture);
-
             SetImageChange(true);
-            fileManager.DeletePreviousCopyImage(); // borramos la imagén anterior seleccionada
+            // borramos la imagén anterior seleccionada
+            fileManager.DeletePreviousCopyImage();
             fileManager.SetCurrentImageName(fileName);
             fileManager.SaveFileInternalExtorage(texture, fileName); // salvamos una copia la imagén que selecciono
         }

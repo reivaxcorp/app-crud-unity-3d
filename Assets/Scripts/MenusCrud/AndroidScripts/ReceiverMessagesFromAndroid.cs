@@ -55,7 +55,7 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("CurrentMenu es nulo");
+                Debug.LogWarning("CurrentMenu es Null");
             }
         }
         else
