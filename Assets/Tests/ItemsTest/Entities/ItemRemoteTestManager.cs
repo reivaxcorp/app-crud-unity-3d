@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using static UnityEngine.Networking.UnityWebRequest;
 
 public class ItemRemoteTestManager
 {
@@ -20,10 +21,10 @@ public class ItemRemoteTestManager
         return itemRemoteList.Find(item => item.Id.Equals(id));
     }
 
-    public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
+    public void SaveItemRemote(ItemRemoteTest itemRemote, IResultTest resultUi)
     {
         itemRemoteList.Add(itemRemote);
-        resultUi.SetResultCrudUi(true, "Ítem guardado");
+        resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentSuccessCreated, "Ítem guardado");
     }
 
     public void DeleteItemRemoteById(string id)
@@ -37,7 +38,7 @@ public class ItemRemoteTestManager
         }
     }
 
-    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResult resultUi)
+    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResultTest resultUi)
     {
         int existingIndex = itemRemoteList.FindIndex(x => x.Id == itemRemoteTest.Id);
 
@@ -46,10 +47,10 @@ public class ItemRemoteTestManager
             // Si el item existe, eliminarlo de la lista
             itemRemoteList.RemoveAt(existingIndex);
             itemRemoteList.Add(itemRemoteTest);
-            resultUi.SetResultCrudUi(true, "Se actualizo el documento");
+            resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentSuccessUpdate, "Se actualizo el documento");
             return;
         }
-        resultUi.SetResultCrudUi(true, "No se encuentra el documento");
+        resultUi.SetResultCrudUi(EResultMenuActionTest.DocumentFailedUpdate, "No se encuentra el documento");
     }
 
     public void ClearAllData()

@@ -1,5 +1,5 @@
 
-public enum EResultMenuAction
+public enum EResultMenuActionTest
 {
     FileSuccessUploated,
     FileFailedUploated,

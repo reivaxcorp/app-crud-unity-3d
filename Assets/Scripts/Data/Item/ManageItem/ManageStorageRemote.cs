@@ -2,11 +2,11 @@ using Firebase.Extensions;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ManageTextureRemote
+public class ManageStorageRemote
 {
     private string _storageUrl = "gs://appcrudunity3d.appspot.com/users/"; // Reemplaza con la URI pública de tu imagen.
                                                                                // public Material materialToUpdate; // El material que se actualizará con la imagen descargada.
-    public ManageTextureRemote(string imageName)
+    public ManageStorageRemote(string imageName)
     {
         _storageUrl += FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/imageItems/" + imageName + ".png";
     }
@@ -54,7 +54,7 @@ public class ManageTextureRemote
     /// Para actualizar y borrar, necesitamos borrar la imagén anterior.
     /// </summary>
     /// <param name="filePath"></param>
-    public async Task<bool> DeleteImageRemote()
+    public async Task<bool> DeleteImageRemote(IResult resultUi)
     {
         Debug.Log("Imagen remota a eliminar: " + _storageUrl);
 
@@ -65,11 +65,13 @@ public class ManageTextureRemote
         await storageReference.DeleteAsync().ContinueWithOnMainThread(task => {
             if (task.IsCompleted)
             {
+                resultUi.SetResultCrudUi(EResultMenuAction.FileRemoteSuccessDeleted, "Archivo remoto borrado correctamente.");
                 Debug.Log("Archivo remoto borrado correctamente.");
                 deleteSuccess = true;
             }
             else
             {
+                resultUi.SetResultCrudUi(EResultMenuAction.FileRemoteFailedDeleted, "Archivo remoto anterior no encontrado");
                 Debug.LogWarning("Archivo remoto anterior no encontrado.");
                 deleteSuccess = false;
             }

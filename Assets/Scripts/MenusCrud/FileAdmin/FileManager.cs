@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 public class FileManager
@@ -16,8 +15,7 @@ public class FileManager
 
     private string _currentImageName;
     private string _folderNameUser;
-    private string _filePathInEditor;
-
+ 
     public FileManager(string folderNameUser)
     {
         _folderNameUser = folderNameUser;
@@ -103,7 +101,7 @@ public class FileManager
     /// <summary>
     /// Borramos la imagen que tengamos anteriormente, al actualizar la imagen
     /// </summary>
-    public void DeleteOldImageAfterSyncronize(string oldImageName)
+    public void DeleteOldImageLocalImage(string oldImageName)
     {
         string filePath = FilesPath.GetFolderItemPath(oldImageName, _folderNameUser);
 

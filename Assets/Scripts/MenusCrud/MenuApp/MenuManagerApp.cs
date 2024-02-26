@@ -78,6 +78,7 @@ public class MenuManagerApp : MonoBehaviour
 
     public void HideMenu()
     {
+        Debug.Log("NO ide");
         MenuSetActive(false);
         HideUiButtons(true);
     }

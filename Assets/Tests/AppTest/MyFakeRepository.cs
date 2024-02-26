@@ -37,7 +37,7 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         Debug.Log("Texure remove id: " + imageId);
     }
 
-    public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
+    public void SaveItemRemote(ItemRemoteTest itemRemote, IResultTest resultUi)
     {
         remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
@@ -52,7 +52,7 @@ public class MyFakeRepository : IRepositoryLocalTest, IRepositoryRemoteTest, IDa
         Debug.Log("Textura textura salvada de forma ficticia " + imageId);
     }
 
-    public void UpdateItemRemote(ItemRemoteTest itemRemote, IResult iResult)
+    public void UpdateItemRemote(ItemRemoteTest itemRemote, IResultTest iResult)
     {
         remoteDb.UpdateItemRemote(itemRemote, iResult); 
     }

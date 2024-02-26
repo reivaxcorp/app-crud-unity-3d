@@ -1027,12 +1027,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2e68acc94da83a4fbed90a8ba19cdd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiApp: {fileID: 1889203354}
   ads: {fileID: 0}
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
   manageItems: {fileID: 1651622796}
+  uiApp: {fileID: 1889203354}
   menuImagePreview: {fileID: 2124449795}
   resultMsj: {fileID: 1471588647}
   inputFieldName: {fileID: 1381756691}
@@ -1414,7 +1414,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 326654716}
         m_TargetAssemblyTypeName: MenuCrud, Assembly-CSharp
-        m_MethodName: HideMenu
+        m_MethodName: CloseMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5418,12 +5418,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b5b2e4bcd1a82c42995e19a604bbc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiApp: {fileID: 1889203354}
   ads: {fileID: 439825011}
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
   manageItems: {fileID: 1651622796}
+  uiApp: {fileID: 1889203354}
   menuImagePreview: {fileID: 1429457105}
   resultMsj: {fileID: 732092310}
   inputFieldName: {fileID: 1669579673}
@@ -7419,7 +7419,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1421400313}
         m_TargetAssemblyTypeName: MenuCrud, Assembly-CSharp
-        m_MethodName: HideMenu
+        m_MethodName: CloseMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

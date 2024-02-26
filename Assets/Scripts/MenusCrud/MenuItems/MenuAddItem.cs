@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class MenuAddItem : MenuCrud, IResult
 {
+    private string generateImageName;
 
     public void SetResultCrudUi(EResultMenuAction result, string msj)
     {
@@ -15,6 +16,8 @@ public class MenuAddItem : MenuCrud, IResult
                 case EResultMenuAction.FileSuccessUploated:
                     resultMsj.text = msj;
                     resultMsj.color = Color.green;
+                    fileManager.ChangeNameImageCopySelected(generateImageName);
+                    WriteDocument(generateImageName);
                     break;
                 case EResultMenuAction.FileFailedUploated:
                     resultMsj.text = msj;
@@ -27,9 +30,8 @@ public class MenuAddItem : MenuCrud, IResult
                 case EResultMenuAction.DocumentSuccessCreated:
                     resultMsj.text = msj;
                     resultMsj.color = Color.green;
-                    fileManager.ChangeNameImageCopySelected(imageNameGenerated);
-                    ResetMenu();
-                    HideMenu();
+                    OpenDialog("ItemCreado", "Ítem creado correctamente");
+                    uiApp.HideMenu();
                     break;
                 case EResultMenuAction.DocumentFailedCreated:
                     resultMsj.text = msj;
@@ -48,15 +50,7 @@ public class MenuAddItem : MenuCrud, IResult
             Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
         }
     }
-
-    public void SetResultWriteDocument(EResultMenuAction result, string title, string body)
-    {
-        if (result == EResultMenuAction.FileSuccessUploated)
-        {
-            OpenDialog(title, body);
-        }
-    }
-
+  
     /// <summary>
     /// Cuando colocamos subir ítem, lo primero que hacemos es subir la imagén, luego escribimos
     /// los datos en realtime database, con WriteDocument, si la subida se realizó correctamente.
@@ -68,12 +62,9 @@ public class MenuAddItem : MenuCrud, IResult
                 progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
                 UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser, iResult: this);
-                bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
-                
-                if (resultUpload) { 
-                    WriteDocument(uploadFileRemote.newImageName);
-                    SetImageNameGenerate(uploadFileRemote.newImageName);
-                }
+                generateImageName = Guid.NewGuid().ToString();
+                uploadFileRemote.SetImageNameGenerate(generateImageName);
+                await uploadFileRemote.UploadFileFirebaseStorage();
         }
     }
 

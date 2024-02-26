@@ -5,6 +5,10 @@ public class ReceiverMessagesFromAndroid : MonoBehaviour
 {
     private MenuCrud currentMenu;
 
+    /// <summary>
+    /// Puede ser el MenuAddItem ó el MenuUpdate Item
+    /// </summary>
+    /// <param name="menu"></param>
     public void SetCurrentMenu(MenuCrud menu)
     {
         this.currentMenu = menu;    

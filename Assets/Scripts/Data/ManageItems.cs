@@ -67,20 +67,8 @@ public class ManageItems : MonoBehaviour
         OrderItem(itemsLocalList);
         await Task.WhenAll(tasks);
 
-        SetLoadingMsj(false);
+        SetLoadingMsj(false); // Ocultar Cargando..
 
-       // StartCoroutine(WaitToLoadLocalItems());
-
-        // una vez cargado los items locales, procedemos a verificar si hay conexion a internet.
-        CheckInternetConection();
-    }
-
-    IEnumerator WaitToLoadLocalItems()
-    {
-        // Esperar 3 segundos, para esperar que se cargen los items locales primero
-        yield return new WaitForSeconds(3.0f);
-
-        // una vez cargado los items locales, procedemos a verificar si hay conexion a internet.
         CheckInternetConection();
     }
 
@@ -120,11 +108,11 @@ public class ManageItems : MonoBehaviour
     }
 
     // Escuchamos los cambios en la base de datos remota, al suscribirnos a los cambios
-    private async void ListeningDbRemote()
+    private void ListeningDbRemote()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
         remoteDbRef.handleValueResult += SyncronizeData;
-        await remoteDbRef.FirebaseValueChanged();
+        remoteDbRef.FirebaseValueChanged();
     }
 
     /// <summary>
@@ -165,8 +153,7 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-                    fileManager.DeleteOldImageAfterSyncronize(itemOld.ImageName);
+                    DeleteOldImage(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
@@ -182,8 +169,7 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-                    fileManager.DeleteOldImageAfterSyncronize(itemOld.ImageName);
+                    DeleteOldImage(itemOld.ImageName);
                     task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: false, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
@@ -191,6 +177,7 @@ public class ManageItems : MonoBehaviour
                 {
                     ItemLocal itemLocalToDelete = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     DeleteItemInScene(itemLocalToDelete);
+                    DeleteOldImage(itemLocalToDelete.ImageName);
                 }
                 else if (itemToUpdate.IsAdd)
                 {
@@ -219,6 +206,12 @@ public class ManageItems : MonoBehaviour
         }
 
         syncStarted = false;
+    }
+
+    private void DeleteOldImage(string oldImageName)
+    {
+        FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+        fileManager.DeleteOldImageLocalImage(oldImageName);
     }
 
     private async Task<bool> CreateItemInScene(ItemLocal item)

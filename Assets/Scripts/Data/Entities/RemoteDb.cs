@@ -22,7 +22,7 @@ public class RemoteDb : IRepositoryRemote
         return this;
     }
 
-    public async Task FirebaseValueChanged()
+    public void FirebaseValueChanged()
     {
 
         if (!IsUserUid()) return;
@@ -32,9 +32,6 @@ public class RemoteDb : IRepositoryRemote
             .Child(userUid)
             .Child("items")
             .ValueChanged += HandleValueChanged;
-
-        // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
-        await Task.Delay(1000);
     }
 
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -158,7 +155,7 @@ public class RemoteDb : IRepositoryRemote
             {
                 // Operación exitosa
                 Debug.Log("Datos escritos exitosamente en la base de datos");
-                resultUi.SetResultWriteDocument(EResultMenuAction.DocumentSuccessCreated, "Ítem subido", "Nuevo ítem agregado");
+                resultUi.SetResultCrudUi(EResultMenuAction.DocumentSuccessCreated, "Nuevo ítem agregado");
             }
         });
     }
@@ -180,7 +177,6 @@ public class RemoteDb : IRepositoryRemote
 
                     // Manejar error
                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                    RemoveFailedImageUploaded(itemRemote.ImageName); // remover el archivo subido
                     iResult.SetResultCrudUi(EResultMenuAction.DocumentFailedUpdate, "Error al actualizar la base de datos");
                 }
                 else
@@ -235,15 +231,5 @@ public class RemoteDb : IRepositoryRemote
             return false;
         }
         return true;
-    }
-
-    /// <summary>
-    /// Anteriormente subimos un archivo a firebase storage, asi cuando falla la lectura
-    /// en RealtimeDatabase, debemos quitar el archivo subido de firebase storage
-    /// </summary>
-    private async void RemoveFailedImageUploaded(string imageNameToRemove)
-    {
-        ManageTextureRemote manageMaterialRemote = new ManageTextureRemote(imageNameToRemove);
-        await manageMaterialRemote.DeleteImageRemote();
     }
 }

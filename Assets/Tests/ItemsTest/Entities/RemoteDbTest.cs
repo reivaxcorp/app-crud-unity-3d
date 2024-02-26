@@ -24,12 +24,12 @@ public class RemoteDbTest : IRepositoryRemoteTest
         return this;
     }
 
-    public void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi)
+    public void SaveItemRemote(ItemRemoteTest itemRemote, IResultTest resultUi)
     {
          ItemRemoteTestManager.GetInstance().SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResult resultUi)
+    public void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResultTest resultUi)
     {
         ItemRemoteTestManager.GetInstance().UpdateItemRemote(itemRemoteTest, resultUi);
     }

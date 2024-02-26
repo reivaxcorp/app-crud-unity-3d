@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.Networking.UnityWebRequest;
 
 /// <summary>
 /// Comprobamos la actulización de los items cuando hacemos touch en alguno
@@ -12,7 +13,7 @@ public class MenuUpdateItem : MenuCrud, IResult
     private ItemLocal currentItemSelected;
     private string oldImageName;
     private bool isDelteItem;
-
+    private string generateImageName;
     /// <summary>
     /// Cuando abrimos el menu, seteamos los valores.
     /// </summary>
@@ -53,9 +54,8 @@ public class MenuUpdateItem : MenuCrud, IResult
                 case EResultMenuAction.FileSuccessUploated:
                     resultMsj.text = msj;
                     resultMsj.color = Color.green;
-                    fileManager.DeletePreviousCopyImage();
-                    fileManager.SetCurrentImageName(oldImageName);
-                    fileManager.ChangeNameImageCopySelected(imageNameGenerated);
+                    fileManager.ChangeNameImageCopySelected(generateImageName);
+                    UpdateDocumentRemote();
                     break;
                 case EResultMenuAction.FileFailedUploated:
                     resultMsj.text = msj;
@@ -65,18 +65,19 @@ public class MenuUpdateItem : MenuCrud, IResult
                     resultMsj.text = msj;
                     resultMsj.color = Color.cyan;
                     break;
-                case EResultMenuAction.DocumentSuccessUpdate:
-                    if(isImageChanged)
-                    {
-                        // imagén de firebase storage
-                        ManageTextureRemote manageMaterialRemote =
-                                     new ManageTextureRemote(oldImageName);
-                        await manageMaterialRemote.DeleteImageRemote();
-                    }
+                case EResultMenuAction.FileSuccessDeleted:
                     resultMsj.text = msj;
                     resultMsj.color = Color.green;
-                    HideMenu();
-                    ResetMenu();
+                    uiApp.HideMenu();
+                    break;
+                case EResultMenuAction.FileFailedDeleted:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.red;
+                    break;
+                case EResultMenuAction.DocumentSuccessUpdate: 
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.green;
+                    uiApp.HideMenu();
                     break;
                 case EResultMenuAction.DocumentFailedUpdate:
                     resultMsj.text = msj;
@@ -85,6 +86,24 @@ public class MenuUpdateItem : MenuCrud, IResult
                 case EResultMenuAction.DocumentCancelUpdate:
                     resultMsj.text = msj;
                     resultMsj.color = Color.cyan;
+                    break;
+                case EResultMenuAction.DocumentSuccessDeleted:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.green;
+                    uiApp.HideMenu();
+                    break;
+                case EResultMenuAction.DocumentFailedDeleted:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.cyan;
+                    break;
+                case EResultMenuAction.FileRemoteSuccessDeleted:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.green;
+                    await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, this);
+                    break;
+                case EResultMenuAction.FileRemoteFailedDeleted:
+                    resultMsj.text = msj;
+                    resultMsj.color = Color.red;
                     break;
                 default:
                     break;
@@ -121,11 +140,7 @@ public class MenuUpdateItem : MenuCrud, IResult
 
                     if (isImageChanged)
                     {
-                        bool resultUpload = await UpdateImageRemote();
-                        if (resultUpload)
-                        {
-                            UpdateDocumentRemote();
-                        }
+                         await UpdateImageRemote();
                     }
                     else
                     {
@@ -199,8 +214,10 @@ public class MenuUpdateItem : MenuCrud, IResult
             {
                 if(isDelteItem)
                 {
-                    await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, this);
-                    SetItemToDelete(false);
+                    // imagén de firebase storage
+                    ManageStorageRemote manageMaterialRemote =
+                                 new ManageStorageRemote(currentItemSelected.ImageName);
+                    await manageMaterialRemote.DeleteImageRemote(this);
                 }
             }
         }
@@ -221,12 +238,11 @@ public class MenuUpdateItem : MenuCrud, IResult
         ItemRemote itemRemote = new ItemRemote(
             id: currentItemSelected.Id, 
             name: inputFieldName.text,
-            imageName: isImageChanged ? imageNameGenerated : oldImageName, 
+            imageName: isImageChanged ? generateImageName : oldImageName, 
             creationDate: currentItemSelected.CreationDate);
 
         // actualizamos el documente de firebase realtimadatabase
         MyApplication.repository.UpdateItemRemote(itemRemote, this);
-      
     }
  
 
@@ -234,8 +250,9 @@ public class MenuUpdateItem : MenuCrud, IResult
     {
         byte[] fileBytes = fileManager.GetBytesImageSelected();
         UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser, iResult: this);
+        generateImageName = Guid.NewGuid().ToString();
+        uploadFileRemote.SetImageNameGenerate(generateImageName);
         bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
-        SetImageNameGenerate(uploadFileRemote.newImageName);
         return resultUpload;
     }
 

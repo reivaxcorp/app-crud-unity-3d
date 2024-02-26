@@ -15,12 +15,12 @@ public class BuildItem: MonoBehaviour
     public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
     {
        
-        Texture2D texture2D = GetSavedTexture(imageName + ".png");
+        Texture2D texture2D = GetSavedTexture(imageName);
 
         // si no esta la imagen, es que se actualizo anteriormente en otro dispositivo
         if(texture2D == null)
         {
-            ManageTextureRemote createMaterial = new ManageTextureRemote(imageName);
+            ManageStorageRemote createMaterial = new ManageStorageRemote(imageName);
             texture2D = await createMaterial.DownloadImage();
             FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
             fileManager.SaveFileInternalExtorage(texture2D, imageName);

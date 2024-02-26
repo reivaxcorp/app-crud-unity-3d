@@ -1,7 +1,7 @@
 
 public interface IRepositoryRemoteTest {
-    void SaveItemRemote(ItemRemoteTest itemRemote, IResult resultUi);
-    void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResult resultUi);
+    void SaveItemRemote(ItemRemoteTest itemRemote, IResultTest resultUi);
+    void UpdateItemRemote(ItemRemoteTest itemRemoteTest, IResultTest resultUi);
     void DeleteItemRemoteById(string id);
     RemoteDbTest GetRemoteDb();
 }

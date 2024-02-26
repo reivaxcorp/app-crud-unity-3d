@@ -6,19 +6,18 @@ using UnityEditor;
 
 public class MenuCrud : MonoBehaviour, IResultDialog
 {
-
-    [SerializeField] MenuManagerApp uiApp;
+    
     [SerializeField] GameObject ads;
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
     [SerializeField] ManageItems manageItems;
+    [SerializeField] protected MenuManagerApp uiApp;
     [SerializeField] protected Image menuImagePreview;
     [SerializeField] protected TextMeshProUGUI resultMsj;
     [SerializeField] protected TMP_InputField inputFieldName;
     protected ProgressText progressText;
     protected bool isImageChanged;
-    protected string imageNameGenerated;
 
     public FileManager fileManager
     {
@@ -52,15 +51,14 @@ public class MenuCrud : MonoBehaviour, IResultDialog
     {
         inputFieldName.text = imageName;
     }
-
-    public void SetImageNameGenerate(string imageName)
+     
+    public void CloseMenu()
     {
-        this.imageNameGenerated = imageName;
-    }
-
-    public void HideMenu()
-    {
-        fileManager.DeletePreviousCopyImage();
+        if(isImageChanged)
+        {
+            fileManager.DeletePreviousCopyImage();
+        }
+        ClearMenu();
         uiApp.HideMenu();
     }
 
@@ -88,6 +86,7 @@ public class MenuCrud : MonoBehaviour, IResultDialog
     {
         if (isDialogConfirm) // cerro con el botón "Aceptar"
         {
+            ClearMenu();
             uiApp.HideMenu();
         }
         else
@@ -230,7 +229,6 @@ public class MenuCrud : MonoBehaviour, IResultDialog
         {
 
             string fileName = Path.GetFileNameWithoutExtension(path);
-            fileManager.SetCurrentImageName(fileName);
 
             byte[] fileData = File.ReadAllBytes(path);
             Texture2D texture = new Texture2D(2, 2);

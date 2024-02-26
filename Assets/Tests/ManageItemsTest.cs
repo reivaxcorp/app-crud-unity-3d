@@ -11,7 +11,7 @@ using UnityEngine;
 /// también las texturas.
 /// </summary>
 [TestFixture]
-public class ManageItemsTest : IResult
+public class ManageItemsTest : IResultTest 
 {
 
     [SetUp]
@@ -344,9 +344,9 @@ public class ManageItemsTest : IResult
         return true;
     }
 
-    public void SetResultCrudUi(bool successful, string msj)
+    public void SetResultCrudUi(EResultMenuActionTest result, string msj)
     {
-        if (successful)
+        if (result == EResultMenuActionTest.DocumentSuccessCreated)
         {
             Debug.Log("Documento escrito");
         }
