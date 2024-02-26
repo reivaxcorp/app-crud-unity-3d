@@ -15,7 +15,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
 
     public void SetResultCrudUi(string title, string msj)
     {
-        progressText?.StopProgressTextAnimation();
+        StartAnimationTextMenu(false, "");
         uiApp.MenuSetActive(false);
         OpenDialog(title, msj);
     }
@@ -62,7 +62,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             {
                 try
                 {
-                    progressText?.StartProgressTextAnimation("Actualizando", resultMsj);
+                    StartAnimationTextMenu(false, "Actualizando");
 
                     if (isImageChanged)
                     {
@@ -99,13 +99,19 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
      
     private async Task<bool> UpdateImageRemote()
     {
+        // Obtenemos los bytes de la imagén temporal seleccionada
         byte[] fileBytes = fileManager.GetBytesImageSelected();
         UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
+        // Generar nombre de imagén aleatorea
         generateImageName = Guid.NewGuid().ToString();
+        // Colocar nombre de imagén aleatorea
         uploadFileRemote.SetImageNameGenerate(generateImageName);
-        bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage();
+        // subir nueva imagén
+        bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage(); 
         fileManager.ChangeNameImageCopySelected(generateImageName);
+        // borrar imagén anterior
         await DeleteImageRemote();
+        // actualizar documento
         UpdateDocumentRemote();
         return resultUpload;
     }
@@ -119,6 +125,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             imageName: isImageChanged ? generateImageName : oldImageName,
             creationDate: currentItemSelected.CreationDate);
 
+        // Invoke("ShowInterstitialAd", 3f);
         // actualizamos el documente de firebase realtimadatabase
         MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
     }
@@ -149,7 +156,6 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     {
         if(isDeleteConfirm)
         {
-            SetItemToDelete(true);
             await DeleteImageRemote();
             await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
         }

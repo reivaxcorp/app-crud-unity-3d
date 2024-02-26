@@ -44,7 +44,7 @@ public class MenuCrud : MonoBehaviour
     }
 
     /// <summary>
-    /// Cuando el usuario elige una imagén
+    /// Cuando el usuario elige una imagén 
     /// </summary>
     /// <param name="isImageChanged"></param>
     public void SetImageChange(bool isImageChanged)
@@ -52,20 +52,22 @@ public class MenuCrud : MonoBehaviour
         this.isImageChanged = isImageChanged;
     }
 
-    /// <summary>
-    /// Cuando el usuario quiere borrar un item
-    /// </summary>
-    /// <param name="isItemToDelete"></param>
-    public void SetItemToDelete(bool isItemToDelete)
-    {
-        this.isDelteItem = isItemToDelete;
-    }
-
     public void SetImageNameInInput(string imageName)
     {
         inputFieldName.text = imageName;
     }
 
+    public void StartAnimationTextMenu(bool isAnimationStart, string msj)
+    {
+        if(isAnimationStart)
+        {
+            progressText?.StartProgressTextAnimation(msj, resultMsj);
+        }
+        else
+        {
+            progressText?.StopProgressTextAnimation();
+        }
+    }
 
     /// <summary>
     /// Verificamos que los datos hayan sido llenado
@@ -155,7 +157,6 @@ public class MenuCrud : MonoBehaviour
         ClearInputs();
         WaitForFirebase(true);
         SetImageChange(false);
-        SetItemToDelete(false);
         ClearResultCrud();
         SetCurrentMenu(null);
     }

@@ -42,6 +42,11 @@ public class FileManager
         unityPlayer.Call("startActivityForResult", intent, requestCode, null);
     }
 
+    /// <summary>
+    /// Obtenemos los bytes de la imagén temporal seleccionada
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public byte[] GetBytesImageSelected()
     {
 

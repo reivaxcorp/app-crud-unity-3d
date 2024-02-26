@@ -7,11 +7,11 @@ public class MenuAddItem : MenuCrud, IResult
 
     public void SetResultCrudUi(string title, string msj)
     {
-        progressText?.StopProgressTextAnimation();
+        StartAnimationTextMenu(false, "");
         uiApp.MenuSetActive(false);
-        OpenDialog(title, msj);   
+        OpenDialog(title, msj);
     }
-  
+
     /// <summary>
     /// Cuando colocamos subir ítem, lo primero que hacemos es subir la imagén, luego escribimos
     /// los datos en realtime database, con WriteDocument, si la subida se realizó correctamente.
@@ -20,32 +20,37 @@ public class MenuAddItem : MenuCrud, IResult
     {
         if (IsDataSetted())
         {
-                progressText?.StartProgressTextAnimation("Subiendo", resultMsj);
-                byte[] fileBytes = fileManager.GetBytesImageSelected();
-                UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
-                generateImageName = Guid.NewGuid().ToString();
-                uploadFileRemote.SetImageNameGenerate(generateImageName);
-                await uploadFileRemote.UploadFileFirebaseStorage();
-                fileManager.ChangeNameImageCopySelected(generateImageName);
-                WriteDocument(generateImageName);
+            StartAnimationTextMenu(true, "Creando");
+            // Obtenemos los bytes de la imagén temporal seleccionada
+            byte[] fileBytes = fileManager.GetBytesImageSelected();
+            UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
+            // Generar nombre de imagén aleatorea
+            generateImageName = Guid.NewGuid().ToString();
+            // Colocar nombre de imagén aleatorea
+            uploadFileRemote.SetImageNameGenerate(generateImageName);
+            // subir nueva imagén
+            await uploadFileRemote.UploadFileFirebaseStorage();
+            fileManager.ChangeNameImageCopySelected(generateImageName);
+            WriteDocumentRemote(generateImageName);
         }
     }
- 
+
     /// <summary>
     /// Una vez subida la imagén, procedemos a escribir el documento.
     /// </summary>
     /// <param name="imageName"></param>
-    private void WriteDocument(string imageName)
+    private void WriteDocumentRemote(string imageName)
     {
-        if(MyApplication.repository != null)
+        if (MyApplication.repository != null)
         {
             ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, imageName: imageName);
             MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
             // Invoke("ShowInterstitialAd", 3f);
-        } else
+        }
+        else
         {
             Debug.LogWarning("El repositorio es Null");
         }
     }
-     
+
 }
