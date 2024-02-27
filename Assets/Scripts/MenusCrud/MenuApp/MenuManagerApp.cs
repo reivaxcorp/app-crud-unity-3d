@@ -16,7 +16,8 @@ public class MenuManagerApp : MonoBehaviour
     [Header("APP info")]
     [SerializeField] GameObject menuCompany;
     [SerializeField] GameObject myItemsOrdened;
-    
+    [SerializeField] GameObject tutorialInfo;
+
     private MenuCrud menu;
 
     private bool firstTouch = false;
@@ -60,7 +61,7 @@ public class MenuManagerApp : MonoBehaviour
         if (menuCompany.activeSelf)
         {
             menuCompany.SetActive(false);
-            HideUiButtons(true);
+            HideUiButtons(false);
         }
     }
 
@@ -87,6 +88,7 @@ public class MenuManagerApp : MonoBehaviour
         addItemBtn.SetActive(!isActive);
         backBtn.SetActive(!isActive);
         menuCompanyBtn.SetActive(!isActive);
+        tutorialInfo.SetActive(!isActive);
     }
 
     public void MenuSetActive(bool isActive)
@@ -199,5 +201,6 @@ public class MenuManagerApp : MonoBehaviour
         if(menuCompany == null) { Debug.LogWarning("Por favor, por el gameobject MenuCompany en el inspector"); }
         if (backBtn == null) { Debug.LogWarning("Por favor, por el gameobject BackBtn en el inspector"); }
         if(menuCompanyBtn == null) { Debug.LogWarning("Por favor, por el gameobject MenuCompanyBtn en el inspector"); }
+        if(tutorialInfo == null) { Debug.LogWarning("Por favor, por el gameObject TutorialInfo en el inspector"); }
     }
 }

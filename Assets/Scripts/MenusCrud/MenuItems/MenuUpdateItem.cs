@@ -101,13 +101,12 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     {
         // Obtenemos los bytes de la imagén temporal seleccionada
         byte[] fileBytes = fileManager.GetBytesImageSelected();
-        UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
         // Generar nombre de imagén aleatorea
         generateImageName = Guid.NewGuid().ToString();
-        // Colocar nombre de imagén aleatorea
-        uploadFileRemote.SetImageNameGenerate(generateImageName);
+        ManageStorageRemote manageStorageRemote =
+            new ManageStorageRemote(generateImageName, fileManager.folderNameUser, fileBytes);
         // subir nueva imagén
-        bool resultUpload = await uploadFileRemote.UploadFileFirebaseStorage(); 
+        bool resultUpload = await manageStorageRemote.UploadFileFirebaseStorage();
         fileManager.ChangeNameImageCopySelected(generateImageName);
         // borrar imagén anterior
         await DeleteImageRemote();
@@ -131,7 +130,8 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     }
 
     /// <summary>
-    /// borramos imagen desactualiza de firebase storage
+    /// borramos imagén anterior remoto, cuando ya hemos colocado otra imagén nueva
+    /// de firebase storage, o borramos la imagén cuando borramos el ítem
     /// </summary>
     private async Task<bool> DeleteImageRemote()
     {

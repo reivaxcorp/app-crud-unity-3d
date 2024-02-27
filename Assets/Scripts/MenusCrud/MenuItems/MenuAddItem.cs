@@ -23,13 +23,12 @@ public class MenuAddItem : MenuCrud, IResult
             StartAnimationTextMenu(true, "Creando");
             // Obtenemos los bytes de la imagén temporal seleccionada
             byte[] fileBytes = fileManager.GetBytesImageSelected();
-            UploadFileRemote uploadFileRemote = new UploadFileRemote(fileBytes, fileManager.folderNameUser);
             // Generar nombre de imagén aleatorea
             generateImageName = Guid.NewGuid().ToString();
-            // Colocar nombre de imagén aleatorea
-            uploadFileRemote.SetImageNameGenerate(generateImageName);
+            ManageStorageRemote manageStorageRemote =
+                new ManageStorageRemote(generateImageName, fileManager.folderNameUser, fileBytes);
             // subir nueva imagén
-            await uploadFileRemote.UploadFileFirebaseStorage();
+            await manageStorageRemote.UploadFileFirebaseStorage();
             fileManager.ChangeNameImageCopySelected(generateImageName);
             WriteDocumentRemote(generateImageName);
         }
