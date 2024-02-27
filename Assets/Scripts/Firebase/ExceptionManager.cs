@@ -54,7 +54,7 @@ public class ExceptionManager
             }
         }
 
-        Debug.LogError("Encontró un error: " + task.Exception);
-        return "Encontró un error";
+        Debug.LogError("Error. inténtelo nuevamente : " + task.Exception);
+        return "Error. inténtelo nuevamente";
     }
 }

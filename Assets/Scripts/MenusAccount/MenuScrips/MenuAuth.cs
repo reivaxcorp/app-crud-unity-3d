@@ -7,6 +7,7 @@ public class MenuAuth : MonoBehaviour
     public TextMeshProUGUI resultMsj;
     protected FirebaseAuthManager firebaseAuthManager;
     protected ValidateMenuInputs validateInputs;
+    [SerializeField] GameObject loadingScreen;
 
     /// <summary>
     /// Establece el texto del resultado de la autenticación.
@@ -48,10 +49,23 @@ public class MenuAuth : MonoBehaviour
                 default:
                     break;
             }
+            ShowScreenLoading(false);
         }
         else
         {
             Debug.LogWarning("msj result menu es null");
+        }
+    }
+
+    public void ShowScreenLoading(bool isShowScreen)
+    {
+        if(loadingScreen != null)
+        {
+            loadingScreen.SetActive(isShowScreen);
+        }
+        else
+        {
+            Debug.LogWarning("Coloca el loading screen (prefab) en el inspector del menu");
         }
     }
 

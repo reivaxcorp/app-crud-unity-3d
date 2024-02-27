@@ -16,6 +16,8 @@ public class MenuLogin : MenuAuth
             {
                 if (validateInputs.IsValidPassword(inputPassword, resultMsj))
                 {
+                    ShowScreenLoading(true);
+
                     firebaseAuthManager.OnAccountAuthResult += SetResult;
                     firebaseAuthManager.LoginWithExistingAccount(inputMail.text, inputPassword.text);
                 }

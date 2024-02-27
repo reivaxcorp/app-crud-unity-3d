@@ -15,6 +15,8 @@ public class MenuCreateAccount : MenuAuth
             {
                 if (validateInputs.IsFormatPasswordCorrect(inputPassword, inputRePassword, resultMsj))
                 {
+                    ShowScreenLoading(true);
+
                     string mail = inputMail.text;
                     string password = inputPassword.text;
 
