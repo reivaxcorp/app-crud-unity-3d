@@ -155,7 +155,7 @@ public class ManageStorageRemote
     /// Para actualizar y borrar, necesitamos borrar la imagén anterior.
     /// </summary>
     /// <param name="filePath"></param>
-    public async Task<bool> DeleteImageRemote(IResult resultUi)
+    public async Task<bool> DeleteImageRemote()
     {
         Debug.Log("Imagen remota a eliminar: " + _storageUrl);
 

@@ -182,6 +182,9 @@ public class MenuCrud : MonoBehaviour
         uiApp.HideMenu();
     }
 
+    /// <summary>
+    /// Reset menu cuando desactivamos
+    /// </summary>
     public void ResetMenu()
     {
         ClearInputs();

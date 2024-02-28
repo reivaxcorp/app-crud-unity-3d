@@ -135,7 +135,7 @@ namespace StarterAssets
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-            
+
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -386,6 +386,31 @@ namespace StarterAssets
             if (animationEvent.animatorClipInfo.weight > 0.5f)
             {
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.name.Equals("DeadZone"))
+            {
+                ResetPlayer();
+            }
+        }
+
+        private void ResetPlayer()
+        {
+            PlayerManager playerManager = GetComponent<PlayerManager>();
+
+            if (playerManager != null)
+            {
+                /// Para trasladar nuestro personaje es necesario deshabilitar los scrips de
+                /// Started Assets
+                playerManager.DisableController(true);
+                playerManager.ResetOriginalPosition();
+            }
+            else
+            {
+                Debug.LogWarning("PlayerManager es null, por favor coloca el player manager en el inspector");
             }
         }
     }
