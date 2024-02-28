@@ -1,3 +1,33 @@
+/*********************************************************************************
+ * Nombre del Archivo:     RemoteDb.cs
+ * Descripción:            Creamos, leemos, actualizamos, borramos los ítems en Realtime Database.
+                           También aprovecharemos la base de datos en tiempo real, al escuchar algún cambio
+                           que será manejado por nuestro ItemManager.cs 
+ *                         
+ * Autor:                  Javier
+ * Organización:           ReivaxCorp.
+ *
+ * Derechos de Autor (c) [2024] ReivaxCorp
+ * 
+ * Permiso es otorgado, sin cargo, para que cualquier persona obtenga una copia
+ * de este software y de los archivos de documentación asociados (el "Software"),
+ * para tratar en el Software sin restricción, incluyendo sin limitación los
+ * derechos para usar, copiar, modificar, fusionar, publicar, distribuir,
+ * sublicenciar, y/o vender copias del Software, y para permitir a las personas a
+ * quienes pertenezca el Software, sujeto a las siguientes condiciones:
+ *
+ * El aviso de derechos de autor anterior y este aviso de permiso se incluirán en
+ * todas las copias o partes sustanciales del Software.
+ *
+ * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
+ * IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A LAS GARANTÍAS DE COMERCIABILIDAD,
+ * IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
+ * AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER
+ * RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO
+ * O DE OTRO MODO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS
+ * TRATOS EN EL SOFTWARE.
+ *********************************************************************************/
+
 using Firebase.Database;
 using Firebase.Extensions;
 using System;
@@ -83,51 +113,6 @@ public class RemoteDb : IRepositoryRemote
          .ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
     }
 
-    public async Task<List<ItemRemote>> GetItemsRemote()
-    {
-
-        List<ItemRemote> itemsList = new List<ItemRemote>();
-
-        if (!IsUserUid()) return itemsList;
-
-        // Obtén la referencia a la ubicación de los items para el usuario actual
-        await FirebaseSDK.GetInstance().defaultInstance
-            .GetReference("users")
-            .Child(userUid)
-            .Child("items")
-            .GetValueAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted)
-                {
-                    // Handle the error...
-                    throw new Exception("Error al recuperar los datos " + task.Exception.ToString());
-                }
-                else if (task.IsCompleted)
-                {
-                    // Iterar sobre los hijos del DataSnapshot
-                    foreach (DataSnapshot itemSnapshot in task.Result.Children)
-                    {
-                        // Obtener el valor del DataSnapshot y convertirlo a un diccionario
-                        Dictionary<string, object> itemData = (Dictionary<string, object>)itemSnapshot.Value;
-
-                        // Crear un nuevo objeto ItemRemote y asignar los valores del diccionario
-                        ItemRemote item = new ItemRemote
-                        {
-                            // Ajusta estas líneas según la estructura de tus datos remotos
-                            Id = itemData["id"].ToString(),
-                            Name = itemData["name"].ToString(),
-                            ImageName = itemData["image_name"].ToString(),
-                            CreationDate = long.Parse(itemData["creation_date"].ToString())
-                        };
-
-                        // Agregar el objeto ItemRemote a la lista
-                        itemsList.Add(item);
-                    }                  
-                }
-            });
-
-        return itemsList;
-    }
 
     public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
@@ -190,7 +175,6 @@ public class RemoteDb : IRepositoryRemote
                 }
             });
     }
-
 
     public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)
     {

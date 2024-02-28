@@ -1,3 +1,10 @@
+/*
+ * TimeUtils.cs
+ * Script for resizing textures in Unity
+ * Original Author: OpenAI GPT-3.5
+ * Modified by [ReivaxCorp.]
+ */
+
 using System;
 
 public class TimeUtils

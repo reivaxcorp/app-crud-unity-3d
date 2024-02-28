@@ -1,3 +1,7 @@
+/*********************************************************************************
+ * Descripción:            Prepara el Interstitial Ad, cada vez que agregamos o actualizamos un ítem.
+ *********************************************************************************/
+
 using UnityEngine;
 using UnityEngine.Advertisements;
 
