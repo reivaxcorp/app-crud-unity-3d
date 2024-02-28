@@ -59,14 +59,14 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
         await localDb.SaveLocalItemsAsync(listItemsLocal);
     }
 
-    public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
+    public async Task<bool> SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        remoteDb.SaveItemRemote(itemRemote, resultUi);
+        return await remoteDb.SaveItemRemote(itemRemote, resultUi);
     }
 
-    public void UpdateItemRemote(ItemRemote itemRemote, IResult resultUi)
+    public async Task<bool> UpdateItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        remoteDb.UpdateItemRemote(itemRemote, resultUi);
+        return await remoteDb.UpdateItemRemote(itemRemote, resultUi);
     }
 
     public async Task<ItemLocal> GetLocalItemById(string id)

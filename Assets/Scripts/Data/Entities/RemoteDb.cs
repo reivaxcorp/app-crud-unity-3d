@@ -41,7 +41,7 @@ public class RemoteDb : IRepositoryRemote
     public event OnHandleValueChangedCallBack handleValueResult;
     private string userUid;
 
-    
+
     public void SetUserUid(string userUid)
     {
         this.userUid = userUid;
@@ -61,6 +61,7 @@ public class RemoteDb : IRepositoryRemote
             .GetReference("users")
             .Child(userUid)
             .Child("items")
+            .LimitToFirst(AppConfig.ITEM_MAX)
             .ValueChanged += HandleValueChanged;
 
         // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
@@ -98,7 +99,8 @@ public class RemoteDb : IRepositoryRemote
             itemsRemoteList.Add(item);
         }
 
-       // Debug.Log("handled itemsRemoteList " + itemsRemoteList.Count);
+        AppConfig.SetCurrentItemsCount(itemsRemoteList.Count);
+        // Debug.Log("handled itemsRemoteList " + itemsRemoteList.Count);
         handleValueResult?.Invoke(itemsRemoteList);
     }
 
@@ -110,13 +112,16 @@ public class RemoteDb : IRepositoryRemote
          .GetReference("users")
          .Child(userUid)
          .Child("items")
+         .LimitToFirst(AppConfig.ITEM_MAX)
          .ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
     }
 
 
-    public void SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
+    public async Task<bool> SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
-        if (!IsUserUid()) return;
+        bool saveSuccess = false;
+
+        if (!IsUserUid()) return saveSuccess;
 
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
 
@@ -131,49 +136,60 @@ public class RemoteDb : IRepositoryRemote
 
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 
-        rootRef.Child("users").Child(userUid).Child("items").Child(key).SetValueAsync(entryValues).ContinueWithOnMainThread(task =>
+        await rootRef.Child("users").Child(userUid).Child("items").Child(key).SetValueAsync(entryValues)
+            .ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
                 // Manejar error
                 Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
                 resultUi.SetResultCrudUi("Error", "Error al escribir en la base de datos");
+                saveSuccess = false;
             }
             else
             {
                 // Operación exitosa
                 Debug.Log("Datos escritos exitosamente en la base de datos");
                 resultUi.SetResultCrudUi("Completado", "Nuevo ítem agregado");
+                saveSuccess = true;
             }
         });
+
+        return saveSuccess;
     }
 
-    public void UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
+    public async Task<bool> UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
-        if (!IsUserUid()) return;
+        bool updateSuccess = false;
+
+        if (!IsUserUid()) return updateSuccess;
 
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
-        rootRef
-            .Child("users")
-            .Child(userUid)
-            .Child("items")
-            .Child(itemRemote.Id)
-            .UpdateChildrenAsync(itemRemote.ToDictionary()).ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted || task.IsCanceled)
-                {
+        await rootRef
+             .Child("users")
+             .Child(userUid)
+             .Child("items")
+             .Child(itemRemote.Id)
+             .UpdateChildrenAsync(itemRemote.ToDictionary()).ContinueWithOnMainThread(task =>
+             {
+                 if (task.IsFaulted || task.IsCanceled)
+                 {
 
-                    // Manejar error
-                    Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                    iResult.SetResultCrudUi("Error", "Error al actualizar");
-                }
-                else
-                {
-                    // Operación exitosa
-                    Debug.Log("Datos escritos exitosamente en la base de datos");
-                    iResult.SetResultCrudUi("Actualización", "Datos actualizados exitosamente");
-                }
-            });
+                     // Manejar error
+                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
+                     iResult.SetResultCrudUi("Error", "Error al actualizar");
+                     updateSuccess = false;
+                 }
+                 else
+                 {
+                     // Operación exitosa
+                     Debug.Log("Datos escritos exitosamente en la base de datos");
+                     iResult.SetResultCrudUi("Actualización", "Datos actualizados exitosamente");
+                     updateSuccess = true;
+                 }
+             });
+
+        return updateSuccess;
     }
 
     public async Task<bool> DeleteItemRemoteById(string id, IResult iResult)

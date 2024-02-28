@@ -146,13 +146,7 @@ public class MenuCrud : MonoBehaviour
 
         return true;
     }
-
-    private void LogWarningAndSetResult(string mesageWaring)
-    {
-        Debug.LogWarning(mesageWaring);
-    }
-
-    private void SetMsjInfoUI(string msj)
+    protected void SetMsjInfoUI(string msj)
     {
         if (resultMsj != null)
         {
@@ -163,6 +157,11 @@ public class MenuCrud : MonoBehaviour
         {
             Debug.LogWarning("Por favor, coloca resultMsj en el Inspector");
         }
+    }
+
+    private void LogWarningAndSetResult(string mesageWaring)
+    {
+        Debug.LogWarning(mesageWaring);
     }
 
     public void CloseMenu()

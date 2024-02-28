@@ -1,7 +1,6 @@
 /*********************************************************************************
- * Nombre del Archivo:     IRepositoryRemote.cs
- * Descripción:            Interfaz que nos ayudará en la comunicación con la base de datos remota, por medio del 
- *                         repositorio. 
+ * Nombre del Archivo:     AppConfig.cs
+ * Descripción:            Configuracion basica de la aplicación.
  *                         
  * Autor:                  Javier
  * Organización:           ReivaxCorp.
@@ -27,11 +26,29 @@
  * TRATOS EN EL SOFTWARE.
  *********************************************************************************/
 
-using System.Threading.Tasks;
 
-public interface IRepositoryRemote {
-    Task<bool> SaveItemRemote(ItemRemote itemRemote, IResult resultUi);
-    Task<bool> UpdateItemRemote(ItemRemote itemRemote, IResult resultUi);
-    Task<bool> DeleteItemRemoteById(string id, IResult resultUi);
-    RemoteDb GetRemoteDb();
+using UnityEngine;
+
+public class AppConfig 
+{
+    public static float timeInterstitialAd = 1.0f;
+    public const int  ITEM_MAX = 10;
+    private static int _currentItemPut = 0;
+
+
+    public static bool IsItemAvariableToPut()
+    {
+        return _currentItemPut < ITEM_MAX;
+    }
+
+    // Sumamos los items que vayamos colocando
+    public static void SetCurrentItemsCount(int count)
+    {
+        if(count <= ITEM_MAX && count >= 0)
+        {
+            _currentItemPut = count;
+            return;
+        }
+        throw new System.Exception("Limite de ítems alcanzado");
+    }
 }

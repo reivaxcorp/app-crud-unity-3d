@@ -1,4 +1,5 @@
 /*********************************************************************************
+ * Nombre del Archivo:     ManageItems.cs
  * Descripción:            En primer lugar, cargamos los ítems locales del usuario guardados 
  *                         en su dispositivo (si los hay), luego verificamos si hay algún cambio en la base 
  *                         de datos de RealtimeDatabase remota, y si los hay, actualizamos y volvemos a 
