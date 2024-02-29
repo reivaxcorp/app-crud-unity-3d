@@ -374,7 +374,7 @@ public class ManageItems : MonoBehaviour
     private bool IsListsDbEquals(List<ItemLocal> itemLocals, List<ItemRemote> itemRemotes)
     {
         if (itemLocals.Count != itemRemotes.Count) return false;
-        if (itemLocals.Count == 0) return false;
+        if (itemLocals.Count == 0 && itemRemotes.Count == 0) return true;
 
         bool isSameContent = true;
 

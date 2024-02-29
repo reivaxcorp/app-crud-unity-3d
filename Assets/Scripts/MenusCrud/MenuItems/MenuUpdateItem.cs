@@ -120,7 +120,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     {
         if(dialogDeleteConfirm != null)
         {
-            dialogDeleteConfirm.ShowDialog("Borrar ítem" , "Deseas eliminar el ítem", this);
+            dialogDeleteConfirm.ShowDialog("Borrar ítem" , "¿Deseas eliminar el ítem?", this);
         } else
         {
             Debug.LogWarning("DialogDeleteConfirm es null, colocalo en el inspector");
@@ -168,7 +168,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
         // imagén de firebase storage
         ManageStorageRemote manageMaterialRemote =
                      new ManageStorageRemote(currentItemSelected.ImageName);
-        await manageMaterialRemote.DeleteImageRemote(resultUi: this);
+        await manageMaterialRemote.DeleteImageRemote();
         return true;
     }
  
