@@ -178,8 +178,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     /// <returns></returns>
     private bool IsSomeDatachanged()
     {
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-        return isImageChanged || !sanitizedFileName.Equals(currentItemSelected.Name);
+        return isImageChanged || !inputFieldName.text.Equals(currentItemSelected.Name);
     }
 
     public async void ConfirmDialogDelete(bool isDeleteConfirm)
