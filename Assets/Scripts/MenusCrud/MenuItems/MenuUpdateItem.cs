@@ -145,7 +145,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
         return resultUpload;
     }
 
-    private void UpdateDocumentRemote()
+    private async void UpdateDocumentRemote()
     {
         // Ítem a actualizar
         ItemRemote itemRemote = new ItemRemote(
@@ -153,10 +153,10 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             name: inputFieldName.text,
             imageName: isImageChanged ? generateImageName : oldImageName,
             creationDate: currentItemSelected.CreationDate);
-
-        // Invoke("ShowInterstitialAd", 3f);
+        
         // actualizamos el documente de firebase realtimadatabase
-        MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
+        bool updateResult = await MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
+        if (updateResult) { Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); }
     }
 
     /// <summary>
@@ -186,7 +186,8 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
         if(isDeleteConfirm)
         {
             await DeleteImageRemote();
-            await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
+            bool deleteResult = await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
+            if (deleteResult) { Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); }
         }
     }
 

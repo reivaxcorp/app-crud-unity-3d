@@ -46,19 +46,25 @@ public class MenuAddItem : MenuCrud, IResult
     /// </summary>
     public async void CreateDocumentRemote()
     {
-        if (IsDataSetted())
+        if(AppConfig.IsItemAvariableToPut())
         {
-            StartAnimationTextMenu(true, "Creando");
-            // Obtenemos los bytes de la imagén temporal seleccionada
-            byte[] fileBytes = fileManager.GetBytesImageSelected();
-            // Generar nombre de imagén aleatorea
-            generateImageName = Guid.NewGuid().ToString();
-            ManageStorageRemote manageStorageRemote =
-                new ManageStorageRemote(generateImageName, fileManager.folderNameUser, fileBytes);
-            // subir nueva imagén
-            await manageStorageRemote.UploadFileFirebaseStorage();
-            fileManager.ChangeNameImageCopySelected(generateImageName);
-            WriteDocumentRemote(generateImageName);
+            if (IsDataSetted())
+            {
+                StartAnimationTextMenu(true, "Creando");
+                // Obtenemos los bytes de la imagén temporal seleccionada
+                byte[] fileBytes = fileManager.GetBytesImageSelected();
+                // Generar nombre de imagén aleatorea
+                generateImageName = Guid.NewGuid().ToString();
+                ManageStorageRemote manageStorageRemote =
+                    new ManageStorageRemote(generateImageName, fileManager.folderNameUser, fileBytes);
+                // subir nueva imagén
+                await manageStorageRemote.UploadFileFirebaseStorage();
+                fileManager.ChangeNameImageCopySelected(generateImageName);
+                WriteDocumentRemote(generateImageName);
+            }
+        } else
+        {
+            SetMsjInfoUI("Ítems maximos alcanzados, edita ó borra uno");
         }
     }
 
@@ -66,13 +72,13 @@ public class MenuAddItem : MenuCrud, IResult
     /// Una vez subida la imagén, procedemos a escribir el documento.
     /// </summary>
     /// <param name="imageName"></param>
-    private void WriteDocumentRemote(string imageName)
+    private async void WriteDocumentRemote(string imageName)
     {
         if (MyApplication.repository != null)
         {
             ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, imageName: imageName);
-            MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
-            // Invoke("ShowInterstitialAd", 3f);
+            bool saveResult = await MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
+            if(saveResult) { Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); }
         }
         else
         {

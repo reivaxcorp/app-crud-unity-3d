@@ -30,8 +30,8 @@
 using System.Threading.Tasks;
 
 public interface IRepositoryRemote {
-    void SaveItemRemote(ItemRemote itemRemote, IResult resultUi);
-    void UpdateItemRemote(ItemRemote itemRemote, IResult resultUi);
+    Task<bool> SaveItemRemote(ItemRemote itemRemote, IResult resultUi);
+    Task<bool> UpdateItemRemote(ItemRemote itemRemote, IResult resultUi);
     Task<bool> DeleteItemRemoteById(string id, IResult resultUi);
     RemoteDb GetRemoteDb();
 }
