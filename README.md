@@ -1,4 +1,4 @@
-# Serie de Tutoriales de Unity y Firebase: Texturas
+# Serie de Tutoriales de Unity y Firebase: Creación, subida, actualización y borrado de imágenes. Asi como también escritura de documentos en Firebase
 
 ¡Bienvenido a la Serie de Tutoriales de Unity y Firebase: Texturas! En esta serie de tutoriales, aprenderás cómo leer, cargar, subir y borrar texturas en Unity 3D utilizando Firebase en una aplicación Android. Esta guía completa te llevará paso a paso a través de todo el proceso, desde la configuración de Firebase hasta la implementación de un sistema CRUD (create-read-update-delete) completo en tu aplicación Unity.
 
@@ -47,6 +47,47 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
   RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO
   O DE OTRO MODO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS
   TRATOS EN EL SOFTWARE.
+
+## Reglas de Firebase RealtimeDatabase y Firebase Storage.
+
+{
+- RealtimeDAtabase:
+
+  ```json
+  "rules": {      
+     "users": {
+      "$userUid": {
+       	"items": {
+           ".read": "auth != null && $userUid === auth.uid && auth.token.email_verified == true",
+           ".write": "auth != null && $userUid === auth.uid && auth.token.email_verified == true",
+            "name": {".validate": "newData.isString() && newData.val().length <= 30"}
+      	}
+      }
+    }
+  }
+  ```
+  
+- FirebaseStorage:
+
+```markdown
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uidFolder}/imageItems/{fileName} {
+      allow write: if request.auth.uid != null
+      						 && request.auth.uid == uidFolder
+                   && request.auth.token.email_verified == true
+                   && request.resource.size < 5 * 1024 * 1024;
+      allow read: if request.auth.uid != null
+      						&& request.auth.uid == uidFolder
+                  && request.auth.token.email_verified == true;
+      allow delete:  if request.auth.uid != null
+      						&& request.auth.uid == uidFolder
+                  && request.auth.token.email_verified == true;
+                   
+    }
+  }
+}
+```
 
 ## Conéctate Conmigo
 
