@@ -34,7 +34,6 @@ using UnityEngine;
 
 public class BuildItem: MonoBehaviour
 {
-
  
     public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
     {
@@ -58,9 +57,8 @@ public class BuildItem: MonoBehaviour
         Material[] currentMaterials = meshRenderer.materials;
         currentMaterials[0] = newMaterial;
         meshRenderer.materials = currentMaterials;
-        gameObject.SetActive(true);
     }
-
+ 
     // Obtiene la textura desde nuestro dispositivo interno
     private Texture2D GetSavedTexture(string imageName)
     {

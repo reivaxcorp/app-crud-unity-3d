@@ -52,10 +52,12 @@ public class ManageItems : MonoBehaviour
     private NetworkManager networkManager;
     private bool syncStarted;
     private List<ItemLocal> itemsLocalList;
+    private List<GameObject> itemsGameObjects;
 
     private void Awake()
     {
         buildItem = gameObject.AddComponent<BuildItem>();
+        itemsGameObjects = new List<GameObject>();
     }
 
     // Start is called before the first frame update
@@ -97,7 +99,8 @@ public class ManageItems : MonoBehaviour
         }
         await Task.WhenAll(tasks);
 
-        OrderItem(itemsLocalList);
+        OrderItems(itemsLocalList);
+        EnablePhysicsItems();
         SetLoadingMsj(false); // Ocultar Cargando..
 
         StartCoroutine(CheckInternetConection());
@@ -210,6 +213,7 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalToDelete = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     DeleteItemInScene(itemLocalToDelete);
                     DeleteOldImage(itemLocalToDelete.ImageName);
+                    DeleteOldGameObjectItem(itemToUpdate.Id);
                 }
                 else if (itemToUpdate.IsAdd)
                 {
@@ -233,7 +237,9 @@ public class ManageItems : MonoBehaviour
 
             // Esperar a que todas las tareas se completen
             await Task.WhenAll(tasks);
-            OrderItem(itemsToSave);
+            OrderItems(itemsToSave);
+            EnablePhysicsItems();
+
             // actualizamos la lista local con la remota
 
             itemsLocalList = itemsToSave;
@@ -269,6 +275,8 @@ public class ManageItems : MonoBehaviour
 
                     itemToCreate.name = item.Id;
                     await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
+
+                    itemsGameObjects.Add(itemToCreate);
                 }
             }
         }
@@ -313,7 +321,7 @@ public class ManageItems : MonoBehaviour
         }
     }
 
-    private void OrderItem(List<ItemLocal> itemsLocalList)
+    private void OrderItems(List<ItemLocal> itemsLocalList)
     {
         if (myItemsOrdered != null)
         {
@@ -337,6 +345,36 @@ public class ManageItems : MonoBehaviour
         else
         {
             Debug.LogWarning("Por favor pon MyItemsOrdened game object en el inspector en Manager");
+        }
+    }
+
+    /// <summary>
+    /// Cuando eliminamos un ítem, también debemos eliminarlo de la lista de gameObjects.
+    /// </summary>
+    /// <param name="id"></param>
+    private void DeleteOldGameObjectItem(string id)
+    {
+        GameObject itemExists = itemsGameObjects.Find(item => item.name.Equals(id));
+        if (itemExists != null)
+        {
+            itemsGameObjects.Remove(itemExists);
+        }
+    }
+
+    /// <summary>
+    /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
+    /// asi podran interactuar correctamente con el entorno, ya que de otra menera
+    /// al tener colliders y rigidBodys, se colapasan entre si, al estar pegados.
+    /// </summary>
+    private void EnablePhysicsItems()
+    {
+        foreach (GameObject item in itemsGameObjects)
+        {
+            ItemScript itemScript = item.GetComponent<ItemScript>();
+            if (itemScript != null)
+            {
+                itemScript.EnablePhysicsItem();
+            }
         }
     }
 
