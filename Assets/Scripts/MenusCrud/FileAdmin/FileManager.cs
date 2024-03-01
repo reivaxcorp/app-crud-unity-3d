@@ -33,8 +33,13 @@ using UnityEngine;
 
 public class FileManager
 {
-    private const int SIZE_WIDTH = 256;
-    private const int SIZE_HEIGHT = 256;
+    /// <summary>
+    /// Cambiar de tamaño si quieres mas calidad de imagén, tamaño en px.
+    /// Ten en cuenta que a mayor tamaño mas tardara en cargar las imágenes. Y también
+    /// se verá reflejado en la cuota de firebase, si tienes muchos usuarios.
+    /// </summary>
+    private const int SIZE_WIDTH = 512;
+    private const int SIZE_HEIGHT = 512;
 
     public string folderNameUser
     {

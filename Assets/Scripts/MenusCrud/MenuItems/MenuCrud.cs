@@ -206,7 +206,7 @@ public class MenuCrud : MonoBehaviour
             InterstitialAd interstitialAd = ads.GetComponent<InterstitialAd>();
             if (interstitialAd != null)
             {
-                interstitialAd.ShowAd();
+                interstitialAd.LoadAd();
             }
             else
             {

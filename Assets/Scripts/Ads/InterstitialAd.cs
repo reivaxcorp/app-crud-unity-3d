@@ -1,5 +1,9 @@
 /*********************************************************************************
- * Descripción:            Prepara el Interstitial Ad, cada vez que agregamos o actualizamos un ítem.
+ * Descripción:            Prepara el Interstitial Ad, cada vez que agregamos o 
+ *                         actualizamos un ítem.
+ *                         Sin cambios significativos, se mantuvieron los comentarios en el Ingles,
+ *                         y se agregaron info en Español. Se llama desde el menu, "MenuCrud.cs" en el 
+ *                         método ShowInterstitialAd(). 
  *********************************************************************************/
 
 using UnityEngine;
@@ -16,12 +20,29 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
         _adUnitId = _androidAdUnitId;
     }
 
+    // Primero cargamos el Ad, luego lo mostrarmos a travez del callback, si se cargo.
+
     // Load content to the Ad Unit:
     public void LoadAd()
     {
-        // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
-        Debug.Log("Loading Ad: " + _adUnitId);
-        Advertisement.Load(_adUnitId, this);
+        AdsInitializer adsInitializer = GetComponent<AdsInitializer>();
+
+        if (adsInitializer == null)
+        {
+            Debug.LogWarning("ads es null, colocalo en el inspector");
+            return;
+        }
+
+        if (adsInitializer.isInitializacionComplete)
+        {
+            // IMPORTANT! Only load content AFTER initialization (in this example, initialization is handled in a different script).
+            Debug.Log("Loading Ad: " + _adUnitId);
+            Advertisement.Load(_adUnitId, this);
+        }
+        else
+        {
+            Debug.LogWarning("Ads no se inicializó");
+        }
     }
 
     // Show the loaded content in the Ad Unit:
@@ -36,6 +57,9 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     public void OnUnityAdsAdLoaded(string adUnitId)
     {
         Debug.Log("Interstitial loaded");
+
+        ShowAd(); // una vez cargado podemos mostrar el ad interstitial
+
         // Optionally execute code if the Ad Unit successfully loads content.
     }
 

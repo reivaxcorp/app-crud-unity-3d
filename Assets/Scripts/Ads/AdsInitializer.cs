@@ -7,14 +7,20 @@ using UnityEngine.Advertisements;
 
 public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 {
+    public bool isInitializacionComplete
+    {
+        private set { _isInitializacionComplete = value; }
+        get { return _isInitializacionComplete; }
+    }
     [SerializeField] string _androidGameId;
     [SerializeField] bool _testMode = true;
-
+    private bool _isInitializacionComplete;
     private string _gameId;
 
     void Awake()
     {
         InitializeAds();
+        isInitializacionComplete = false;
     }
 
     public void InitializeAds()
@@ -33,16 +39,7 @@ public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
     public void OnInitializationComplete()
     {
         Debug.Log("Unity Ads initialization complete.");
-
-        InterstitialAd interstitialAd = gameObject.GetComponent<InterstitialAd>();
-
-        if(interstitialAd != null)
-        {
-            interstitialAd.LoadAd();
-        } else
-        {
-            Debug.LogWarning("interstitialAd.cs no se encontre en el UI app en el inspector");
-        }
+        isInitializacionComplete = true;
     }
 
     public void OnInitializationFailed(UnityAdsInitializationError error, string message)
