@@ -28,6 +28,7 @@
  * TRATOS EN EL SOFTWARE.
  *********************************************************************************/
 
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -49,14 +50,22 @@ public class BuildItem: MonoBehaviour
             fileManager.SaveFileInternalExtorage(texture2D, imageName);
         }
 
-        Material newMaterial = new Material(Shader.Find("Standard"));
-        newMaterial.mainTexture = texture2D;
-        newMaterial.SetTexture("_MainTex", texture2D);
+        try
+        {
+            Material newMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            newMaterial.mainTexture = texture2D;
+            newMaterial.SetTexture("_MainTex", texture2D);
 
-        MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        Material[] currentMaterials = meshRenderer.materials;
-        currentMaterials[0] = newMaterial;
-        meshRenderer.materials = currentMaterials;
+            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            Material[] currentMaterials = meshRenderer.materials;
+            currentMaterials[0] = newMaterial;
+            meshRenderer.materials = currentMaterials;
+        } 
+        catch (Exception ex)
+        {
+            Debug.LogWarning("Error al aplicar la textura " + ex.Message);
+        }
+
     }
  
     // Obtiene la textura desde nuestro dispositivo interno
