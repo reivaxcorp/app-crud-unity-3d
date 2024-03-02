@@ -142,6 +142,15 @@ public class MenuManagerApp : MonoBehaviour
 
     private void Update()
     {
+        ThrowRayCastToItem();
+    }
+
+    /// <summary>
+    /// Comprobamos los toques del usuario en la pantalla, para poder asi editar el ítem
+    /// en la posición que seleccione, haciendo doble touch rapidamente.
+    /// </summary>
+    private void ThrowRayCastToItem()
+    {
         timepassed = Time.time - timetouch;
 
         if ((Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) || Input.GetMouseButtonDown(0))
