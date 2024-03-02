@@ -7,7 +7,7 @@ public class ShootPower : MonoBehaviour
 {
     [SerializeField] GameObject gun;
     [SerializeField] GameObject objectToLaunchPrefab; // Prefab del objeto que quieres lanzar
-    [SerializeField] private float speedBullet = 20f;
+    [SerializeField] private float powerBullet = 3000f;
 
     void Update()
     {
@@ -64,42 +64,24 @@ public class ShootPower : MonoBehaviour
             // Instanciar el objeto a lanzar en la posición del jugador
             GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gun.transform.position, Quaternion.identity);
 
-            // Iniciar la coroutine para mover el objeto hacia la posición del objetivo
-            StartCoroutine(MoveToObject(targetPosition, objectToLaunch));
-        } else
+            // Calcular la dirección hacia la posición del objetivo
+            Vector3 direction = (targetPosition - objectToLaunch.transform.position).normalized;
+
+            // Aplicar fuerza al objeto lanzado en la dirección del rayo
+            objectToLaunch.GetComponent<Rigidbody>().AddForce(direction * powerBullet);
+
+        }
+        else
         {
             // Instanciar el objeto a lanzar en la posición del jugador
             GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gun.transform.position, Quaternion.identity);
             // Iniciar la coroutine para mover el objeto hacia la posición del objetivo
-            StartCoroutine(MoveToInfinity(ray, objectToLaunch));
-        }
-    }
 
-    IEnumerator MoveToObject(Vector3 targetPosition, GameObject objectToLaunch)
-    {
-        while (objectToLaunch != null)
-        {
-            // Calcular la dirección hacia la posición del objetivo
-            Vector3 direction = (targetPosition - objectToLaunch.transform.position).normalized;
-
-            // Mover el objeto hacia la posición del objetivo
-            objectToLaunch.transform.Translate(direction * speedBullet * Time.deltaTime);
-
-            yield return null; // Esperar al siguiente frame antes de continuar la coroutine
-        }
-    }
-
-    IEnumerator MoveToInfinity(Ray ray, GameObject objectToLaunch)
-    {
-        while (objectToLaunch != null)
-        {
             // Calcular la dirección hacia la posición del objetivo
             Vector3 direction = ray.direction.normalized;
 
-            // Mover el objeto hacia la posición del objetivo
-            objectToLaunch.transform.Translate(direction * speedBullet * Time.deltaTime);
-
-            yield return null; // Esperar al siguiente frame antes de continuar la coroutine
+            // Aplicar fuerza al objeto lanzado en la dirección del rayo
+            objectToLaunch.GetComponent<Rigidbody>().AddForce(direction * powerBullet);
         }
     }
 }
