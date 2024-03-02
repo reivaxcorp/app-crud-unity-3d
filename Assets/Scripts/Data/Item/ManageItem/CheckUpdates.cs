@@ -34,6 +34,7 @@ using System.Collections.Generic;
 
 public class CheckUpdates
 {
+    private static List<ItemRemote> listItemsChanged = new List<ItemRemote>();
 
     /// <summary>
     /// Verificamos los valores a actualizar y eliminar y aniadir, de la base de datos local
@@ -48,6 +49,8 @@ public class CheckUpdates
        List<ItemLocal> itemsLocalList
        )
     {
+        listItemsChanged.Clear();
+
         List<ItemUpdate> itemUpdates = new List<ItemUpdate>();
 
         foreach (ItemLocal itemLocal in itemsLocalList)
@@ -75,6 +78,8 @@ public class CheckUpdates
                   isFieldsUpdated: true,
                   isRemove: false,
                   isAdd: false));
+
+                listItemsChanged.Add(itemRemote);
             }
             // Solo se han cambiado los campos
             else if (IsFielsUpdate(itemRemote, itemLocal))
@@ -85,6 +90,8 @@ public class CheckUpdates
                  isFieldsUpdated: true,
                  isRemove: false,
                  isAdd: false));
+
+                listItemsChanged.Add(itemRemote);
             }
             // Se ha cambiado la imagén
             else if (IsImageUpdated(itemRemote, itemLocal))
@@ -95,6 +102,8 @@ public class CheckUpdates
                 isFieldsUpdated: false,
                 isRemove: false,
                 isAdd: false));
+
+                listItemsChanged.Add(itemRemote);
             }
             else
             {
@@ -122,10 +131,22 @@ public class CheckUpdates
                 isFieldsUpdated: false,
                 isRemove: false,
                 isAdd: true));
+
+                listItemsChanged.Add(itemRemote);
             }
         }
 
         return itemUpdates;
+    }
+
+    /// <summary>
+    /// Para obtener la lista que items se acabaron de actualizar, ignorando los que
+    /// en realidad no han cambiado en nada.
+    /// </summary>
+    /// <returns></returns>
+    public static List<ItemRemote> GetItemsChanged()
+    {
+        return listItemsChanged;
     }
 
     /// <summary>

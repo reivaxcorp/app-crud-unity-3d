@@ -42,7 +42,7 @@ public class ManageItems : MonoBehaviour
     [SerializeField]
     private GameObject itemPrefab;
     [SerializeField]
-    private GameObject myItemsOrdered;
+    private ItemSceneConfig itemSceneConfig;
     [SerializeField]
     private GameObject loadingScreen;
     [SerializeField]
@@ -52,13 +52,12 @@ public class ManageItems : MonoBehaviour
     private NetworkManager networkManager;
     private bool syncStarted;
     private List<ItemLocal> itemsLocalList;
-    private List<GameObject> itemsGameObjects;
 
     private void Awake()
     {
         buildItem = gameObject.AddComponent<BuildItem>();
-        itemsGameObjects = new List<GameObject>();
-    }
+        CheckReferences();
+     }
 
     // Start is called before the first frame update
     void Start()
@@ -99,10 +98,8 @@ public class ManageItems : MonoBehaviour
         }
         await Task.WhenAll(tasks);
 
-        OrderItems(itemsLocalList);
-        EnablePhysicsItems();
+        ConfigAllItemInScene();
         SetLoadingMsj(false); // Ocultar Cargando..
-
         StartCoroutine(CheckInternetConection());
     }
 
@@ -167,11 +164,6 @@ public class ManageItems : MonoBehaviour
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
 
-        Debug.Log("Is somoe list equals " + isSomeListDbEquals + " " +
-       " Lista local " +
-       itemsLocalList.Count + " lista remota " + itemsRemoteList.Count);
-
-
         if (!isSomeListDbEquals)
         {
 
@@ -213,12 +205,12 @@ public class ManageItems : MonoBehaviour
                     ItemLocal itemLocalToDelete = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     DeleteItemInScene(itemLocalToDelete);
                     DeleteOldImage(itemLocalToDelete.ImageName);
-                    DeleteOldGameObjectItem(itemToUpdate.Id);
+                    itemSceneConfig.DeleteOldGameObjectItem(itemToUpdate.Id);
                 }
                 else if (itemToUpdate.IsAdd)
                 {
                     // Nuevo item añadido
-                    ItemLocal itemLocalToAdd = 
+                    ItemLocal itemLocalToAdd =
                         itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     task = CreateItemInScene(itemLocalToAdd);
@@ -226,7 +218,8 @@ public class ManageItems : MonoBehaviour
                 }
                 else
                 {
-                    // es necesario agregar los que no fueron cambiados tambien
+                    // es necesario agregar los que no fueron cambiados tambien, 
+                    // ya que sobreescribiremos la base de datos local.
                     // sin cambios el ítem local con el ítem remoto
                     ItemLocal itemLocal = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     task = CreateItemInScene(itemLocal);
@@ -237,11 +230,9 @@ public class ManageItems : MonoBehaviour
 
             // Esperar a que todas las tareas se completen
             await Task.WhenAll(tasks);
-            OrderItems(itemsToSave);
-            EnablePhysicsItems();
 
-            // actualizamos la lista local con la remota
-
+            itemSceneConfig.OrderSomeItemPositionInScene(CheckUpdates.GetItemsChanged());
+            // nueva lista para saber en la base de datos local
             itemsLocalList = itemsToSave;
             await MyApplication.repository.SaveLocalItemsAsync(itemsLocalList);
         }
@@ -259,32 +250,30 @@ public class ManageItems : MonoBehaviour
     {
         if (itemPrefab != null)
         {
-            if (myItemsOrdered.transform.Find(item.Id) == null)
+            if (itemSceneConfig.transform.Find(item.Id) == null)
             {
+                GameObject itemToCreate = Instantiate(itemPrefab);
+                itemToCreate.transform.position = itemSceneConfig.transform.position;
+
+                TextMeshPro[] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
+
+                if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
                 {
-                    GameObject itemToCreate = Instantiate(itemPrefab);
-                    itemToCreate.transform.position = myItemsOrdered.transform.position;
-
-                    TextMeshPro[] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
-
-                    if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
-                    {
-                        textMeshProChildren[0].text = item.Name;
-                        textMeshProChildren[1].text = "Creado:\n" + TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
-                    }
-
-                    itemToCreate.name = item.Id;
-                    await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
-
-                    itemsGameObjects.Add(itemToCreate);
+                    textMeshProChildren[0].text = item.Name;
+                    textMeshProChildren[1].text = "Creado:\n" + TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
                 }
+
+                itemToCreate.name = item.Id;
+                await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
+
+                itemSceneConfig.SetItemGameObject(itemToCreate);
             }
         }
         else
         {
-            Debug.LogWarning("Por favor, coloca la referencia del item prefab en el ispector");
             return false;
         }
+
         return true;
     }
 
@@ -321,60 +310,12 @@ public class ManageItems : MonoBehaviour
         }
     }
 
-    private void OrderItems(List<ItemLocal> itemsLocalList)
+    private void ConfigAllItemInScene()
     {
-        if (myItemsOrdered != null)
+        if (itemSceneConfig != null)
         {
-            if (itemsLocalList.Count > 0)
-            {
-                MyItemsOrder myItemsOrder = myItemsOrdered.GetComponent<MyItemsOrder>();
-                if (myItemsOrder != null)
-                {
-                    myItemsOrder.OrderItemPositionInScene(itemsLocalList);
-                }
-                else
-                {
-                    Debug.LogWarning("MyItemsOrder.cs no colocado en MyItemsOrdered gameObject");
-                }
-            }
-            else
-            {
-                Debug.Log("Lista de items local vacia");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Por favor pon MyItemsOrdened game object en el inspector en Manager");
-        }
-    }
-
-    /// <summary>
-    /// Cuando eliminamos un ítem, también debemos eliminarlo de la lista de gameObjects.
-    /// </summary>
-    /// <param name="id"></param>
-    private void DeleteOldGameObjectItem(string id)
-    {
-        GameObject itemExists = itemsGameObjects.Find(item => item.name.Equals(id));
-        if (itemExists != null)
-        {
-            itemsGameObjects.Remove(itemExists);
-        }
-    }
-
-    /// <summary>
-    /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
-    /// asi podran interactuar correctamente con el entorno, ya que de otra menera
-    /// al tener colliders y rigidBodys, se colapasan entre si, al estar pegados.
-    /// </summary>
-    private void EnablePhysicsItems()
-    {
-        foreach (GameObject item in itemsGameObjects)
-        {
-            ItemScript itemScript = item.GetComponent<ItemScript>();
-            if (itemScript != null)
-            {
-                itemScript.EnablePhysicsItem();
-            }
+            itemSceneConfig.OrderAllItemPositionInScene();
+            itemSceneConfig.EnablePhysicsAllItems();
         }
     }
 
@@ -383,10 +324,6 @@ public class ManageItems : MonoBehaviour
         if (loadingScreen != null)
         {
             loadingScreen.SetActive(isActive);
-        }
-        else
-        {
-            Debug.LogWarning("Por favor pon el LoadingMsj en el Manager desde UiApp gameObject");
         }
     }
 
@@ -428,7 +365,7 @@ public class ManageItems : MonoBehaviour
 
     private bool CheckDependenciesInitialize()
     {
-        return    
+        return
                   MyApplication.repository != null &&
                   FirebaseSDK.GetInstance().isFirebaseReady &&
                   FirebaseSDK.GetInstance().auth.CurrentUser != null;
@@ -437,12 +374,17 @@ public class ManageItems : MonoBehaviour
     // Cuando no tenemos conexion a internet, no podemos añadir items.
     private void DisableBtnAddItem(bool isEnable)
     {
-        if(addItemBtn != null)
+        if (addItemBtn != null)
         {
             addItemBtn.SetActive(!isEnable);
-        } else
-        {
-            Debug.LogWarning("Por favor, coloca el botón añadir item (addItemBtn) en el inspector del Manager");
         }
+    }
+
+    private void CheckReferences() {
+
+        if(itemPrefab == null) { Debug.LogWarning("Por favor, coloca el ItemPrefab en el ManageItems.cs en el inspector"); }
+        if (itemSceneConfig == null) { Debug.LogWarning("Por favor, coloca el itemSceneConfig en el ManageItems.cs en el inspector"); }
+        if (loadingScreen == null) { Debug.LogWarning("Por favor, coloca el loadingScreen en el ManageItems.cs en el inspector"); }
+        if (addItemBtn == null) { Debug.LogWarning("Por favor, coloca el addItemBtn en el ManageItems.cs en el inspector"); }
     }
 }
