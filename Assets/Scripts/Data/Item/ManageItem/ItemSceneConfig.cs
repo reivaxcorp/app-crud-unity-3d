@@ -48,6 +48,10 @@ public class ItemSceneConfig : MonoBehaviour
         itemsGameObjects.Add(itemInScene);
     }
 
+    /// <summary>
+    /// Cuando un usuario actualiza o añade un nuevo ítem, este aparecera en frente de el
+    /// </summary>
+    /// <param name="itemsRemoteList"></param>
     public void OrderSomeItemPositionInScene(List<ItemRemote> itemsRemoteList)
     {
         if(player == null)
@@ -134,6 +138,22 @@ public class ItemSceneConfig : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
+    /// asi podran interactuar correctamente con el entorno, ya que de otra menera
+    /// al tener colliders y rigidBodys, se colapasan entre si, al estar pegados.
+    /// </summary>
+    public void EnablePhysicsSomeItems()
+    {
+        foreach (GameObject item in itemsGameObjects)
+        {
+            ItemScript itemScript = item.GetComponent<ItemScript>();
+            if (itemScript != null)
+            {
+                itemScript.EnablePhysicsItem();
+            }
+        }
+    }
 
     /// <summary>
     /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
