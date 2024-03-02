@@ -98,7 +98,7 @@ public class ManageItems : MonoBehaviour
         }
         await Task.WhenAll(tasks);
 
-        ConfigAllItemInScene();
+        itemSceneConfig.OrderAllItemPositionInScene();
         SetLoadingMsj(false); // Ocultar Cargando..
         StartCoroutine(CheckInternetConection());
     }
@@ -232,6 +232,7 @@ public class ManageItems : MonoBehaviour
             await Task.WhenAll(tasks);
 
             itemSceneConfig.OrderSomeItemPositionInScene(CheckUpdates.GetItemsChanged());
+
             // nueva lista para saber en la base de datos local
             itemsLocalList = itemsToSave;
             await MyApplication.repository.SaveLocalItemsAsync(itemsLocalList);
@@ -307,15 +308,6 @@ public class ManageItems : MonoBehaviour
         if (gameObjectExists != null)
         {
             Destroy(gameObjectExists);
-        }
-    }
-
-    private void ConfigAllItemInScene()
-    {
-        if (itemSceneConfig != null)
-        {
-            itemSceneConfig.OrderAllItemPositionInScene();
-            itemSceneConfig.EnablePhysicsAllItems();
         }
     }
 

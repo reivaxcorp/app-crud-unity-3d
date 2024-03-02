@@ -46,57 +46,27 @@ public class ItemSceneConfig : MonoBehaviour
     public void SetItemGameObject(GameObject itemInScene)
     {
         itemsGameObjects.Add(itemInScene);
-    }
+    } 
 
     /// <summary>
-    /// Cuando un usuario actualiza o añade un nuevo ítem, este aparecera en frente de el
+    /// Cuando leemos los datos de la base de datos local, debemos ordenar los ítems
+    /// en la escena.
     /// </summary>
-    /// <param name="itemsRemoteList"></param>
-    public void OrderSomeItemPositionInScene(List<ItemRemote> itemsRemoteList)
+    public void OrderAllItemPositionInScene()
     {
-        if(player == null)
-        {
-            Debug.LogWarning("La referencia Player no existe en ItemSceneConfig en el inspector, por favor colocala");
-            return;
-        }
-
-        List<GameObject> itemsToOrder = new List<GameObject>();
-        
-        for (int index = 0; index < itemsRemoteList.Count; index++)
-        {
-            GameObject itemInScene =
-                itemsGameObjects.Find(item => item.name.Equals(itemsRemoteList[index].Id));
-            
-            if(itemInScene != null)
-            {
-                itemsToOrder.Add(itemInScene);
-            }
-        }
-
         float nextPositionX = this.transform.position.x;
 
         if (item != null)
         {
-            for (int index = 0; index < itemsToOrder.Count; index++)
+            for (int index = 0; index < itemsGameObjects.Count; index++)
             {
-                GameObject itemInScene = itemsToOrder[index];
+                GameObject itemInScene = itemsGameObjects[index];
 
                 if (itemInScene != null)
                 {
-                    Renderer rendeder = itemInScene.GetComponent<Renderer>();
-
-                    Vector3 currentPlayerPosition =
-                        player.GetComponent<Transform>().position;
-
-                    // colocar los ítems actualizados delante del jugador
-                    itemInScene.transform.position =
-                        new Vector3(
-                            currentPlayerPosition.x,
-                            currentPlayerPosition.y + rendeder.bounds.size.y,
-                            currentPlayerPosition.z + rendeder.bounds.size.z * 2
-                        );
-                   
-                    nextPositionX += rendeder.bounds.size.x * 2;
+                    SetItemParentToThis(itemInScene);
+                    nextPositionX = TranslateItemSideBySide(itemInScene, nextPositionX);
+                    EnablePhysicsItem(itemInScene);
                 }
                 else
                 {
@@ -110,65 +80,53 @@ public class ItemSceneConfig : MonoBehaviour
         }
     }
 
-    public void OrderAllItemPositionInScene()
+    /// <summary>
+    /// Cuando un usuario actualiza o añade un nuevo ítem, debemos ordenarlos en la escena
+    /// Pero dejar los que no fueron modificados en su lugar. 
+    /// </summary>
+    /// <param name="itemsRemoteListUpdated"></param>
+    public void OrderSomeItemPositionInScene(List<ItemRemote> itemsRemoteListUpdated)
     {
-        float nextPositionX = this.transform.position.x;
-
-        if(item != null)
+        if (player == null)
         {
-            for (int index = 0; index < itemsGameObjects.Count; index++)
+            Debug.LogWarning("La referencia Player no existe en ItemSceneConfig en el inspector, por favor colocala");
+            return;
+        }
+
+        List<GameObject> itemsToOrder = new List<GameObject>();
+
+        for (int index = 0; index < itemsRemoteListUpdated.Count; index++)
+        {
+            GameObject itemInScene =
+                itemsGameObjects.Find(item => item.name.Equals(itemsRemoteListUpdated[index].Id));
+
+            if (itemInScene != null)
             {
-                GameObject itemInScene = itemsGameObjects[index];
+                itemsToOrder.Add(itemInScene);
+            }
+        }
+
+        if (item != null)
+        {
+            for (int index = 0; index < itemsToOrder.Count; index++)
+            {
+                GameObject itemInScene = itemsToOrder[index];
 
                 if (itemInScene != null)
                 {
-                    itemInScene.transform.SetParent(this.transform);
-                    itemInScene.transform.position =
-                        new Vector3(nextPositionX, transform.position.y, transform.position.z);
-                    Renderer rendeder = itemInScene.GetComponent<Renderer>();
-                    nextPositionX += rendeder.bounds.size.x * 2;
-                } else
+                    SetItemParentToThis(itemInScene);
+                    TranslateItemFromOfPlayer(itemInScene);
+                    EnablePhysicsItem(itemInScene);
+                }
+                else
                 {
                     Debug.LogWarning("El ítem no existe enla escena!");
                 }
             }
-        } else
+        }
+        else
         {
             Debug.LogWarning("Por favor coloca el item prefab (item) en el inspector");
-        }
-    }
-
-    /// <summary>
-    /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
-    /// asi podran interactuar correctamente con el entorno, ya que de otra menera
-    /// al tener colliders y rigidBodys, se colapasan entre si, al estar pegados.
-    /// </summary>
-    public void EnablePhysicsSomeItems()
-    {
-        foreach (GameObject item in itemsGameObjects)
-        {
-            ItemScript itemScript = item.GetComponent<ItemScript>();
-            if (itemScript != null)
-            {
-                itemScript.EnablePhysicsItem();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Una vez cargados los items podemos habilitar su gravedad y sus fisicas, 
-    /// asi podran interactuar correctamente con el entorno, ya que de otra menera
-    /// al tener colliders y rigidBodys, se colapasan entre si, al estar pegados.
-    /// </summary>
-    public void EnablePhysicsAllItems()
-    {
-        foreach (GameObject item in itemsGameObjects)
-        {
-            ItemScript itemScript = item.GetComponent<ItemScript>();
-            if (itemScript != null)
-            {
-                itemScript.EnablePhysicsItem();
-            }
         }
     }
 
@@ -182,6 +140,56 @@ public class ItemSceneConfig : MonoBehaviour
         if (itemExists != null)
         {
             itemsGameObjects.Remove(itemExists);
+        }
+    }
+
+    /// <summary>
+    /// Traslada los ítems uno al lado del otro, cuando la aplicación empieza.
+    /// </summary>
+    /// <param name="itemInScene">GameObject item</param>
+    /// <param name="nextPositionX">La próxima posición</param>
+    /// <returns></returns>
+    private float TranslateItemSideBySide(GameObject itemInScene, float nextPositionX)
+    {
+        float nextPos = nextPositionX;
+
+        Renderer rendeder = itemInScene.GetComponent<Renderer>();
+        itemInScene.transform.position =
+            new Vector3(nextPositionX, transform.position.y, transform.position.z);
+        nextPos += rendeder.bounds.size.x * 2;
+        return nextPos;
+    }
+
+   /// <summary>
+   /// Trasladamos el item, recién actualizado ó añadido, al lado del jugador.
+   /// </summary>
+   /// <param name="itemInScene"></param>
+    private void TranslateItemFromOfPlayer(GameObject itemInScene)
+    {
+        Renderer rendeder = itemInScene.GetComponent<Renderer>();
+       
+        Vector3 currentPlayerPosition =
+            player.GetComponent<Transform>().position;
+        // colocar los ítems actualizados delante del jugador
+        itemInScene.transform.position =
+            new Vector3(
+                currentPlayerPosition.x,
+                currentPlayerPosition.y + rendeder.bounds.size.y,
+                currentPlayerPosition.z + rendeder.bounds.size.z * 2
+            );
+    }
+
+    private void SetItemParentToThis(GameObject itemInScene)
+    {
+        itemInScene.transform.SetParent(this.transform);
+    }
+
+    private void EnablePhysicsItem(GameObject itemInScene)
+    {
+        ItemScript itemScript = itemInScene.GetComponent<ItemScript>();
+        if (itemScript != null)
+        {
+            itemScript.EnablePhysicsItem();
         }
     }
 
