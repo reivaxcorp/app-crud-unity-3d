@@ -170,6 +170,9 @@ public class ManageItems : MonoBehaviour
             List<ItemUpdate> itemListUpdates =
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
+            ShowDebugList("Db:", itemsLocalList, itemsRemoteList);
+            Debug.Log("itemListUpdates: " +  itemListUpdates.Count);
+
             foreach (ItemUpdate itemToUpdate in itemListUpdates)
             {
 
@@ -370,6 +373,13 @@ public class ManageItems : MonoBehaviour
         {
             addItemBtn.SetActive(!isEnable);
         }
+    }
+
+    private void ShowDebugList(string title, List<ItemLocal> itemLocal, List<ItemRemote> itemRemotes)
+    {
+        Debug.Log("título " + title);
+        Debug.Log("Tamaño lista local: " + itemLocal.Count + " " +
+            "Tamaño lista remota: " + itemRemotes);
     }
 
     private void CheckReferences() {

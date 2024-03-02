@@ -178,7 +178,8 @@ public class MenuManagerApp : MonoBehaviour
 
                     RaycastHit hit;
                     // Debug del rayo lanzado por el Raycast
-                    Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.green); // Aquí puedes ajustar la longitud del rayo multiplicando la dirección por un valor específico
+                    //
+                    // Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.green); // Aquí puedes ajustar la longitud del rayo multiplicando la dirección por un valor específico
 
                     if (Physics.Raycast(ray, out hit, Mathf.Infinity))
                     {
