@@ -73,4 +73,20 @@ public class ItemScript : MonoBehaviour
         }
         return true;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.name.Equals("DeadZone"))
+        {
+            RestItem();
+        }
+    }
+
+    /// <summary>
+    /// Si se cae el ítem lo trasladamos a la posicion de nuestro ItemSceneConfig (Hierarchy)
+    /// </summary>
+    private void RestItem()
+    {
+        gameObject.transform.position = gameObject.transform.parent.position;
+    }
 }

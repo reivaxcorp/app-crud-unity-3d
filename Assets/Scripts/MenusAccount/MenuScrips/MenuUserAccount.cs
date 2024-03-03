@@ -99,6 +99,7 @@ public class MenuUserAccount : MenuAuth
 
     public void LoadSceneMyItems()
     {
+        ShowScreenLoading(true);
         SceneManager.LoadScene("AppScene");
     }
 
