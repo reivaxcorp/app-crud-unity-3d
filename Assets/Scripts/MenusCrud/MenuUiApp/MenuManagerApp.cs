@@ -1,9 +1,7 @@
 /*********************************************************************************
  * Nombre del Archivo:     MenuManagerApp.cs 
  * Descripción:            Clase que se encargará de la interacción del usuario con los botónes
- *                         de la interfaz de usuario, asi como también en la interacción de los items, 
- *                         al hacer doble touch en cada uno de ellos. Por otro lado, tambien mostrara ó 
- *                         ocultara los menús y los botones en las situaciones correspondientes.
+ *                         de la interfaz de usuario.
  *                         
  * Autor:                  Javier
  * Organización:           ReivaxCorp.
@@ -50,12 +48,6 @@ public class MenuManagerApp : MonoBehaviour
     [SerializeField] GameObject tutorialInfo;
 
     private MenuCrud menu;
-
-    private bool firstTouch = false;
-    private float timetouch = 0.0f;
-    private float timepassed = 0.0f;
-    private float timeToTouch = 0.5f;
- 
 
     public void ShowMenuAddItem()
     {
@@ -140,95 +132,6 @@ public class MenuManagerApp : MonoBehaviour
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
 
-    private void Update()
-    {
-        ThrowRayCastToItem();
-    }
-
-    /// <summary>
-    /// Comprobamos los toques del usuario en la pantalla, para poder asi editar el ítem
-    /// en la posición que seleccione, haciendo doble touch rapidamente.
-    /// </summary>
-    private void ThrowRayCastToItem()
-    {
-        timepassed = Time.time - timetouch;
-
-        if ((Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) || Input.GetMouseButtonDown(0))
-        {
-
-            if (IsDobleTouch())
-            {
-                if (Camera.main != null)
-                {
-                    Ray ray;
-
-                    if (Input.touchCount > 0)
-                    {
-                        ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-                    }
-                    else if (Input.GetMouseButtonDown(0))
-                    {
-                        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    }
-                    else
-                    {
-                        // No se realizó ningún toque ni clic, no se realiza ninguna acción
-                        return;
-                    }
-
-                    RaycastHit hit;
-                    // Debug del rayo lanzado por el Raycast
-                    //
-                    // Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.green); // Aquí puedes ajustar la longitud del rayo multiplicando la dirección por un valor específico
-
-                    if (Physics.Raycast(ray, out hit, Mathf.Infinity))
-                    {
-
-                        if (myItemsOrdened != null)
-                        {
-                            for (int indexChild = 0; indexChild < myItemsOrdened.transform.childCount; indexChild++)
-                            {
-                                if (myItemsOrdened.transform.GetChild(indexChild).name.Equals(hit.collider.name))
-                                {
-                                    //   Debug.Log("Item box clicked.. " + hit.collider);
-                                    ShowMenuUpdateItem(hit.collider.name);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogWarning("MyItemsOrdener no esta colocado en el inspector");
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Colocar la camara principal, con la etiqueta MainCamera");
-                }
-            }
-        }
-    }
-
-    private bool IsDobleTouch()
-    {
-        if (!firstTouch)
-        {
-
-            firstTouch = true;
-            timetouch = Time.time;
-            timepassed = 0.0f;
-            return false;
-        }
-
-        if (timepassed > timeToTouch)
-        {
-            timetouch = Time.time;
-            timepassed = 0.0f;
-            return false;
-        }
-
-        return true;
-    }
 
     private void Awake()
     {
