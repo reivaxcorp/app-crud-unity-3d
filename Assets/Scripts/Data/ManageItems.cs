@@ -164,6 +164,9 @@ public class ManageItems : MonoBehaviour
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
 
+        ShowDebugList("Son iguales? " + isSomeListDbEquals, itemsLocalList, itemsRemoteList);
+        Debug.Log("----------\n----------\n----------\n----------\n----------\n");
+
         if (!isSomeListDbEquals)
         {
 
@@ -171,7 +174,7 @@ public class ManageItems : MonoBehaviour
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
             ShowDebugList("Db:", itemsLocalList, itemsRemoteList);
-            Debug.Log("itemListUpdates: " +  itemListUpdates.Count);
+            Debug.Log("itemListUpdates: " + itemListUpdates.Count);
 
             foreach (ItemUpdate itemToUpdate in itemListUpdates)
             {
@@ -234,7 +237,7 @@ public class ManageItems : MonoBehaviour
             // Esperar a que todas las tareas se completen
             await Task.WhenAll(tasks);
 
-            itemSceneConfig.OrderSomeItemPositionInScene(CheckUpdates.GetItemsChanged());
+            OrderItem();
 
             // nueva lista para saber en la base de datos local
             itemsLocalList = itemsToSave;
@@ -242,6 +245,24 @@ public class ManageItems : MonoBehaviour
         }
 
         syncStarted = false;
+    }
+
+    /// <summary>
+    /// Cuando tenemos la base de datos local vacía, lo que hacemos es ordenar los items
+    /// uno al lado del otro, no al frente del jugador, 
+    /// en cambio si hay alguna actualización si 
+    /// </summary>
+    private void OrderItem()
+    {
+        // Si borramos los datos o si abrimos la app en otro dispositivo
+        if (itemsLocalList.Count == 0)
+        {
+            itemSceneConfig.OrderAllItemPositionInScene();
+        }
+        else
+        {
+            itemSceneConfig.OrderSomeItemPositionInScene(CheckUpdates.GetItemsChanged());
+        }
     }
 
     private void DeleteOldImage(string oldImageName)
@@ -379,7 +400,7 @@ public class ManageItems : MonoBehaviour
     {
         Debug.Log("título " + title);
         Debug.Log("Tamaño lista local: " + itemLocal.Count + " " +
-            "Tamaño lista remota: " + itemRemotes);
+            "Tamaño lista remota: " + itemRemotes.Count);
     }
 
     private void CheckReferences() {

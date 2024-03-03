@@ -66,7 +66,7 @@ public static class ItemExtensions
 
     public static bool IsSameContent(ItemLocal itemLocal, ItemRemote itemRemote)
     {
-        if(itemLocal == null || itemRemote == null) return false;
+        if(itemLocal == null && itemRemote == null) return true;
 
         return
                 itemLocal.Id.Equals(itemRemote.Id) &&

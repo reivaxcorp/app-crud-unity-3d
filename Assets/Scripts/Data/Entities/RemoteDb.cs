@@ -61,7 +61,6 @@ public class RemoteDb : IRepositoryRemote
             .GetReference("users")
             .Child(userUid)
             .Child("items")
-            .LimitToFirst(AppConfig.ITEM_MAX)
             .ValueChanged += HandleValueChanged;
 
         // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
@@ -112,7 +111,6 @@ public class RemoteDb : IRepositoryRemote
          .GetReference("users")
          .Child(userUid)
          .Child("items")
-         .LimitToFirst(AppConfig.ITEM_MAX)
          .ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
     }
 

@@ -8360,7 +8360,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gun: {fileID: 186965778}
   objectToLaunchPrefab: {fileID: 4081062236969477691, guid: 9285dde136acdc84885b2ed50eda7c1c, type: 3}
-  speedBullet: 20
+  powerBullet: 2000
 --- !u!1 &1931697682
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,9 +5,9 @@ using UnityEngine.InputSystem.HID;
 
 public class ShootPower : MonoBehaviour
 {
-    [SerializeField] GameObject gun;
+    [SerializeField] GameObject gunPlayer;
     [SerializeField] GameObject objectToLaunchPrefab; // Prefab del objeto que quieres lanzar
-    [SerializeField] private float powerBullet = 3000f;
+    [SerializeField] private float powerBullet = 2000f;
 
     void Update()
     {
@@ -62,7 +62,7 @@ public class ShootPower : MonoBehaviour
             Vector3 targetPosition = hit.point;
 
             // Instanciar el objeto a lanzar en la posición del jugador
-            GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gun.transform.position, Quaternion.identity);
+            GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gunPlayer.transform.position, Quaternion.identity);
 
             // Calcular la dirección hacia la posición del objetivo
             Vector3 direction = (targetPosition - objectToLaunch.transform.position).normalized;
@@ -74,7 +74,7 @@ public class ShootPower : MonoBehaviour
         else
         {
             // Instanciar el objeto a lanzar en la posición del jugador
-            GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gun.transform.position, Quaternion.identity);
+            GameObject objectToLaunch = Instantiate(objectToLaunchPrefab, gunPlayer.transform.position, Quaternion.identity);
             // Iniciar la coroutine para mover el objeto hacia la posición del objetivo
 
             // Calcular la dirección hacia la posición del objetivo
