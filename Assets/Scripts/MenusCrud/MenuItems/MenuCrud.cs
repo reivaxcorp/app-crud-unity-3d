@@ -231,10 +231,12 @@ public class MenuCrud : MonoBehaviour
         {
             case PermissionStatus.Granted:
                 Debug.Log("¡Permiso concedido!");
+                SetMsjInfoUI("¡Permiso concedido!");
                 fileManager.CreateIntentFileAndroid();
                 break;
             case PermissionStatus.Denied:
                 Debug.LogWarning("Permiso denegado por el usuario.");
+                SetMsjInfoUI("Permiso denegado por el usuario.");
                 break;
         }
     }

@@ -56,7 +56,7 @@ public class AndroidPermission : MonoBehaviour
             Permission.RequestUserPermission(StoragePermission);
 
             float elapsedTime = 0f;
-            float timeout = 10f; // Ajusta el tiempo de espera según tus necesidades
+            float timeout = 10f; // Tiempo para aceptar los permisos
 
             while (!Permission.HasUserAuthorizedPermission(StoragePermission) && elapsedTime < timeout)
             {
@@ -64,6 +64,7 @@ public class AndroidPermission : MonoBehaviour
                 elapsedTime += Time.deltaTime;
             }
 
+            // Una vez pasado el tiempo, preguntamos si el  usuario confirmo los permisos
             if (Permission.HasUserAuthorizedPermission(StoragePermission))
             {
                 OnPermissionResult?.Invoke(PermissionStatus.Granted);
