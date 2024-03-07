@@ -273,7 +273,7 @@ public class ManageItemsTest : IResultTest
                     ItemLocalTest itemLocalUptated = itemsRemoteList.Find(item => item.Id == itemToUpdate.Id)
                         .ItemRemoteToItemLocal();
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    SyncTextures(itemOld.ImageName);
+                    DeleteOldImage(itemOld.ImageName);
                     CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
@@ -282,7 +282,7 @@ public class ManageItemsTest : IResultTest
                     ItemLocalTest itemLocalUptated = 
                         itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    SyncTextures(itemOld.ImageName);
+                    DeleteOldImage(itemOld.ImageName);
                     CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
@@ -290,16 +290,15 @@ public class ManageItemsTest : IResultTest
                 {
                     ItemLocalTest itemLocalUptated = 
                         itemsRemoteList.Find(item => item.Id == itemToUpdate.Id).ItemRemoteToItemLocal();
-                    MyApplicationTest.GetRepository().RemoveTexture(itemToUpdate.Id);
                     ItemLocalTest itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    SyncTextures(itemOld.ImageName);
+                    DeleteOldImage(itemOld.ImageName);
                     CreateItemInScene(itemLocalUptated);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
                 {
                     ItemLocalTest itemLocalToDelete = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    SyncTextures(itemLocalToDelete.ImageName);
+                    DeleteOldImage(itemLocalToDelete.ImageName);
                     DeleteItemInScene(itemLocalToDelete);
                 }
                 else if (itemToUpdate.IsAdd)
@@ -354,10 +353,9 @@ public class ManageItemsTest : IResultTest
         Debug.Log("Ítem en la escena ficticio ha sido borrado " + itemLocalTest.Id);
     }
 
-    private void SyncTextures(string oldImageName)
+    private void DeleteOldImage(string oldImageName)
     {
-        Debug.Log("Imagén remota borrada de forma fictisia");
-        MyApplicationTest.GetRepository().RemoveTexture(oldImageName);
+        Debug.Log("Imagén remota borrada de forma fictisia " + oldImageName);
     }
 
     private List<ItemLocalTest> LoadLocalData()

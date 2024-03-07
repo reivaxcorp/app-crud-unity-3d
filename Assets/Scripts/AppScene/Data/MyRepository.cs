@@ -33,8 +33,7 @@ using System.Threading.Tasks;
  
 public class MyRepository : IRepositoryLocal, IRepositoryRemote
 {
-    private readonly IRepositoryLocal localDb;
-
+    private IRepositoryLocal localDb;
     private IRepositoryRemote remoteDb;
 
 
