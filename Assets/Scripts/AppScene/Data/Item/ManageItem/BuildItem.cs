@@ -44,10 +44,16 @@ public class BuildItem: MonoBehaviour
         // si no esta la imagen, es que se actualizo anteriormente en otro dispositivo
         if(texture2D == null)
         {
-            ManageStorageRemote createMaterial = new ManageStorageRemote(imageName);
-            texture2D = await createMaterial.DownloadImage();
-            FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-            fileManager.SaveFileInternalExtorage(texture2D, imageName);
+            texture2D = await MyApplication.repository.DowloadImageStorage(imageName);
+
+            if(texture2D != null)
+            {
+                FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+                fileManager.SaveFileInternalExtorage(texture2D, imageName);
+            } else
+            {
+                Debug.LogWarning("Error al bajar la imagen de Firebase Storage");
+            }
         }
 
         try

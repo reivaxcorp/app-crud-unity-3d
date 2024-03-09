@@ -63,7 +63,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
                 ItemLocal itemLocal = await MyApplication.repository.GetLocalItemById(itemId);
                 this.currentItemSelected = itemLocal;
                 FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-                Texture2D texture2D = fileManager.LoadFileAsTexture2D(itemLocal.ImageName); 
+                Texture2D texture2D = fileManager.LoadFileAsTexture2D(itemLocal.ImageName);
                 SetImageNameInInput(itemLocal.Name);
                 SetImagePreview(texture2D);
                 this.oldImageName = itemLocal.ImageName;
@@ -78,7 +78,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             Debug.LogWarning("El repositorio es null");
         }
     }
- 
+
     /// <summary>
     /// Si se cambia la imagén, debemos subirla, y luego si se sube correctamente,
     /// debemos borrar la imagén anterior de firebase storage, por medio de la interface
@@ -88,7 +88,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     {
         if (IsDataSetted())
         {
-            if(IsSomeDatachanged())
+            if (IsSomeDatachanged())
             {
                 try
                 {
@@ -96,7 +96,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
 
                     if (isImageChanged)
                     {
-                         await UpdateImageRemote();
+                        await UpdateImageRemote();
                     }
                     else
                     {
@@ -118,31 +118,39 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
 
     public void DeleteItem()
     {
-        if(dialogDeleteConfirm != null)
+        if (dialogDeleteConfirm != null)
         {
-            dialogDeleteConfirm.ShowDialog("Borrar ítem" , "¿Deseas eliminar el ítem?", this);
-        } else
+            dialogDeleteConfirm.ShowDialog("Borrar ítem", "¿Deseas eliminar el ítem?", this);
+        }
+        else
         {
             Debug.LogWarning("DialogDeleteConfirm es null, colocalo en el inspector");
         }
     }
-     
+
     private async Task<bool> UpdateImageRemote()
     {
         // Obtenemos los bytes de la imagén temporal seleccionada
         byte[] fileBytes = fileManager.GetBytesImageSelected();
         // Generar nombre de imagén aleatorea
         generateImageName = Guid.NewGuid().ToString();
-        ManageStorageRemote manageStorageRemote =
-            new ManageStorageRemote(generateImageName, fileManager.folderNameUser, fileBytes);
         // subir nueva imagén
-        bool resultUpload = await manageStorageRemote.UploadFileFirebaseStorage();
-        fileManager.ChangeNameImageCopySelected(generateImageName);
-        // borrar imagén anterior
-        await DeleteImageRemote();
-        // actualizar documento
-        UpdateDocumentRemote();
-        return resultUpload;
+        bool resultUpload = await MyApplication.repository.UploadFileFirebaseStorage(generateImageName, fileManager.folderNameUser, fileBytes);
+        
+        if (resultUpload)
+        {
+            fileManager.ChangeNameImageCopySelected(generateImageName);
+            // borrar imagén anterior
+            await DeleteImageRemote();
+            // actualizar documento
+            UpdateDocumentRemote();
+            return resultUpload;
+        }
+        else
+        {
+            SetResultCrudUi("Error", "Error al subir la  imagén");
+            return false;
+        }
     }
 
     private async void UpdateDocumentRemote()
@@ -153,10 +161,13 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             name: inputFieldName.text,
             imageName: isImageChanged ? generateImageName : oldImageName,
             creationDate: currentItemSelected.CreationDate);
-        
+
         // actualizamos el documente de firebase realtimadatabase
         bool updateResult = await MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
-        if (updateResult) { Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); }
+        
+        if (updateResult) { 
+            Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); 
+        }
     }
 
     /// <summary>
@@ -166,12 +177,9 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     private async Task<bool> DeleteImageRemote()
     {
         // imagén de firebase storage
-        ManageStorageRemote manageMaterialRemote =
-                     new ManageStorageRemote(currentItemSelected.ImageName);
-        await manageMaterialRemote.DeleteImageRemote();
-        return true;
+        return await MyApplication.repository.DeleteImageStorage(currentItemSelected.ImageName);
     }
- 
+
     /// <summary>
     /// Verificamos si el usuario cambio algo en la Ui
     /// </summary>
@@ -183,11 +191,27 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
 
     public async void ConfirmDialogDelete(bool isDeleteConfirm)
     {
-        if(isDeleteConfirm)
+        if (isDeleteConfirm)
         {
-            await DeleteImageRemote();
-            bool deleteResult = await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
-            if (deleteResult) { Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd); }
+            bool deleteImageResult = await DeleteImageRemote();
+           
+            if (deleteImageResult)
+            {
+                bool deleteDocumentResult = await MyApplication.repository.DeleteItemRemoteById(currentItemSelected.Id, iResultUi: this);
+
+                if (deleteDocumentResult)
+                {
+                    Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd);
+                }
+                else
+                {
+                    SetResultCrudUi("Error", "Error al borrar el documento");
+                }
+            }
+            else
+            {
+                SetResultCrudUi("Error", "Error al borrar la imagén remota");
+            }
         }
     }
 

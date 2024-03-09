@@ -30,8 +30,9 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
- 
-public class MyRepository : IRepositoryLocal, IRepositoryRemote
+using UnityEngine;
+
+public class MyRepository : IRepositoryLocal, IRepositoryRemote, IRepositoryStorage
 {
     private IRepositoryLocal localDb;
     private IRepositoryRemote remoteDb;
@@ -47,7 +48,7 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
     {
         return await remoteDb.DeleteItemRemoteById(id, iResultUi);
     }
-   
+
     public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
         return await localDb.GetLocalItemsAsync();
@@ -71,6 +72,26 @@ public class MyRepository : IRepositoryLocal, IRepositoryRemote
     public async Task<ItemLocal> GetLocalItemById(string id)
     {
         return await localDb.GetLocalItemById(id);
+    }
+
+    public async Task<bool> UploadFileFirebaseStorage(string generateImageName, string folderNameUser, byte[] fileBytes)
+    {
+        ManageStorageRemote manageStorageRemote =
+                     new ManageStorageRemote(generateImageName, folderNameUser, fileBytes);
+        return await manageStorageRemote.UploadFileFirebaseStorage();
+    }
+
+    public async Task<Texture2D> DowloadImageStorage(string imageName)
+    {
+        ManageStorageRemote createMaterial = new ManageStorageRemote(imageName);
+        return await createMaterial.DownloadImage();
+    }
+
+    public async Task<bool> DeleteImageStorage(string imageName)
+    {
+        ManageStorageRemote manageMaterialRemote =
+                   new ManageStorageRemote(imageName);
+        return await manageMaterialRemote.DeleteImageRemote();
     }
 
     public RemoteDb GetRemoteDb()

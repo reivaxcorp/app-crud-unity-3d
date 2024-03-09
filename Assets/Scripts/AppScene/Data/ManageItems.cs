@@ -164,16 +164,12 @@ public class ManageItems : MonoBehaviour
 
         bool isSomeListDbEquals = IsListsDbEquals(itemsLocalList, itemsRemoteList);
 
-        ShowDebugList("Son iguales? " + isSomeListDbEquals, itemsLocalList, itemsRemoteList);
-        Debug.Log("----------\n----------\n----------\n----------\n----------\n");
-
         if (!isSomeListDbEquals)
         {
 
             List<ItemUpdate> itemListUpdates =
                      CheckUpdates.CheckUpdatesItems(itemsRemoteList, itemsLocalList);
 
-            ShowDebugList("Db:", itemsLocalList, itemsRemoteList);
             Debug.Log("itemListUpdates: " + itemListUpdates.Count);
 
             foreach (ItemUpdate itemToUpdate in itemListUpdates)
@@ -394,13 +390,6 @@ public class ManageItems : MonoBehaviour
         {
             addItemBtn.SetActive(!isEnable);
         }
-    }
-
-    private void ShowDebugList(string title, List<ItemLocal> itemLocal, List<ItemRemote> itemRemotes)
-    {
-        Debug.Log("título " + title);
-        Debug.Log("Tamaño lista local: " + itemLocal.Count + " " +
-            "Tamaño lista remota: " + itemRemotes.Count);
     }
 
     private void CheckReferences() {
