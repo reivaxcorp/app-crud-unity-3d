@@ -31,6 +31,7 @@ using UnityEngine;
 
 public class AppConfig 
 {
+    public const string STORAGE_DIR = "gs://appcrudunity3d.appspot.com";
     public static float timeInterstitialAd = 1.0f;
     public const int  ITEM_MAX = 10;
     private static int _currentItemPut = 0;

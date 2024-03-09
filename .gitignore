@@ -21,6 +21,7 @@ Library/Firebase/
 Assets/Firebase/
 Assets/Editor Default Resources/
 Assets/ExternalDependencyManager/
+Assets/StreamingAssets/
 Assets/Plugins/
 
 
@@ -88,3 +89,4 @@ crashlytics-build.properties
 # Ignorar el archivo google-services.json en la carpeta Assets
 Assets/google-services.json
 Assets/google-services.json.meta
+Assets/StreamingAssets.meta

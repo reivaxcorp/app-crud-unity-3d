@@ -37,7 +37,7 @@ using UnityEngine;
 /// </summary>
 public class ManageStorageRemote
 {
-    private string _storageUrl = "gs://appcrudunity3d.appspot.com/users/"; // Reemplaza con la URI pública de tu imagen.
+    private string _storageUrl = AppConfig.STORAGE_DIR; // Reemplaza con la URI pública de tu imagen.
     private string _folderUserUid;
     private string _generateImageName;
     private byte[] _fileBytes;
@@ -51,7 +51,7 @@ public class ManageStorageRemote
 
     public ManageStorageRemote(string imageName)
     {
-        _storageUrl += FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/imageItems/" + imageName + ".png";
+        _storageUrl += "/users/" + FirebaseSDK.GetInstance().auth.CurrentUser.UserId + "/imageItems/" + imageName + ".png";
     }
 
     public async Task<bool> UploadFileFirebaseStorage()
@@ -66,7 +66,7 @@ public class ManageStorageRemote
             if (_generateImageName != null)
             {
 
-                StorageReference storageRef = firebaseStorage.GetReferenceFromUrl("gs://appcrudunity3d.appspot.com");
+                StorageReference storageRef = firebaseStorage.GetReferenceFromUrl(AppConfig.STORAGE_DIR);
                 StorageReference userRef = storageRef
                     .Child("users")
                     .Child(_folderUserUid)
