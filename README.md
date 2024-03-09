@@ -1,56 +1,27 @@
-# Serie de Tutoriales de Unity y Firebase: Creación, subida, actualización y borrado de imágenes. Asi como también escritura de documentos en Firebase
+# App Crud Tutorial Unity 3D
 
-¡Bienvenido a la Serie de Tutoriales de Unity y Firebase: Texturas! En esta serie de tutoriales, aprenderás cómo leer, cargar, subir y borrar texturas en Unity 3D utilizando Firebase en una aplicación Android. Esta guía completa te llevará paso a paso a través de todo el proceso, desde la configuración de Firebase hasta la implementación de un sistema CRUD (create-read-update-delete) completo en tu aplicación Unity.
+Este proyecto es una aplicación CRUD (Create, Read, Update, Delete) desarrollada en Unity 3D. La aplicación utiliza Firebase para gestionar datos en tiempo real, almacenamiento de archivos y autenticación.
+La aplicación trata específicamente en el manejo de texturas dentro en una aplicación Android, aunque también se puede adaptar a otras plataformas.
+A continuación, se detallan los pasos para configurar y ejecutar la aplicación:
 
-## Visión General
-
-Esta serie de tutoriales está diseñada para ayudarte a comprender la integración entre Unity y Firebase, centrándose específicamente en el manejo de texturas dentro de tus proyectos de Unity. Al final de esta serie, podrás:
-
-- Implementar un sistema de inicio de sesión de usuario para autenticar usuarios y gestionar permisos.
-- Leer y cargar texturas desde Firebase Database.
-- Subir texturas a Firebase Storage.
-- Descargar texturas desde Firebase Storage.
-- Borrar y actualizar texturas almacenadas en Firebase.
-
-## Empezando
-
-Para comenzar, asegúrate de tener los siguientes requisitos previos:
-
-- Unity instalado en tu máquina de desarrollo.
-- Un proyecto Firebase activo creado en la Consola de Firebase.
-- Conocimientos básicos de Unity y programación en C#.
-- Entorno de desarrollo de Android configurado si estás apuntando a dispositivos Android.
-
-## Contenido del Repositorio
-
-Este repositorio contiene todo el código fuente y los activos utilizados en la serie de tutoriales. Cada tutorial tendrá su propia rama correspondiente en el repositorio. Puedes encontrar el código de cada tutorial en su respectiva rama.
-
-## Videos de los Tutoriales
+## Videos tutoriales del proyecto
 
 La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto específico del trabajo con Firebase y texturas en Unity. Puedes encontrar la lista de reproducción completa [aquí](https://youtube.com/playlist?list=PLsvltDspdJcfiiWy2baA2MCNzBm32USjv&si=q7dTsZltYs-d3eOI).
 
-## Uso del Código
+## Configuración en Firebase
 
-- Derechos de Autor (c) [2024] ReivaxCorp
-- Permiso es otorgado, sin cargo, para que cualquier persona obtenga una copia
-  de este software y de los archivos de documentación asociados (el "Software"),
-  para tratar en el Software sin restricción, incluyendo sin limitación los
-  derechos para usar, copiar, modificar, fusionar, publicar, distribuir,
-  sublicenciar, y/o vender copias del Software, y para permitir a las personas a
-  quienes pertenezca el Software, sujeto a las siguientes condiciones:
-- El aviso de derechos de autor anterior y este aviso de permiso se incluirán en
-  todas las copias o partes sustanciales del Software.
-  EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
-  IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A LAS GARANTÍAS DE COMERCIABILIDAD,
-  IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
-  AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER
-  RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO
-  O DE OTRO MODO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS
-  TRATOS EN EL SOFTWARE.
+- Crea un proyecto en Firebase:
+-	Accede a la Consola de Firebase.
+-	Crea un nuevo proyecto y selecciona la plataforma (en nuestro caso, Android).
+-	En la pestaña “Agregar app”, ingresa el nombre de tu paquete (que utilizarás en Unity 3D).
+- Descarga el archivo de configuración:
+-	Completa los pasos proporcionados por Firebase.
+-	Descarga el archivo google-services.json.
 
-## Reglas de Firebase RealtimeDatabase y Firebase Storage.
+# Configura las reglas de firebase:
+-	En la sección “Realtime Database”, establece las reglas de acceso, el la pestaña "Reglas".
+- Haz lo mismo para la sección “Storage”.
 
-{
 - RealtimeDAtabase:
 
   ```json
@@ -88,6 +59,81 @@ service firebase.storage {
   }
 }
 ```
+# Configura la autenticación:
+-	En la sección “Authentication” (barra lateral), habilita el método de acceso con “Correo electrónico/contraseña”.
+- En la pestaña "Plantillas" personaliza las plantillas de confirmación de email según el nombre de tu aplicación en "Nombre del remitente", también puedes 
+  configurar el idioma de la plantilla.
+
+## Configuración en Unity 3D para Firebase
+
+  # Descarga el SDK de Firebase:
+  - Sigue la documentación oficial y descarga el SDK de Firebase desde la página oficial: Descargar Firebase para Unity.
+    [SDK firebase](https://firebase.google.com/download/unity?hl=es-419)
+  # Instala los paquetes necesarios:
+  - Importa los siguientes paquetes al proyecto:
+        FirebaseAuth.unitypackage,
+        FirebaseDatabase.unitypackage,
+        FirebaseStorage.unitypackage
+  # Agrega el archivo google-services.json:
+  - Coloca el archivo google-services.json en la carpeta “Assets” de tu proyecto Unity 3D.
+    Este archivo contiene la configuración específica de tu proyecto Firebase.
+  # Configura el nombre del paquete:
+  - En Unity, en Edit -> Project Settings... -> Player,  en la pestaña “Identification”,
+    asegúrate de que el “Package name” coincida con el nombre de paquete que configuraste en Firebase. Esto es importante para que Firebase funcione correctamente.
+
+  # Configuración de la activity para la selección de archivos en Android
+  - En la carpeta “Assets”, encontrarás el archivo CrudUnityPlayerActivity.java.
+  - Asegúrate de que el nombre del paquete en este archivo sea el mismo que el configurado en Firebase.
+  - Luego, en la carpeta “Assets/Plugins/Android”, encontrarás el archivo AndroidManifest.xml.
+    Asegúrate de que este archivo contenga los permisos que el usuario deberar confirmar para acceder al almacenamiento de su dispositivo.
+  - AndroidManifest.xml
+   ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <!-- GENERATED BY UNITY. REMOVE THIS COMMENT TO PREVENT OVERWRITING WHEN EXPORTING AGAIN-->
+        <manifest
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            package="com.yourcompany.unityappcrud"
+            xmlns:tools="http://schemas.android.com/tools">
+        	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        	<uses-permission android:name="android.permission.INTERNET" />
+        	<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+        	
+        	<application>
+                <activity android:name="com.yourcompany.unityappcrud.UnityPlayerActivity"
+                          android:theme="@style/UnityThemeSelector">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                    <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+                </activity>
+            </application>
+        </manifest>
+  ```
+ - En “com.youtcompany.unityappcrud” debes reemplazar con tu nombre de paquete.
+
+# Habilita las opciones de desarrollador (Emulador - Dispositivo físico):
+- En tu dispositivo Android, ve a la configuración y busca la sección “Acerca del teléfono” o “Información del software”.
+- Busca el número de compilación y tócalo varias veces hasta que se active el modo de desarrollador.
+- Luego, en la configuración, verás una nueva opción llamada “Opciones de desarrollador”. Habilita la “Depuración USB”.
+# Configura una keystore:
+- Antes de ejecutar la aplicación en un emulador o dispositovo, debes crear una keystore (almacén de claves) para firmar tu APK.
+- Si ya tienes una keystore, selecciona la que deseas usar. Si no, crea una nueva. Recuerda que es necesario para poder subir tu app a
+  la Play Store.
+# Rutas de almacenamiento en el editor:
+- Cuando pruebas la aplicación en el editor de Unity, las imágenes y datos se guardarán en una ubicación específica.
+- En Windows, la ruta será similar a: C:\Users\nombredeusuario\AppData\LocalLow\company_name\product_name.
+- Puedes modificar estos nombres en la configuración del proyecto en Unity (Project Settings > Player).
+# Recursos adicionales:
+- Si necesitas más detalles o instrucciones específicas, consulta la lista de reproducción en mi tutorial en YouTube.
+- Lista de Reproducción: [Aplicación CRUD en Unity 3D, utilizando Firebase.](https://www.youtube.com/playlist?list=PLsvltDspdJcfiiWy2baA2MCNzBm32USjv)
+
+## Uso del Código
+- Derechos de Autor © [2024] ReivaxCorp
+- Se otorga permiso, sin cargo, a cualquier persona para obtener una copia de este software y de los archivos de documentación asociados (el “Software”), para tratar con el Software sin restricciones, incluyendo, pero no limitado a, los derechos para usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del Software, y para permitir a las personas a quienes pertenezca el Software hacer lo mismo, sujeto a las siguientes condiciones:
+- El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software realizadas por el desarrollador, específicamente en las carpetas “Assets/Scripts”.
+- Las partes de plugins y recursos provenientes de la Asset Store de Unity 3D están sujetas a los derechos de autor de los respectivos desarrolladores o artistas, así como a las políticas de Unity 3D.
+- EL SOFTWARE SE PROPORCIONA “TAL CUAL”, SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, PERO NO LIMITADO A, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑO U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO U OTRO MOTIVO, DERIVADA DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE.
 
 ## Conéctate Conmigo
 
@@ -96,7 +142,9 @@ Si tienes alguna pregunta, comentario o sugerencia, no dudes en ponerte en conta
 - Correo electrónico: [reivaxcorp@email.com](mailto:reivaxcorp@gmail.com)
 - LinkedIn: [Javier Monzón](https://www.linkedin.com/in/javier-monzón-a527952b5)
 - YouTube: [ReivaxCorp.](https://www.youtube.com/channel/UCFaeV4z3zCTvF48ay6q7MtQ)
+- Lista de Reproducción: [Aplicación CRUD en Unity 3D, utilizando Firebase.](https://www.youtube.com/playlist?list=PLsvltDspdJcfiiWy2baA2MCNzBm32USjv)
 - Google Play: [ReivaxCorp](https://play.google.com/store/apps/dev?id=6165909766232622777)
 - Sitio Web: [reivaxcorp.com](https://reivaxcorp.com)
 
-¡Suerte con todo!
+ ¡Saludos!
+  Javier.
