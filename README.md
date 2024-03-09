@@ -146,5 +146,5 @@ Si tienes alguna pregunta, comentario o sugerencia, no dudes en ponerte en conta
 - Google Play: [ReivaxCorp](https://play.google.com/store/apps/dev?id=6165909766232622777)
 - Sitio Web: [reivaxcorp.com](https://reivaxcorp.com)
 
- ¡Saludos!
-  Javier.
+ ¡Saludos!,
+ Javier.
