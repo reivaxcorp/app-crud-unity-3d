@@ -50,40 +50,40 @@ public class ExceptionManager
                 // Check if the email address is already in use
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.EmailAlreadyInUse)
                 {
-                    return "El correo electronico ya se esta usando en otra cuenta";
+                    return "The email address is already in use on another account";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.WrongPassword)
                 {
-                    return "Contraseña incorrecta";
+                    return "Incorrect password";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.UserNotFound)
                 {
-                    return "Cuenta no encontrada";
+                    return "Account not found";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.UserMismatch)
                 {
-                    return "Usuario no coincidente";
+                    return "Mismatched user";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.UserDisabled)
                 {
-                    return "Usuario deshabilitado!";
+                    return "User disabled";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.InvalidCredential)
                 {
-                    return "Credenciales invalidas!";
+                    return "Invalid credentials";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.InvalidAppCredential)
                 {
-                    return "Credenciales de aplicación invalidas!";
+                    return "Invalid application credentials";
                 }
                 if (firebaseException.ErrorCode == (int)Firebase.Auth.AuthError.RejectedCredential)
                 {
-                    return "Credencial rechazada!";
+                    return "Credential rejected";
                 }
             }
         }
 
         Debug.LogError("Error. inténtelo nuevamente : " + task.Exception);
-        return "Error. inténtelo nuevamente";
+        return "Error. try again";
     }
 }

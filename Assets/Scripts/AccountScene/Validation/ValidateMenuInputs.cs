@@ -47,7 +47,7 @@ public class ValidateMenuInputs : MonoBehaviour
         }
         else
         {
-            msjLoginResult.SetText("Formato de email no valido!");
+            msjLoginResult.SetText("Invalid email format!");
             return false;
         }
     }
@@ -61,7 +61,7 @@ public class ValidateMenuInputs : MonoBehaviour
         }
         else
         {
-            msjLoginResult.SetText("La contraseña debe ser mayor que cinco caracteres");
+            msjLoginResult.SetText("The password must be longer than five characters");
             return false;
         }
     }
@@ -72,13 +72,13 @@ public class ValidateMenuInputs : MonoBehaviour
         
             if(!password.text.Equals(rePassword.text))
             {
-                msjLoginResult.SetText("Las contraseñas no coinciden");
+                msjLoginResult.SetText("Passwords do not match");
                 return false;
             }
             return true;
         } else
         {
-            msjLoginResult.SetText("La contraseña debe ser mayor que cinco caracteres");
+            msjLoginResult.SetText("The password must be longer than five characters");
             return false;
         }
     }

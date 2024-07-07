@@ -140,14 +140,14 @@ public class RemoteDb : IRepositoryRemote
             {
                 // Manejar error
                 Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                resultUi.SetResultCrudUi("Error", "Error al escribir en la base de datos");
+                resultUi.SetResultCrudUi("Error", "Error writing to the database");
                 saveSuccess = false;
             }
             else
             {
                 // Operación exitosa
                 Debug.Log("Datos escritos exitosamente en la base de datos");
-                resultUi.SetResultCrudUi("Completado", "Nuevo ítem agregado");
+                resultUi.SetResultCrudUi("Completed", "New item added");
                 saveSuccess = true;
             }
         });
@@ -173,15 +173,15 @@ public class RemoteDb : IRepositoryRemote
                  {
 
                      // Manejar error
-                     Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                     iResult.SetResultCrudUi("Error", "Error al actualizar");
+                     Debug.LogError("Error writing to the database: " + task.Exception);
+                     iResult.SetResultCrudUi("Error", "Error updating");
                      updateSuccess = false;
                  }
                  else
                  {
                      // Operación exitosa
                      Debug.Log("Datos escritos exitosamente en la base de datos");
-                     iResult.SetResultCrudUi("Actualización", "Datos actualizados exitosamente");
+                     iResult.SetResultCrudUi("Update", "Data updated successfully");
                      updateSuccess = true;
                  }
              });
@@ -209,14 +209,14 @@ public class RemoteDb : IRepositoryRemote
 
                      // Manejar error
                      Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
-                     iResult.SetResultCrudUi("Error", "Error al borrar el ítem remoto de la base de datos");
+                     iResult.SetResultCrudUi("Error", "Error deleting the remote item from the database");
                      deleteSuccess = false;
                  }
                  else
                  {
                      // Operación exitosa
                      Debug.Log("Ítem remoto borrado correctamente");
-                     iResult.SetResultCrudUi("Borrado", "Ítem remoto borrado correctamente");
+                     iResult.SetResultCrudUi("Deleted", "Remote item deleted successfully");
                      deleteSuccess = true;
                  }
              });

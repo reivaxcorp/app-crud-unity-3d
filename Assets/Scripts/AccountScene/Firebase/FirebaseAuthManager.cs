@@ -59,7 +59,7 @@ public class FirebaseAuthManager
                 if (task.IsCanceled)
                 {
                     Debug.LogError("Was canceled.");
-                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_CANCEL, "¡Creación de cuenta cancelada!");
+                    authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_CANCEL, "Account creation canceled!");
                     OnAccountAuthResult?.Invoke(authResult);
                     return;
                 }
@@ -75,7 +75,7 @@ public class FirebaseAuthManager
                 Debug.LogFormat("Firebase user created successfully: {0} ({1})",
                     result.User.DisplayName, result.User.UserId);
 
-                authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_SUCCESS, "Cuenta creada");
+                authResult = new AccountAuthResult(AuthType.CREATE_ACCOUNT_SUCCESS, "Account successfully created");
                 OnAccountAuthResult?.Invoke(authResult); // we need TaskScheduler.FromCurrentSync.... to set text
             });
 
@@ -103,7 +103,7 @@ public class FirebaseAuthManager
                     if (task.IsCanceled)
                     {
                         Debug.LogError("Was canceled.");
-                        authResult = new AccountAuthResult(AuthType.LOGIN_CANCEL, "¡Login cancelado!");
+                        authResult = new AccountAuthResult(AuthType.LOGIN_CANCEL, "Login canceled!");
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
@@ -118,7 +118,7 @@ public class FirebaseAuthManager
                     Debug.LogFormat("User signed in successfully: {0} ({1})",
                     result.User.DisplayName, result.User.UserId);
 
-                    authResult = new AccountAuthResult(AuthType.LOGIN_SUCCESS,"Logeado como: \n" + result.User.Email);
+                    authResult = new AccountAuthResult(AuthType.LOGIN_SUCCESS, "Logged in as: \n" + result.User.Email);
                     OnAccountAuthResult?.Invoke(authResult);
                 });
         }
@@ -136,19 +136,19 @@ public class FirebaseAuthManager
                     if (task.IsCanceled)
                     {
                         Debug.LogError("SendEmailVerificationAsync was canceled.");
-                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_CANCEL, "Email de verificación cancelado");
+                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_CANCEL, "Verification email canceled");
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
                     if (task.IsFaulted)
                     {
                         Debug.LogError("SendEmailVerificationAsync encountered an error: " + task.Exception);
-                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_FAILURE, "Error al enviar el email de verificación");
+                        authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_FAILURE, "Error sending verification email");
                         OnAccountAuthResult?.Invoke(authResult);
                         return;
                     }
 
-                    authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_SUCCESS, "Se acaba de enviar el email de verificación\nVerifica tu mail e inicia sesión");
+                    authResult = new AccountAuthResult(AuthType.SEND_MAIL_VERIFICATION_SUCCESS, "Verification email has just been sent\nVerify your email and log in");
                     OnAccountAuthResult?.Invoke(authResult);
                     Debug.Log("Email sent successfully.");
                 });
@@ -158,7 +158,7 @@ public class FirebaseAuthManager
     public void LogOut()
     {
         FirebaseSDK.GetInstance().LogOut();
-        AccountAuthResult result = new AccountAuthResult(AuthType.LOGOUT, "Deslogeado");
+        AccountAuthResult result = new AccountAuthResult(AuthType.LOGOUT, "Logged out");
         OnAccountAuthResult?.Invoke(result);
     }
 

@@ -125,22 +125,22 @@ public class MenuCrud : MonoBehaviour
 
         if (string.IsNullOrEmpty(sanitizedFileName))
         {
-            LogWarningAndSetResult("Ingrese el nombre de la imagén");
-            SetMsjInfoUI("Ingrese el nombre de la imagén");
+            LogWarningAndSetResult("Enter the image name");
+            SetMsjInfoUI("Enter the image name");
             return false;
         }
 
         if (sanitizedFileName.Length > 30)
         {
             LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
-            SetMsjInfoUI("Nombre debe ser menor a 30 caracteres");
+            SetMsjInfoUI("Name must be less than 30 characters");
             return false;
         }
 
         if (menuImagePreview.sprite == null)
         {
-            LogWarningAndSetResult("Seleccione una imagén");
-            SetMsjInfoUI("Seleccione una imagén");
+            LogWarningAndSetResult("Select an image");
+            SetMsjInfoUI("Select an image");
             return false;
         }
 
@@ -231,12 +231,12 @@ public class MenuCrud : MonoBehaviour
         {
             case PermissionStatus.Granted:
                 Debug.Log("¡Permiso concedido!");
-                SetMsjInfoUI("¡Permiso concedido!");
+                SetMsjInfoUI("Permission granted!");
                 fileManager.CreateIntentFileAndroid();
                 break;
             case PermissionStatus.Denied:
                 Debug.LogWarning("Permiso denegado por el usuario.");
-                SetMsjInfoUI("Permiso denegado por el usuario.");
+                SetMsjInfoUI("Permission denied by the user.");
                 break;
         }
     }

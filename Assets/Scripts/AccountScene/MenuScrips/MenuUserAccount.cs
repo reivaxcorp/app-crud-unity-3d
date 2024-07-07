@@ -123,7 +123,7 @@ public class MenuUserAccount : MenuAuth
 
         if (user.IsEmailVerified)
         {
-            AccountAuthResult result = new AccountAuthResult(AuthType.LOGIN_SUCCESS, "Logeado con email: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email);
+            AccountAuthResult result = new AccountAuthResult(AuthType.LOGIN_SUCCESS, "Logged in with email: \n" + FirebaseSDK.GetInstance().auth.CurrentUser.Email);
             SetResult(result);
         }
         else

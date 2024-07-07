@@ -50,7 +50,7 @@ public class MenuAddItem : MenuCrud, IResult
         {
             if (IsDataSetted())
             {
-                StartAnimationTextMenu(true, "Creando");
+                StartAnimationTextMenu(true, "Creating");
                 // Obtenemos los bytes de la imagén temporal seleccionada
                 byte[] fileBytes = fileManager.GetBytesImageSelected();
                 // Generar nombre de imagén aleatorea
@@ -65,13 +65,13 @@ public class MenuAddItem : MenuCrud, IResult
                 }
                 else
                 {
-                    SetResultCrudUi("Error", "Error al subir el documento");
+                    SetResultCrudUi("Error", "Error uploading the document");
                 }
             }
         }
         else
         {
-            SetMsjInfoUI("Ítems maximos alcanzados, edita ó borra uno");
+            SetMsjInfoUI("Maximum items reached, edit or delete one");
         }
     }
 

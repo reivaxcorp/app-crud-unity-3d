@@ -92,7 +92,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             {
                 try
                 {
-                    StartAnimationTextMenu(false, "Actualizando");
+                    StartAnimationTextMenu(false, "Updating");
 
                     if (isImageChanged)
                     {
@@ -111,7 +111,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
             }
             else
             {
-                SetResultCrudUi("Todo igual", "Nada ha cambiado....");
+                SetResultCrudUi("Everything the same", "Nothing has changed..");
             }
         }
     }
@@ -120,7 +120,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     {
         if (dialogDeleteConfirm != null)
         {
-            dialogDeleteConfirm.ShowDialog("Borrar ítem", "¿Deseas eliminar el ítem?", this);
+            dialogDeleteConfirm.ShowDialog("Remove item", "Do you want to delete the item?", this);
         }
         else
         {
@@ -148,7 +148,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
         }
         else
         {
-            SetResultCrudUi("Error", "Error al subir la  imagén");
+            SetResultCrudUi("Error", "Error uploading the image");
             return false;
         }
     }
@@ -205,12 +205,12 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
                 }
                 else
                 {
-                    SetResultCrudUi("Error", "Error al borrar el documento");
+                    SetResultCrudUi("Error", "Error deleting the document");
                 }
             }
             else
             {
-                SetResultCrudUi("Error", "Error al borrar la imagén remota");
+                SetResultCrudUi("Error", "Error deleting the remote image");
             }
         }
     }
