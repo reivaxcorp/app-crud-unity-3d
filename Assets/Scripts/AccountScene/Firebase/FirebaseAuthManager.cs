@@ -1,45 +1,44 @@
 using Firebase.Auth;
 using Firebase.Extensions;
-using Google; // Necesitas el plugin de Google Sign-In
-using System.Threading.Tasks;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 using UnityEngine;
 
-public class FirebaseAuthManager: MonoBehaviour
+public class FirebaseAuthManager : MonoBehaviour
 {
     public delegate void AuthCallback(AccountAuthResult result);
     public event AuthCallback OnAccountAuthResult;
 
-    // Sustituye esto con tu Client ID de la consola de Firebase (Tipo Web)
-    private string webClientId = "88826351788-krlrdc0un44kigv8ppknh21noai3in5j.apps.googleusercontent.com";
+    void Start()
+    {
+        // En v2.x.x ya no existe InitializeInstance ni Configuration. 
+        // Solo se activa y él lee los ajustes del menú Window > Google Play Games.
+        PlayGamesPlatform.Activate();
+    }
 
     public void LoginWithGoogle()
     {
-        GoogleSignIn.Configuration = new GoogleSignInConfiguration
-        {
-            RequestIdToken = true,
-            WebClientId = webClientId
-        };
-
-        GoogleSignIn.DefaultInstance.SignIn().ContinueWith(task => {
-            if (task.IsFaulted)
+        // En v2.x.x se usa SignIn en lugar de Authenticate para mayor claridad
+        PlayGamesPlatform.Instance.Authenticate(status => {
+            if (status == SignInStatus.Success)
             {
-                OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_FAILURE, "Google Sign-In Failed"));
-            }
-            else if (task.IsCanceled)
-            {
-                OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_CANCEL, "Canceled"));
+                // CAMBIO CLAVE: RequestServerSideAccess es el nuevo nombre
+                PlayGamesPlatform.Instance.RequestServerSideAccess(false, (authCode) => {
+                    SignInWithFirebase(authCode);
+                });
             }
             else
             {
-                // Éxito en Google, ahora vamos a Firebase
-                SignInWithFirebase(task.Result.IdToken);
+                OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_FAILURE, "Google Login Failed: " + status));
             }
         });
     }
 
-    private void SignInWithFirebase(string idToken)
+    private void SignInWithFirebase(string authCode)
     {
-        Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
+        // PlayGamesAuthProvider sigue siendo el puente con Firebase
+        Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
+
         FirebaseSDK.GetInstance().auth.SignInAndRetrieveDataWithCredentialAsync(credential)
             .ContinueWithOnMainThread(task => {
                 if (task.IsFaulted || task.IsCanceled)
@@ -55,8 +54,16 @@ public class FirebaseAuthManager: MonoBehaviour
 
     public void LogOut()
     {
-        GoogleSignIn.DefaultInstance.SignOut(); // Cerrar sesión en Google
-        FirebaseSDK.GetInstance().LogOut();    // Cerrar sesión en Firebase
-        OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGOUT, "Sesión cerrada"));
+        // Cerrar sesión en Firebase
+        FirebaseAuth.DefaultInstance.SignOut();
+
+        // Re-inicializar la plataforma para limpiar el estado de GPGS
+        PlayGamesPlatform.Instance.Authenticate((_) => { }); // opcional: forzar re-auth al próximo login
+
+        // O directamente limpiar el estado interno desactivando:
+        Social.Active = null;
+        PlayGamesPlatform.Activate(); // re-activa limpia
+
+        Debug.Log("Sesión de Firebase cerrada. GPGS reseteado.");
     }
 }

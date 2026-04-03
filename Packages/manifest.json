@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.google.play.games": "file:C:/Users/reiva/Desktop/Unity/play-games-plugin-for-unity-master/play-games-plugin-for-unity-master/Assets/Public/GooglePlayGames/com.google.play.games",
     "com.unity.ads": "4.4.2",
     "com.unity.cinemachine": "2.6.17",
     "com.unity.collab-proxy": "2.0.4",
