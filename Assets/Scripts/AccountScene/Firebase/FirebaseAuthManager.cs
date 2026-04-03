@@ -20,6 +20,7 @@ public class FirebaseAuthManager : MonoBehaviour
     {
         // En v2.x.x se usa SignIn en lugar de Authenticate para mayor claridad
         PlayGamesPlatform.Instance.Authenticate(status => {
+            Debug.Log("GPGS Login Status: " + status); // Esto te dirá si es 'Canceled', 'InternalError', etc.
             if (status == SignInStatus.Success)
             {
                 // CAMBIO CLAVE: RequestServerSideAccess es el nuevo nombre
