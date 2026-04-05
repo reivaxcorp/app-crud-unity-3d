@@ -1,0 +1,5 @@
+C:/Users/reiva/Unity3D/app crud unity 3d/.utmp/RelWithDebInfo/2z3t6cd4/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/reiva/Unity3D/app crud unity 3d/.utmp/RelWithDebInfo/2z3t6cd4/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/reiva/Unity3D/app crud unity 3d/.utmp/RelWithDebInfo/2z3t6cd4/arm64-v8a/FramePacing/CMakeFiles/swappywrapper.dir
+C:/Users/reiva/Unity3D/app crud unity 3d/.utmp/RelWithDebInfo/2z3t6cd4/arm64-v8a/FramePacing/CMakeFiles/edit_cache.dir
+C:/Users/reiva/Unity3D/app crud unity 3d/.utmp/RelWithDebInfo/2z3t6cd4/arm64-v8a/FramePacing/CMakeFiles/rebuild_cache.dir

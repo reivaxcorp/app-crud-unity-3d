@@ -1,0 +1,1 @@
+C:\Users\reiva\Unity3D\app crud unity 3d\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\2z3t6cd4\obj\arm64-v8a

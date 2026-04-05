@@ -1,7 +1,7 @@
 using Firebase.Auth;
 using Firebase.Extensions;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
+//using GooglePlayGames;
+//using GooglePlayGames.BasicApi;
 using UnityEngine;
 
 public class FirebaseAuthManager : MonoBehaviour
@@ -13,13 +13,13 @@ public class FirebaseAuthManager : MonoBehaviour
     {
         // En v2.x.x ya no existe InitializeInstance ni Configuration. 
         // Solo se activa y él lee los ajustes del menú Window > Google Play Games.
-        PlayGamesPlatform.Activate();
+       // PlayGamesPlatform.Activate();
     }
 
     public void LoginWithGoogle()
     {
         // En v2.x.x se usa SignIn en lugar de Authenticate para mayor claridad
-        PlayGamesPlatform.Instance.Authenticate(status => {
+     /*   PlayGamesPlatform.Instance.Authenticate(status => {
             Debug.Log("GPGS Login Status: " + status); // Esto te dirá si es 'Canceled', 'InternalError', etc.
             if (status == SignInStatus.Success)
             {
@@ -32,7 +32,7 @@ public class FirebaseAuthManager : MonoBehaviour
             {
                 OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_FAILURE, "Google Login Failed: " + status));
             }
-        });
+        });*/
     }
 
     private void SignInWithFirebase(string authCode)
@@ -59,12 +59,12 @@ public class FirebaseAuthManager : MonoBehaviour
         FirebaseAuth.DefaultInstance.SignOut();
 
         // Re-inicializar la plataforma para limpiar el estado de GPGS
-        PlayGamesPlatform.Instance.Authenticate((_) => { }); // opcional: forzar re-auth al próximo login
+      /*  PlayGamesPlatform.Instance.Authenticate((_) => { }); // opcional: forzar re-auth al próximo login
 
         // O directamente limpiar el estado interno desactivando:
         Social.Active = null;
         PlayGamesPlatform.Activate(); // re-activa limpia
 
-        Debug.Log("Sesión de Firebase cerrada. GPGS reseteado.");
+        Debug.Log("Sesión de Firebase cerrada. GPGS reseteado.");*/
     }
 }
