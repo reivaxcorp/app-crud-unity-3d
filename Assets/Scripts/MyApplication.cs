@@ -39,6 +39,8 @@ public class MyApplication : MonoBehaviour
     }
     private static MyRepository _repository;
 
+    // Propiedad para que el Manager de Auth sepa cuándo arrancar
+    public static bool IsFirebaseReady { get; private set; } = false;
 
     private async void Start()
     {
@@ -51,50 +53,80 @@ public class MyApplication : MonoBehaviour
     private async Task<MyRepository> CreateRepositoryAsync()
     {
 
-        RemoteDb remoteDb = new RemoteDb();
-        LocalDb localDb = new LocalDb();
+      
 
-        repository = new MyRepository(localDb, remoteDb);
-
+        Debug.Log("SISTEMA: Firebase y Repositorio listos.");
         // FIRST wait to initialize Sdk Firebase
-        bool isInitialize = await InicializeFirebase();
+        IsFirebaseReady = await InicializeFirebase();
 
-        if (isInitialize)
+        if (IsFirebaseReady)
         {
+            RemoteDb remoteDb = new RemoteDb();
+            LocalDb localDb = new LocalDb();
+            repository = new MyRepository(localDb, remoteDb);
+
+            Debug.Log("SISTEMA: Firebase y Repositorio listos.");
             return repository;
         }
         else
         {
-            Debug.LogWarning("Error al crear el respositorio");
+            Debug.LogError("SISTEMA: Falló la inicialización crítica de Firebase.");
             return null;
         }
     }
 
     // we wait firebase start
+    /* private async Task<bool> InicializeFirebase()
+     {
+         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
+
+         try
+         {
+             // Este método DEBE llamar internamente a FirebaseApp.CheckAndFixDependenciesAsync()
+             return await firebaseSdk.InitFirebaseDependenciesAsync();
+         }
+         catch (Exception ex)
+         {
+             Debug.LogError($"Error fatal en InitFirebase: {ex.Message}");
+             return false;
+         }
+     }*/
+
     private async Task<bool> InicializeFirebase()
     {
-        FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
-
         try
         {
-            bool firebaseInitialized = await firebaseSdk.InitFirebaseDependenciesAsync();
-
-            if (firebaseInitialized)
+            // 1. Configuramos las opciones manualmente con los datos de tu XML
+            Firebase.AppOptions options = new Firebase.AppOptions
             {
-                Debug.Log($"Firebase running");
-                return firebaseInitialized;
+                ApiKey = "AIzaSyAeeNWpjVs2vhpTJZCbtp7iZkjHzeGQMjE",
+                AppId = "1:88826351788:android:1dacb2cf5eeb16d054cf09",
+                ProjectId = "appcrudunity3d",
+                DatabaseUrl = new System.Uri("https://appcrudunity3d-default-rtdb.firebaseio.com"),
+                StorageBucket = "appcrudunity3d.appspot.com",
+                MessageSenderId = "88826351788"
+            };
+
+            // 2. Intentamos crear la App con estas opciones
+            Firebase.FirebaseApp.Create(options);
+
+            // 3. Verificamos dependencias como siempre
+            var dependencyStatus = await Firebase.FirebaseApp.CheckAndFixDependenciesAsync();
+
+            if (dependencyStatus == Firebase.DependencyStatus.Available)
+            {
+                Debug.Log("SISTEMA: Firebase cargado manualmente con éxito.");
+                return true;
             }
             else
             {
-                // Handle the exception where Firebase initialization failed.
-                Debug.Log($"Firebase initialization it's false");
+                Debug.LogError($"SISTEMA: Dependencias no disponibles: {dependencyStatus}");
                 return false;
             }
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            // Handle the exception where Firebase initialization failed.
-            Debug.Log($"Firebase initialization error: {ex.Message}");
+            Debug.LogError($"SISTEMA: Error en inicialización manual: {ex.Message}");
             return false;
         }
     }

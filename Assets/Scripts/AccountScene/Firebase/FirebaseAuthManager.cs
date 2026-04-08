@@ -9,66 +9,76 @@ using GooglePlayGames.BasicApi;
 public class FirebaseAuthManager : MonoBehaviour
 {
     private FirebaseAuth firebaseAuth;
+    private bool initialized = false;
 
-    async void Start()
+    // Ya no usamos Start() para inicializar Firebase, 
+    // lo hacemos bajo demanda o mediante una comprobación.
+
+    private async Task EnsureAuthReady()
     {
+        if (initialized) return;
+
+        // Esperamos a que MyApplication termine su trabajo
+        while (!MyApplication.IsFirebaseReady)
+        {
+            await Task.Delay(100); // Pequeña espera para no bloquear el hilo
+        }
+
         await UnityServices.InitializeAsync();
+
+        // Ahora es SEGURO llamar al DefaultInstance
         firebaseAuth = FirebaseAuth.DefaultInstance;
         PlayGamesPlatform.Activate();
+
+        initialized = true;
+        Debug.Log("FirebaseAuthManager: Conectado a la instancia validada por MyApplication.");
     }
 
-    public void DoLogin()
+    public async void DoLogin()
     {
-        // 1. Primero autenticamos al usuario en el dispositivo
+        // Aseguramos la inicialización antes de proceder
+        await EnsureAuthReady();
+
         PlayGamesPlatform.Instance.Authenticate((status) =>
         {
             if (status == SignInStatus.Success)
             {
-                Debug.Log("1. Autenticación local exitosa. Ahora solicitando acceso al servidor...");
-
-                // 2. SOLO AQUÍ, una vez confirmado el éxito, pedimos el ServerSideAccess
+                Debug.Log("Google Play OK. Solicitando acceso al servidor...");
                 PlayGamesPlatform.Instance.RequestServerSideAccess(false, (authCode) =>
                 {
-                    if (string.IsNullOrEmpty(authCode))
+                    if (!string.IsNullOrEmpty(authCode))
                     {
-                        Debug.LogError("Error: El authCode llegó vacío. Revisa el Web Client ID.");
-                        return;
+                        _ = ProcesarLoginDual(authCode);
                     }
-
-                    Debug.Log("2. AuthCode recibido correctamente. Iniciando sesión dual...");
-                    _ = ProcesarLoginDual(authCode);
                 });
             }
             else
             {
-                Debug.LogError("Fallo el login inicial de Google Play: " + status);
-                // Si status es 'Canceled', revisa que tu mail esté en la lista de Testers de la consola
+                Debug.LogError("Fallo el login de Google: " + status);
             }
         });
     }
-
 
     private async Task ProcesarLoginDual(string authCode)
     {
         try
         {
-            // --- PASO A: Firebase ---
+            // PASO A: Firebase (Usa la instancia que ya validamos)
             Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
             await firebaseAuth.SignInAndRetrieveDataWithCredentialAsync(credential);
-            Debug.Log("Firebase OK");
 
-            // --- PASO B: UGS ---
+            // PASO B: UGS
             await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(authCode);
-            Debug.Log("UGS OK. PlayerID: " + AuthenticationService.Instance.PlayerId);
+
+            Debug.Log("LOGIN DUAL EXITOSO");
         }
         catch (System.Exception e)
         {
             Debug.LogError("Error en el login dual: " + e.Message);
         }
     }
-
-
-
 }
+
+
 
 

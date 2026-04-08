@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "88826351788-p0atbnmsgtp902o3rv7eosmtp2ol2t9i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.reivaxcorp.unityappcrud",
+            "certificate_hash": "7e08cb81a393af20b04bea5977e75d8807dc8be7"
+          }
+        },
+        {
           "client_id": "88826351788-krlrdc0un44kigv8ppknh21noai3in5j.apps.googleusercontent.com",
           "client_type": 3
         }
