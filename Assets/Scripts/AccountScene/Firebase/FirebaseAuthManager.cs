@@ -1,70 +1,74 @@
 using Firebase.Auth;
-using Firebase.Extensions;
-//using GooglePlayGames;
-//using GooglePlayGames.BasicApi;
 using UnityEngine;
+using System.Threading.Tasks;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public class FirebaseAuthManager : MonoBehaviour
 {
-    public delegate void AuthCallback(AccountAuthResult result);
-    public event AuthCallback OnAccountAuthResult;
+    private FirebaseAuth firebaseAuth;
 
-    void Start()
+    async void Start()
     {
-        // En v2.x.x ya no existe InitializeInstance ni Configuration. 
-        // Solo se activa y él lee los ajustes del menú Window > Google Play Games.
-       // PlayGamesPlatform.Activate();
+        await UnityServices.InitializeAsync();
+        firebaseAuth = FirebaseAuth.DefaultInstance;
+        PlayGamesPlatform.Activate();
     }
 
-    public void LoginWithGoogle()
+    public void DoLogin()
     {
-        // En v2.x.x se usa SignIn en lugar de Authenticate para mayor claridad
-     /*   PlayGamesPlatform.Instance.Authenticate(status => {
-            Debug.Log("GPGS Login Status: " + status); // Esto te dirá si es 'Canceled', 'InternalError', etc.
+        // 1. Primero autenticamos al usuario en el dispositivo
+        PlayGamesPlatform.Instance.Authenticate((status) =>
+        {
             if (status == SignInStatus.Success)
             {
-                // CAMBIO CLAVE: RequestServerSideAccess es el nuevo nombre
-                PlayGamesPlatform.Instance.RequestServerSideAccess(false, (authCode) => {
-                    SignInWithFirebase(authCode);
+                Debug.Log("1. Autenticación local exitosa. Ahora solicitando acceso al servidor...");
+
+                // 2. SOLO AQUÍ, una vez confirmado el éxito, pedimos el ServerSideAccess
+                PlayGamesPlatform.Instance.RequestServerSideAccess(false, (authCode) =>
+                {
+                    if (string.IsNullOrEmpty(authCode))
+                    {
+                        Debug.LogError("Error: El authCode llegó vacío. Revisa el Web Client ID.");
+                        return;
+                    }
+
+                    Debug.Log("2. AuthCode recibido correctamente. Iniciando sesión dual...");
+                    _ = ProcesarLoginDual(authCode);
                 });
             }
             else
             {
-                OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_FAILURE, "Google Login Failed: " + status));
+                Debug.LogError("Fallo el login inicial de Google Play: " + status);
+                // Si status es 'Canceled', revisa que tu mail esté en la lista de Testers de la consola
             }
-        });*/
+        });
     }
 
-    private void SignInWithFirebase(string authCode)
+
+    private async Task ProcesarLoginDual(string authCode)
     {
-        // PlayGamesAuthProvider sigue siendo el puente con Firebase
-        Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
+        try
+        {
+            // --- PASO A: Firebase ---
+            Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
+            await firebaseAuth.SignInAndRetrieveDataWithCredentialAsync(credential);
+            Debug.Log("Firebase OK");
 
-        FirebaseSDK.GetInstance().auth.SignInAndRetrieveDataWithCredentialAsync(credential)
-            .ContinueWithOnMainThread(task => {
-                if (task.IsFaulted || task.IsCanceled)
-                {
-                    OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_FAILURE, "Firebase Auth Failed"));
-                    return;
-                }
-
-                Firebase.Auth.AuthResult result = task.Result;
-                OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGIN_SUCCESS, "Bienvenido: " + result.User.DisplayName));
-            });
+            // --- PASO B: UGS ---
+            await AuthenticationService.Instance.SignInWithGooglePlayGamesAsync(authCode);
+            Debug.Log("UGS OK. PlayerID: " + AuthenticationService.Instance.PlayerId);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Error en el login dual: " + e.Message);
+        }
     }
 
-    public void LogOut()
-    {
-        // Cerrar sesión en Firebase
-        FirebaseAuth.DefaultInstance.SignOut();
 
-        // Re-inicializar la plataforma para limpiar el estado de GPGS
-      /*  PlayGamesPlatform.Instance.Authenticate((_) => { }); // opcional: forzar re-auth al próximo login
 
-        // O directamente limpiar el estado interno desactivando:
-        Social.Active = null;
-        PlayGamesPlatform.Activate(); // re-activa limpia
-
-        Debug.Log("Sesión de Firebase cerrada. GPGS reseteado.");*/
-    }
 }
+
+
