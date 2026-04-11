@@ -1,27 +1,33 @@
-using Firebase.Auth;
-using UnityEngine;
-using System.Threading.Tasks;
-using Unity.Services.Core;
-using Unity.Services.Authentication;
+锘縰sing Firebase.Auth;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
+using System.Threading.Tasks;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FirebaseAuthManager : MonoBehaviour
 {
     private FirebaseAuth firebaseAuth;
     private bool initialized = false;
 
-    // Ya no usamos Start() para inicializar Firebase, 
-    // lo hacemos bajo demanda o mediante una comprobaci髇.
+    public delegate void AuthCallback(AccountAuthResult result);
+    public event AuthCallback OnAccountAuthResult;
+
+    private void Start()
+    {
+        _ =  EnsureAuthReady();
+    }
 
     private async Task EnsureAuthReady()
     {
-        if (initialized) return;
+       // if (initialized) return;
 
         // Esperamos a que MyApplication termine su trabajo
         while (!MyApplication.IsFirebaseReady)
         {
-            await Task.Delay(100); // Peque馻 espera para no bloquear el hilo
+            await Task.Delay(100); // Peque帽a espera para no bloquear el hilo
         }
 
         await UnityServices.InitializeAsync();
@@ -34,9 +40,30 @@ public class FirebaseAuthManager : MonoBehaviour
         Debug.Log("FirebaseAuthManager: Conectado a la instancia validada por MyApplication.");
     }
 
-    public async void DoLogin()
+    public void DoLogin()
     {
-        // Aseguramos la inicializaci髇 antes de proceder
+       // SceneManager.LoadScene("AppScene");
+        //return;
+        // Agregamos un Timeout manual o una validaci贸n de seguridad
+        PlayGamesPlatform.Instance.Authenticate((status) =>
+        {
+            if (status == SignInStatus.Success)
+            {
+                // ... tu l贸gica de 茅xito ...
+
+                SceneManager.LoadScene("AppScene");
+            }
+            else
+            {
+                Debug.LogWarning("Login fallido o cancelado. Estado: " + status);
+                // IMPORTANTE: No dejes que la app se quede en un loop infinito.
+                // Muestra un bot贸n de "Entrar como invitado" o un mensaje de error 
+                // que el revisor de Google pueda cerrar.
+            }
+        });
+
+        /* // con google play?????
+        // Aseguramos la inicializaci贸n antes de proceder
         await EnsureAuthReady();
 
         PlayGamesPlatform.Instance.Authenticate((status) =>
@@ -57,6 +84,7 @@ public class FirebaseAuthManager : MonoBehaviour
                 Debug.LogError("Fallo el login de Google: " + status);
             }
         });
+        */
     }
 
     private async Task ProcesarLoginDual(string authCode)
@@ -77,6 +105,16 @@ public class FirebaseAuthManager : MonoBehaviour
             Debug.LogError("Error en el login dual: " + e.Message);
         }
     }
+
+    public void LogOut()
+    {
+        FirebaseSDK.GetInstance().LogOut();
+        AccountAuthResult result = new AccountAuthResult(AuthType.LOGOUT, "Logged out");
+        OnAccountAuthResult?.Invoke(result);
+        FirebaseSDK.GetInstance().LogOut();    // Cerrar sesi锟絥 en Firebase
+        OnAccountAuthResult?.Invoke(new AccountAuthResult(AuthType.LOGOUT, "Sesi锟絥 cerrada"));
+    }
+
 }
 
 
