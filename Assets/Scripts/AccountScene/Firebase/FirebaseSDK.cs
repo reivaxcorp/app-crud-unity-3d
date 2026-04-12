@@ -35,14 +35,11 @@ using Firebase.Storage;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class FirebaseSDK
 {
-    public FirebaseApp app
-    {
-        private set { _app = value; }
-        get { return _app; }
-    }
     public FirebaseDatabase defaultInstance
     {
         private set { _defaultInstance = value; }
@@ -68,6 +65,11 @@ public class FirebaseSDK
         private set { _isFirebaseReady = value; }
         get { return _isFirebaseReady; }
     }
+    public FirebaseApp app
+    {
+        private set { _app = value; }
+        get { return _app; }
+    }
 
     private static FirebaseSDK instance;
     private FirebaseApp _app;
@@ -82,43 +84,71 @@ public class FirebaseSDK
     /// Initialize firebase dependencies. 
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> InitFirebaseDependenciesAsync()
+    public async Task<bool> InicializeFirebase()
     {
-
-        await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        try
         {
-            var dependencyStatus = task.Result;
-
-            if (dependencyStatus == DependencyStatus.Available)
+            // 1. Configuramos las opciones manualmente con los datos de tu XML
+            Firebase.AppOptions options = new Firebase.AppOptions
             {
-                // Create and hold a reference to your FirebaseApp,
-                // where app is a Firebase.FirebaseApp property of your application class.
+                ApiKey = "AIzaSyAeeNWpjVs2vhpTJZCbtp7iZkjHzeGQMjE",
+                AppId = "1:88826351788:android:1dacb2cf5eeb16d054cf09",
+                ProjectId = "appcrudunity3d",
+                DatabaseUrl = new System.Uri("https://appcrudunity3d-default-rtdb.firebaseio.com"),
+                StorageBucket = "appcrudunity3d.appspot.com",
+                MessageSenderId = "88826351788"
+            };
 
-                this.app = Firebase.FirebaseApp.DefaultInstance; // PRODUCTION MODE
+            // 2. Intentamos crear la App con estas opciones
+            Firebase.FirebaseApp.Create(options) ;
 
-                // Set a flag here to indicate whether Firebase is ready to use by your app.
-                this.defaultInstance = FirebaseDatabase.DefaultInstance;
+            // 3. Verificamos dependencias como siempre
+            var dependencyStatus = await Firebase.FirebaseApp.CheckAndFixDependenciesAsync();
+            
 
-                this.firebaseStorage = FirebaseStorage.DefaultInstance;
-
+            if (dependencyStatus == Firebase.DependencyStatus.Available)
+            {
+                Debug.Log("SISTEMA: Firebase cargado manualmente con éxito.");
+               
                 this.auth = FirebaseAuth.DefaultInstance;
                 this.auth.StateChanged += AuthStateChanged;
+                this.firebaseStorage = FirebaseStorage.DefaultInstance;
+                this.defaultInstance = FirebaseDatabase.DefaultInstance;
+                this._app = FirebaseApp.DefaultInstance;
 
                 isFirebaseReady = true;
-                AuthStateChanged(this, null);
+                return true;
             }
             else
             {
-                Debug.LogError(System.String.Format(
-                  "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
-                // Firebase Unity SDK is not safe to use here.
+                Debug.LogError($"SISTEMA: Dependencias no disponibles: {dependencyStatus}");
                 isFirebaseReady = false;
-                throw new Exception(System.String.Format(
-                  "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
+                return false;
             }
-        });
-       
-        return isFirebaseReady;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"SISTEMA: Error en inicialización manual: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> DoLogin()
+    {
+        try
+        {
+            var result = await auth.SignInAnonymouslyAsync();
+            _user = result.User;
+
+            Debug.Log($"Login Anónimo OK. User ID: {result.User.UserId}");
+            SceneManager.LoadScene("AppScene");
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Error en login anónimo: " + e.Message);
+            return false;
+        }
     }
 
     /// <summary>

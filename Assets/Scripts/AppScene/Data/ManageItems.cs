@@ -380,12 +380,11 @@ public class ManageItems : MonoBehaviour
     {
         Debug.Log(" MyApplication.repository " + MyApplication.repository != null);
         Debug.Log(" irebaseSDK.GetInstance().isFirebaseReady " + FirebaseSDK.GetInstance().isFirebaseReady);
-        Debug.Log("FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous " + FirebaseSDK.GetInstance().user.IsAnonymous);
+       //Debug.Log("FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous " + FirebaseSDK.GetInstance().user.IsAnonymous);
 
         return
                   MyApplication.repository != null &&
-                  FirebaseSDK.GetInstance().isFirebaseReady &&
-                  FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous;
+                  FirebaseSDK.GetInstance().isFirebaseReady;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.
