@@ -30,6 +30,7 @@
  * TRATOS EN EL SOFTWARE.
  *********************************************************************************/
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -377,10 +378,14 @@ public class ManageItems : MonoBehaviour
 
     private bool CheckDependenciesInitialize()
     {
+        Debug.Log(" MyApplication.repository " + MyApplication.repository != null);
+        Debug.Log(" irebaseSDK.GetInstance().isFirebaseReady " + FirebaseSDK.GetInstance().isFirebaseReady);
+        Debug.Log("FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous " + FirebaseSDK.GetInstance().user.IsAnonymous);
+
         return
                   MyApplication.repository != null &&
                   FirebaseSDK.GetInstance().isFirebaseReady &&
-                  FirebaseSDK.GetInstance().auth.CurrentUser != null;
+                  FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.

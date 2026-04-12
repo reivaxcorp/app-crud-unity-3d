@@ -53,8 +53,6 @@ public class MyApplication : MonoBehaviour
     private async Task<MyRepository> CreateRepositoryAsync()
     {
 
-      
-
         Debug.Log("SISTEMA: Firebase y Repositorio listos.");
         // FIRST wait to initialize Sdk Firebase
         IsFirebaseReady = await InicializeFirebase();
