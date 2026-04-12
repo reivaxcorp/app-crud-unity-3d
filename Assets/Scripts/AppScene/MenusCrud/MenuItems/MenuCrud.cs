@@ -38,7 +38,6 @@ using UnityEngine.UI;
 public class MenuCrud : MonoBehaviour
 {
     
-    [SerializeField] GameObject ads;
     [SerializeField] MenuDialogConfirm dialogMsj;
     [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
@@ -197,26 +196,6 @@ public class MenuCrud : MonoBehaviour
     public void ClearResultCrud()
     {
         resultMsj.text = string.Empty;
-    }
-
-    public void ShowInterstitialAd()
-    {
-        if (ads != null)
-        {
-            InterstitialAd interstitialAd = ads.GetComponent<InterstitialAd>();
-            if (interstitialAd != null)
-            {
-                 interstitialAd.LoadAd();
-            }
-            else
-            {
-                Debug.LogWarning("InterstitialAd no está en el UiAppp GameObject del inspector");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Por favor, coloca el Ads en el MenuAddItem, en su inspector");
-        }
     }
 
     private void OpenImageAndroid()
