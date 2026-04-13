@@ -200,7 +200,8 @@ public class MenuCrud : MonoBehaviour
 
     private void OpenImageAndroid()
     {
-        androidPermission.OnPermissionResult += HandlePermissionResult;
+        androidPermission.OnPermissionResult -= HandlePermissionResult; // Limpiamos por las dudas
+        androidPermission.OnPermissionResult += HandlePermissionResult; // Suscribimos una sola vez
         androidPermission.RequestStoragePermission();
     }  
 

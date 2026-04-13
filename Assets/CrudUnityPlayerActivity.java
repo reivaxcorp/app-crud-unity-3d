@@ -52,33 +52,39 @@
      // El resultado cuando el usuario elige una imagen de la galería, necesitamos enviar
      // la Uri a Unity para que podamos manejarla.
      @Override
-     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-         super.onActivityResult(requestCode, resultCode, data);
- 
-         if (requestCode == 123) { // Este código debe coincidir con el código de solicitud en C#
-             if (resultCode == RESULT_OK) {
- 
-                 // Aquí puedes manejar el resultado, por ejemplo, obtener la URI del archivo seleccionado
-                 if (data != null && data.getData() != null) {
-                     String selectedFileUri = data.getData().toString();
-                     Log.d(TAG, "URI del archivo seleccionado: " + selectedFileUri);
- 
-                     // Obtener bytes de la imagen
-                     String fileNameWithBase64 = getFileNameAndBase64Data(selectedFileUri);
- 
-                     // Envía la URI del archivo a Unity, enviamos el resultado a un GameObject en nuestra jerarquía de escena.
-                     // El primer argumento es "GameObject".
-                     // El segundo argumento es "Nombre del método".
-                     // El tercer argumento es el valor a enviar.
-                     com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid",
-                             fileNameWithBase64);
- 
-                 }
-             } else {
-                 Log.d(TAG, "La selección de archivos fue cancelada.");
-             }
-         }
-     }
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == 123 && resultCode == RESULT_OK && data != null) {
+                Uri selectedUri = data.getData();
+                if (selectedUri != null) {
+                    try {
+                        // 1. Creamos un archivo temporal en el cache de la app
+                        java.io.File tempFile = new java.io.File(getCacheDir(), "temp_upload.jpg");
+                        
+                        // 2. Copiamos los bytes desde el "content://" al archivo real
+                        InputStream inputStream = getContentResolver().openInputStream(selectedUri);
+                        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(tempFile);
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                        outputStream.close();
+                        inputStream.close();
+
+                        // 3. Le pasamos a Unity la ruta del archivo real
+                        String absolutePath = tempFile.getAbsolutePath();
+                        Log.d(TAG, "Archivo copiado a cache: " + absolutePath);
+                        
+                        com.unity3d.player.UnityPlayer.UnitySendMessage("Manager", "ReceiveDataFromAndroid", absolutePath);
+
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error copiando archivo: " + e.getMessage());
+                    }
+                }
+            }
+        }
  
      private String getFileNameAndBase64Data(String imageUri) {
          // Obtener el nombre del archivo y los bytes en Base64

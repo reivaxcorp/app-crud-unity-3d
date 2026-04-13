@@ -57,8 +57,6 @@ public class MyApplication : MonoBehaviour
         // FIRST wait to initialize Sdk Firebase
         IsFirebaseReady = await firebaseSdk.InicializeFirebase();
 
-        Debug.Log("SISTEMA: Firebase y Repositorio listos.");
-
         if (IsFirebaseReady)
         {
             RemoteDb remoteDb = new RemoteDb();

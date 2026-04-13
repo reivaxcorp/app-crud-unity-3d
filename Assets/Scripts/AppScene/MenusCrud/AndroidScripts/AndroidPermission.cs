@@ -42,41 +42,39 @@ public class AndroidPermission : MonoBehaviour
     public delegate void PermissionCallback(PermissionStatus status);
     public event PermissionCallback OnPermissionResult;
 
-    private const string StoragePermission = Permission.ExternalStorageRead;
-
     public void RequestStoragePermission()
     {
-        StartCoroutine(RequestStoragePermissionCoroutine());
-    }
+        string permission = GetAndroidSDKLevel() >= 33
+            ? "android.permission.READ_MEDIA_IMAGES"
+            : Permission.ExternalStorageRead;
 
-    private IEnumerator RequestStoragePermissionCoroutine()
-    {
-        if (!Permission.HasUserAuthorizedPermission(StoragePermission))
-        {
-            Permission.RequestUserPermission(StoragePermission);
-
-            float elapsedTime = 0f;
-            float timeout = 10f; // Tiempo para aceptar los permisos
-
-            while (!Permission.HasUserAuthorizedPermission(StoragePermission) && elapsedTime < timeout)
-            {
-                yield return null;
-                elapsedTime += Time.deltaTime;
-            }
-
-            // Una vez pasado el tiempo, preguntamos si el  usuario confirmo los permisos
-            if (Permission.HasUserAuthorizedPermission(StoragePermission))
-            {
-                OnPermissionResult?.Invoke(PermissionStatus.Granted);
-            }
-            else
-            {
-                OnPermissionResult?.Invoke(PermissionStatus.Denied);
-            }
-        }
-        else
+        if (Permission.HasUserAuthorizedPermission(permission))
         {
             OnPermissionResult?.Invoke(PermissionStatus.Granted);
+            return;
+        }
+
+        // Usamos los Callbacks nativos de Unity en lugar de un Coroutine
+        var callbacks = new PermissionCallbacks();
+
+        callbacks.PermissionGranted += (pName) => {
+            Debug.Log($"{pName} concedido");
+            OnPermissionResult?.Invoke(PermissionStatus.Granted);
+        };
+
+        callbacks.PermissionDenied += (pName) => {
+            Debug.LogWarning($"{pName} denegado");
+            OnPermissionResult?.Invoke(PermissionStatus.Denied);
+        };
+
+        Permission.RequestUserPermission(permission, callbacks);
+    }
+
+    private int GetAndroidSDKLevel()
+    {
+        using (var version = new AndroidJavaClass("android.os.Build$VERSION"))
+        {
+            return version.GetStatic<int>("SDK_INT");
         }
     }
 
