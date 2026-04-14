@@ -56,7 +56,7 @@ public class ManageItems : MonoBehaviour
 
     private void Awake()
     {
-        buildItem = gameObject.AddComponent<BuildItem>();
+        buildItem = GetComponent<BuildItem>();
         CheckReferences();
      }
 
@@ -402,5 +402,6 @@ public class ManageItems : MonoBehaviour
         if (itemSceneConfig == null) { Debug.LogWarning("Por favor, coloca el itemSceneConfig en el ManageItems.cs en el inspector"); }
         if (loadingScreen == null) { Debug.LogWarning("Por favor, coloca el loadingScreen en el ManageItems.cs en el inspector"); }
         if (addItemBtn == null) { Debug.LogWarning("Por favor, coloca el addItemBtn en el ManageItems.cs en el inspector"); }
+        if (buildItem == null) { Debug.LogWarning("Por favor, coloca el BuildItem.cs en el inspector"); }
     }
 }

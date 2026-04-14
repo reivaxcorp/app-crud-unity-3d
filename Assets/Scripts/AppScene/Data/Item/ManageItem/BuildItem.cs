@@ -35,7 +35,8 @@ using UnityEngine;
 
 public class BuildItem: MonoBehaviour
 {
- 
+    public ButtonBoxUiManager buttonBoxUiManager;
+    
     public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
     {
        
@@ -66,7 +67,9 @@ public class BuildItem: MonoBehaviour
             Material[] currentMaterials = meshRenderer.materials;
             currentMaterials[0] = newMaterial;
             meshRenderer.materials = currentMaterials;
-        } 
+
+            FillBoxUi(texture2D, gameObject.name);
+        }
         catch (Exception ex)
         {
             Debug.LogWarning("Error al aplicar la textura " + ex.Message);
@@ -79,5 +82,14 @@ public class BuildItem: MonoBehaviour
     {
         FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
         return fileManager.LoadFileAsTexture2D(imageName);
+    }
+
+    public void FillBoxUi(Texture2D textureSlot, string slotNumber)
+    {
+        if(buttonBoxUiManager == null) { 
+            Debug.LogWarning("Referencia no colocada");
+            return; 
+        }
+        buttonBoxUiManager.FillBoxUi(textureSlot, slotNumber);
     }
 }
