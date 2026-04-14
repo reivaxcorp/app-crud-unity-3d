@@ -48,6 +48,7 @@ public class MyApplication : MonoBehaviour
         {
             await CreateRepositoryAsync();
         }
+        //Debug.Log(Application.persistentDataPath);
     }
 
     private async Task<MyRepository> CreateRepositoryAsync()

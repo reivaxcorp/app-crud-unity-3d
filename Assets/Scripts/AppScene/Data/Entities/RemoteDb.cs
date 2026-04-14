@@ -1,38 +1,9 @@
-/*********************************************************************************
- * Nombre del Archivo:     RemoteDb.cs
- * Descripción:            Creamos, leemos, actualizamos, borramos los ítems en Realtime Database.
-                           También aprovecharemos la base de datos en tiempo real, al escuchar algún cambio
-                           que será manejado por nuestro ItemManager.cs 
- *                         
- * Autor:                  Javier
- * Organización:           ReivaxCorp.
- *
- * Derechos de Autor (c) [2024] ReivaxCorp
- * 
- * Permiso es otorgado, sin cargo, para que cualquier persona obtenga una copia
- * de este software y de los archivos de documentación asociados (el "Software"),
- * para tratar en el Software sin restricción, incluyendo sin limitación los
- * derechos para usar, copiar, modificar, fusionar, publicar, distribuir,
- * sublicenciar, y/o vender copias del Software, y para permitir a las personas a
- * quienes pertenezca el Software, sujeto a las siguientes condiciones:
- *
- * El aviso de derechos de autor anterior y este aviso de permiso se incluirán en
- * todas las copias o partes sustanciales del Software.
- *
- * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
- * IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A LAS GARANTÍAS DE COMERCIABILIDAD,
- * IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
- * AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER
- * RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO
- * O DE OTRO MODO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS
- * TRATOS EN EL SOFTWARE.
- *********************************************************************************/
-
 using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Linq; // Añadido para facilitar la búsqueda en la lista
 
 public class RemoteDb : IRepositoryRemote
 {
@@ -40,6 +11,8 @@ public class RemoteDb : IRepositoryRemote
     public event OnHandleValueChangedCallBack handleValueResult;
     private string userUid;
 
+    // Mantenemos una referencia local a los items para saber qué IDs están ocupados
+    private List<ItemRemote> lastKnownItems = new List<ItemRemote>();
 
     public void SetUserUid(string userUid)
     {
@@ -53,7 +26,6 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task FirebaseValueChanged()
     {
-
         if (!IsUserUid()) return;
 
         FirebaseSDK.GetInstance().defaultInstance
@@ -62,7 +34,6 @@ public class RemoteDb : IRepositoryRemote
             .Child("items")
             .ValueChanged += HandleValueChanged;
 
-        // Esperar 1 segundo antes de continuar para asegurarse de que el suscriptor se ha registrado correctamente
         await Task.Delay(1000);
     }
 
@@ -74,31 +45,28 @@ public class RemoteDb : IRepositoryRemote
             return;
         }
 
-        // Do something with the data in args.Snapshot
-
         List<ItemRemote> itemsRemoteList = new List<ItemRemote>();
 
-        foreach (DataSnapshot itemSnapshot in args.Snapshot.Children)
+        if (args.Snapshot.Exists)
         {
-            // Obtener el valor del DataSnapshot y convertirlo a un diccionario
-            Dictionary<string, object> itemData = (Dictionary<string, object>)itemSnapshot.Value;
-
-            // Crear un nuevo objeto ItemRemote y asignar los valores del diccionario
-            ItemRemote item = new ItemRemote
+            foreach (DataSnapshot itemSnapshot in args.Snapshot.Children)
             {
-                // Ajusta estas líneas según la estructura de tus datos remotos
-                Id = itemData["id"].ToString(),
-                Name = itemData["name"].ToString(),
-                ImageName = itemData["image_name"].ToString(),
-                CreationDate = long.Parse(itemData["creation_date"].ToString())
-            };
+                Dictionary<string, object> itemData = (Dictionary<string, object>)itemSnapshot.Value;
 
-            // Agregar el objeto ItemRemote a la lista
-            itemsRemoteList.Add(item);
+                ItemRemote item = new ItemRemote
+                {
+                    Id = itemSnapshot.Key, // Usamos la Key del nodo como ID (será "1", "2", etc.)
+                    Name = itemData["name"].ToString(),
+                    ImageName = itemData["image_name"].ToString(),
+                    CreationDate = long.Parse(itemData["creation_date"].ToString())
+                };
+
+                itemsRemoteList.Add(item);
+            }
         }
 
+        lastKnownItems = itemsRemoteList; // Actualizamos nuestra copia local
         AppConfig.SetCurrentItemsCount(itemsRemoteList.Count);
-        // Debug.Log("handled itemsRemoteList " + itemsRemoteList.Count);
         handleValueResult?.Invoke(itemsRemoteList);
     }
 
@@ -110,55 +78,69 @@ public class RemoteDb : IRepositoryRemote
          .GetReference("users")
          .Child(userUid)
          .Child("items")
-         .ValueChanged -= HandleValueChanged; // unsubscribe from ValueChanged.
+         .ValueChanged -= HandleValueChanged;
     }
-
 
     public async Task<bool> SaveItemRemote(ItemRemote itemRemote, IResult resultUi)
     {
         bool saveSuccess = false;
-
         if (!IsUserUid()) return saveSuccess;
 
+        // --- LÓGICA DE IDS FIJOS (1-10) ---
+        string nextId = GetFirstAvailableId();
+
+        if (nextId == null)
+        {
+            Debug.LogWarning("Límite de 10 cubos alcanzado.");
+            resultUi.SetResultCrudUi("Limit Reached", "You can only have 10 items.");
+            return false;
+        }
+
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
-
-        // key generada con Push()
-        string key = rootRef.Child("users").Child(userUid).Child("items").Push().Key;
-
-        // Obtener la marca de tiempo del servidor en formato Unix
         long timestampUnix = TimeUtils.GetTimeStampUnix();
 
-        ItemRemote entry =
-            new ItemRemote(key, itemRemote.Name, itemRemote.ImageName, timestampUnix);
-
+        // El ID ya no es un Push(), es el número que encontramos
+        ItemRemote entry = new ItemRemote(nextId, itemRemote.Name, itemRemote.ImageName, timestampUnix);
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 
-        await rootRef.Child("users").Child(userUid).Child("items").Child(key).SetValueAsync(entryValues)
+        await rootRef.Child("users").Child(userUid).Child("items").Child(nextId).SetValueAsync(entryValues)
             .ContinueWithOnMainThread(task =>
-        {
-            if (task.IsFaulted || task.IsCanceled)
             {
-                // Manejar error
-                Debug.LogError("Error al escribir en la base de datos: " + task.Exception);
-                resultUi.SetResultCrudUi("Error", "Error writing to the database");
-                saveSuccess = false;
-            }
-            else
-            {
-                // Operación exitosa
-                Debug.Log("Datos escritos exitosamente en la base de datos");
-                resultUi.SetResultCrudUi("Completed", "New item added");
-                saveSuccess = true;
-            }
-        });
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.LogError("Error en Firebase: " + task.Exception);
+                    resultUi.SetResultCrudUi("Error", "Validation failed (Check Rules)");
+                    saveSuccess = false;
+                }
+                else
+                {
+                    Debug.Log("Cubo guardado en Slot: " + nextId);
+                    resultUi.SetResultCrudUi("Completed", "Item added to slot " + nextId);
+                    saveSuccess = true;
+                }
+            });
 
         return saveSuccess;
+    }
+
+    // Función auxiliar para encontrar el primer hueco del 1 al 10
+    private string GetFirstAvailableId()
+    {
+        for (int i = 1; i <= 10; i++)
+        {
+            string idEvaluado = i.ToString();
+            // Si ningún item actual tiene este ID, está libre
+            if (!lastKnownItems.Any(item => item.Id == idEvaluado))
+            {
+                return idEvaluado;
+            }
+        }
+        return null; // Todo lleno
     }
 
     public async Task<bool> UpdateItemRemote(ItemRemote itemRemote, IResult iResult)
     {
         bool updateSuccess = false;
-
         if (!IsUserUid()) return updateSuccess;
 
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
@@ -171,16 +153,12 @@ public class RemoteDb : IRepositoryRemote
              {
                  if (task.IsFaulted || task.IsCanceled)
                  {
-
-                     // Manejar error
-                     Debug.LogError("Error writing to the database: " + task.Exception);
-                     iResult.SetResultCrudUi("Error", "Error updating");
+                     Debug.LogError("Error actualizando: " + task.Exception);
+                     iResult.SetResultCrudUi("Error", "Update failed");
                      updateSuccess = false;
                  }
                  else
                  {
-                     // Operación exitosa
-                     Debug.Log("Datos escritos exitosamente en la base de datos");
                      iResult.SetResultCrudUi("Update", "Data updated successfully");
                      updateSuccess = true;
                  }
@@ -194,7 +172,6 @@ public class RemoteDb : IRepositoryRemote
         if (!IsUserUid()) return false;
 
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
-
         bool deleteSuccess = false;
 
         await rootRef
@@ -206,17 +183,14 @@ public class RemoteDb : IRepositoryRemote
              {
                  if (task.IsFaulted || task.IsCanceled)
                  {
-
-                     // Manejar error
-                     Debug.LogError("Error al borrar el item remoto en la base de datos: " + task.Exception);
-                     iResult.SetResultCrudUi("Error", "Error deleting the remote item from the database");
+                     Debug.LogError("Error al borrar: " + task.Exception);
+                     iResult.SetResultCrudUi("Error", "Delete failed");
                      deleteSuccess = false;
                  }
                  else
                  {
-                     // Operación exitosa
-                     Debug.Log("Ítem remoto borrado correctamente");
-                     iResult.SetResultCrudUi("Deleted", "Remote item deleted successfully");
+                     Debug.Log("Slot " + id + " liberado.");
+                     iResult.SetResultCrudUi("Deleted", "Slot freed successfully");
                      deleteSuccess = true;
                  }
              });
