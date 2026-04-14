@@ -1130,7 +1130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2e68acc94da83a4fbed90a8ba19cdd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ads: {fileID: 0}
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
@@ -1909,7 +1908,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Back
+  m_text: Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6029,7 +6028,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b5b2e4bcd1a82c42995e19a604bbc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ads: {fileID: 0}
   dialogMsj: {fileID: 1499459709}
   androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}

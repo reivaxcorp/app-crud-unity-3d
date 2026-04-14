@@ -128,8 +128,16 @@ public class MenuManagerApp : MonoBehaviour
 
     public void GoBack()
     {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex - 1);
+        //int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        //SceneManager.LoadScene(currentSceneIndex - 1);
+        // Si ya estás en la primera escena, cierra la app en Android
+        Debug.Log("SISTEMA: Saliendo de la aplicación...");
+        Application.Quit();
+
+        // Esto es solo para que veas que funciona mientras estás en el Editor
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
 
