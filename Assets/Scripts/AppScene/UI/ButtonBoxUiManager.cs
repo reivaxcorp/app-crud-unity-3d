@@ -4,17 +4,24 @@ using System.Linq; // Para buscar fácil en la lista
 
 public class ButtonBoxUiManager : MonoBehaviour
 {
-
-    public void OnClickBox(string name)
+    [SerializeField] private BuildManager buildManager;
+    public void OnClickBox(string slotName, Texture2D selectedTexture)
     {
-        Debug.Log("Button pressed " +name);
+        Debug.Log("Slot seleccionado: " + slotName);
+
+        if (buildManager != null)
+        {
+            // Le decimos al BuildManager que prepare el cubo con esta textura
+            // slotName será "1", "2", etc., según el nombre del objeto UI
+            buildManager.PrepareCube(slotName, selectedTexture);
+        }
     }
 
     public void FillBoxUi(Texture2D textureSlot, string slotNumber)
     {
         // 1. Buscamos el objeto del slot por nombre (ej: "Slot1", "Slot2" o solo "1")
         // Asumo que tus botones de la UI tienen nombres que contienen el número
-        Transform slotTransform = transform.Find("Image_"+slotNumber);
+        Transform slotTransform = transform.Find(slotNumber);
 
         if (slotTransform != null)
         {

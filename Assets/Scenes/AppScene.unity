@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 52845978}
   - component: {fileID: 52845979}
   m_Layer: 5
-  m_Name: Image_4
+  m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,7 +552,7 @@ GameObject:
   - component: {fileID: 126227190}
   - component: {fileID: 126227191}
   m_Layer: 5
-  m_Name: Image_5
+  m_Name: 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1359,7 +1359,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 297, y: 131}
+  m_AnchoredPosition: {x: 273, y: 114}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &287186547
@@ -1376,7 +1376,7 @@ GameObject:
   - component: {fileID: 287186551}
   - component: {fileID: 287186552}
   m_Layer: 5
-  m_Name: Image_3
+  m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1588,7 +1588,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 299315704}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1651622799}
+        m_TargetAssemblyTypeName: BuildManager, Assembly-CSharp
+        m_MethodName: ActionPlace
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &299315704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2324,7 +2336,7 @@ GameObject:
   - component: {fileID: 469761377}
   - component: {fileID: 469761378}
   m_Layer: 5
-  m_Name: Image_2
+  m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2540,6 +2552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81a58214d7ef22d4c872313991cda0d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonBoxUiManager
+  buildManager: {fileID: 0}
 --- !u!1 &516837687
 GameObject:
   m_ObjectHideFlags: 0
@@ -3659,7 +3672,7 @@ GameObject:
   - component: {fileID: 752450902}
   - component: {fileID: 752450903}
   m_Layer: 5
-  m_Name: Image_1
+  m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4648,7 +4661,7 @@ GameObject:
   - component: {fileID: 996485612}
   - component: {fileID: 996485613}
   m_Layer: 5
-  m_Name: Image_7
+  m_Name: 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8432,7 +8445,7 @@ GameObject:
   - component: {fileID: 1606392917}
   - component: {fileID: 1606392916}
   m_Layer: 5
-  m_Name: Image_10
+  m_Name: 10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10237,7 +10250,7 @@ GameObject:
   - component: {fileID: 1987104561}
   - component: {fileID: 1987104562}
   m_Layer: 5
-  m_Name: Image_9
+  m_Name: 9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10382,7 +10395,7 @@ GameObject:
   - component: {fileID: 2013246091}
   - component: {fileID: 2013246092}
   m_Layer: 5
-  m_Name: Image_6
+  m_Name: 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10660,7 +10673,7 @@ GameObject:
   - component: {fileID: 2084508547}
   - component: {fileID: 2084508548}
   m_Layer: 5
-  m_Name: Image_8
+  m_Name: 8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
