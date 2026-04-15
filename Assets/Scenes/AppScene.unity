@@ -242,7 +242,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 52845979}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -661,7 +661,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 126227191}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1485,7 +1485,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 287186552}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2445,7 +2445,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 469761378}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2552,7 +2552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81a58214d7ef22d4c872313991cda0d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonBoxUiManager
-  buildManager: {fileID: 0}
+  buildManager: {fileID: 1651622799}
 --- !u!1 &516837687
 GameObject:
   m_ObjectHideFlags: 0
@@ -3781,7 +3781,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 752450903}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4770,7 +4770,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 996485613}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8528,7 +8528,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1606392916}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10359,7 +10359,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1987104562}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10504,7 +10504,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2013246092}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10782,7 +10782,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2084508548}
         m_TargetAssemblyTypeName: ButtonBoxUi, Assembly-CSharp
-        m_MethodName: OnPressedBox
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
