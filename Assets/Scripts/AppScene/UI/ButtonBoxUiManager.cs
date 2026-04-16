@@ -21,7 +21,7 @@ public class ButtonBoxUiManager : MonoBehaviour
     {
         // 1. Buscamos el objeto del slot por nombre (ej: "Slot1", "Slot2" o solo "1")
         // Asumo que tus botones de la UI tienen nombres que contienen el número
-        Transform slotTransform = transform.Find(slotNumber);
+        Transform slotTransform = transform.Find("slot_" + slotNumber);
 
         if (slotTransform != null)
         {

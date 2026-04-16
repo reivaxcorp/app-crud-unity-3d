@@ -56,9 +56,7 @@ public class RemoteDb : IRepositoryRemote
                 ItemRemote item = new ItemRemote
                 {
                     Id = itemSnapshot.Key, // Usamos la Key del nodo como ID (será "1", "2", etc.)
-                    Name = itemData["name"].ToString(),
-                    ImageName = itemData["image_name"].ToString(),
-                    CreationDate = long.Parse(itemData["creation_date"].ToString())
+                    ImageName = itemData["image_name"].ToString()
                 };
 
                 itemsRemoteList.Add(item);
@@ -97,10 +95,9 @@ public class RemoteDb : IRepositoryRemote
         }
 
         DatabaseReference rootRef = FirebaseSDK.GetInstance().defaultInstance.RootReference;
-        long timestampUnix = TimeUtils.GetTimeStampUnix();
 
         // El ID ya no es un Push(), es el número que encontramos
-        ItemRemote entry = new ItemRemote(nextId, itemRemote.Name, itemRemote.ImageName, timestampUnix);
+        ItemRemote entry = new ItemRemote(nextId, itemRemote.ImageName);
         Dictionary<string, System.Object> entryValues = entry.ToDictionary();
 
         await rootRef.Child("users").Child(userUid).Child("items").Child(nextId).SetValueAsync(entryValues)

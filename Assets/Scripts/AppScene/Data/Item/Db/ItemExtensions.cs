@@ -37,9 +37,7 @@ public static class ItemExtensions
         {
             // Realiza la conversión de los campos según sea necesario
             Id = itemRemote.Id,
-            Name = itemRemote.Name,
-            ImageName = itemRemote.ImageName,
-            CreationDate = itemRemote.CreationDate
+            ImageName = itemRemote.ImageName
         };
     }
 
@@ -53,9 +51,7 @@ public static class ItemExtensions
             {
                 // Realiza la conversión de los campos según sea necesario
                 Id = remoteItem.Id,
-                Name = remoteItem.Name,
-                ImageName = remoteItem.ImageName,
-                CreationDate = remoteItem.CreationDate
+                ImageName = remoteItem.ImageName
             };
 
             itemsLocal.Add(localItem);
@@ -70,8 +66,6 @@ public static class ItemExtensions
 
         return
                 itemLocal.Id.Equals(itemRemote.Id) &&
-                itemLocal.Name.Equals(itemRemote.Name) &&
-                itemLocal.ImageName.Equals(itemRemote.ImageName) && 
-                itemLocal.CreationDate == itemRemote.CreationDate;
+                itemLocal.ImageName.Equals(itemRemote.ImageName);
     }
 }

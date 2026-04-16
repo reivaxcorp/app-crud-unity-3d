@@ -36,33 +36,26 @@ using System.Collections.Generic;
 public class ItemRemote 
 {
     public string Id {  get; set; }
-    public string Name { get; set; }
     public string ImageName { get; set; }
-    public long CreationDate { get; set; }
 
     public ItemRemote(){}
 
-    public ItemRemote(string name, string imageName)
+    public ItemRemote(string imageName)
     {
-        Name = name;
         ImageName = imageName;
     }
 
-    public ItemRemote(string id, string name, string imageName, long creationDate)
+    public ItemRemote(string id, string imageName)
     {
         Id = id;
-        Name = name;
         ImageName = imageName;
-        CreationDate = creationDate;
     }
      
     public Dictionary<string, Object> ToDictionary()
     {
         Dictionary<string, Object> result = new Dictionary<string, Object>();
         result["id"] = Id;
-        result["name"] = Name;
         result["image_name"] = ImageName;
-        result["creation_date"] = CreationDate;
 
         return result;
     }

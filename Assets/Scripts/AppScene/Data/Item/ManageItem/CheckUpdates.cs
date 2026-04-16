@@ -65,33 +65,8 @@ public class CheckUpdates
                 itemUpdates.Add(new ItemUpdate(
                     id: itemLocal.Id,
                     isImageUpdated: false,
-                    isFieldsUpdated: false,
                     isRemove: true,
                     isAdd: false));
-            }
-            // Se ha cambiado los campos y la imagén
-            else if (IsFielsUpdate(itemRemote, itemLocal) && IsImageUpdated(itemRemote, itemLocal))
-            {
-                itemUpdates.Add(new ItemUpdate(
-                  id: itemLocal.Id,
-                  isImageUpdated: true,
-                  isFieldsUpdated: true,
-                  isRemove: false,
-                  isAdd: false));
-
-                listItemsChanged.Add(itemRemote);
-            }
-            // Solo se han cambiado los campos
-            else if (IsFielsUpdate(itemRemote, itemLocal))
-            {
-                itemUpdates.Add(new ItemUpdate(
-                 id: itemLocal.Id,
-                 isImageUpdated: false,
-                 isFieldsUpdated: true,
-                 isRemove: false,
-                 isAdd: false));
-
-                listItemsChanged.Add(itemRemote);
             }
             // Se ha cambiado la imagén
             else if (IsImageUpdated(itemRemote, itemLocal))
@@ -99,7 +74,6 @@ public class CheckUpdates
                 itemUpdates.Add(new ItemUpdate(
                 id: itemLocal.Id,
                 isImageUpdated: true,
-                isFieldsUpdated: false,
                 isRemove: false,
                 isAdd: false));
 
@@ -111,7 +85,6 @@ public class CheckUpdates
                 itemUpdates.Add(new ItemUpdate(
                 id: itemLocal.Id,
                 isImageUpdated: false,
-                isFieldsUpdated: false,
                 isRemove: false,
                 isAdd: false));
             }
@@ -128,7 +101,6 @@ public class CheckUpdates
                 itemUpdates.Add(new ItemUpdate(
                 id: itemRemote.Id,
                 isImageUpdated: false,
-                isFieldsUpdated: false,
                 isRemove: false,
                 isAdd: true));
 
@@ -147,17 +119,6 @@ public class CheckUpdates
     public static List<ItemRemote> GetItemsChanged()
     {
         return listItemsChanged;
-    }
-
-    /// <summary>
-    /// Si el producto cambio, necesitamos bajarlo de nuevo
-    /// </summary>
-    /// <param name="itemRemote"></param>
-    /// <param name="itemLocal"></param>
-    /// <returns></returns>
-    private static bool IsFielsUpdate(ItemRemote itemRemote, ItemLocal itemLocal)
-    {
-        return !itemRemote.Name.Equals(itemLocal.Name);
     }
 
     // si cambia el el image_id_metadata, es probrable que cambie el nombre de la imagen, 

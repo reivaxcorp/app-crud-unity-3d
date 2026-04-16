@@ -33,7 +33,6 @@ public class ItemScript : MonoBehaviour
     private BoxCollider boxCollider;
     private Rigidbody rb;
 
-    // Start is called before the first frame update
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();

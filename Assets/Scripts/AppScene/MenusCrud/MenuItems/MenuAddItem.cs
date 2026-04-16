@@ -83,7 +83,7 @@ public class MenuAddItem : MenuCrud, IResult
     {
         if (MyApplication.repository != null)
         {
-            ItemRemote itemRemote = new ItemRemote(name: inputFieldName.text, imageName: imageName);
+            ItemRemote itemRemote = new ItemRemote( imageName: imageName);
             bool saveResult = await MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
            
             if(saveResult) { 

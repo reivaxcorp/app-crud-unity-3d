@@ -45,7 +45,6 @@ public class MenuCrud : MonoBehaviour
     [SerializeField] protected MenuManagerApp uiApp;
     [SerializeField] protected Image menuImagePreview;
     [SerializeField] protected TextMeshProUGUI resultMsj;
-    [SerializeField] protected TMP_InputField inputFieldName;
     protected ProgressText progressText;
     protected bool isImageChanged;
     protected bool isDelteItem;
@@ -82,11 +81,6 @@ public class MenuCrud : MonoBehaviour
         this.isImageChanged = isImageChanged;
     }
 
-    public void SetImageNameInInput(string imageName)
-    {
-        inputFieldName.text = imageName;
-    }
-
     public void StartAnimationTextMenu(bool isAnimationStart, string msj)
     {
         if(isAnimationStart)
@@ -107,32 +101,9 @@ public class MenuCrud : MonoBehaviour
     {
         ClearResultCrud();
 
-        if (inputFieldName == null)
-        {
-            LogWarningAndSetResult("InputFieldName no asignado en el Inspector");
-            return false;
-        }
-
         if (menuImagePreview == null)
         {
             LogWarningAndSetResult("MenuImagePreview no asignado en el Inspector");
-            return false;
-        }
-
-        // Sanitizar el nombre de la imagen utilizando la expresión regular
-        string sanitizedFileName = StringSanitizer.SanitizeString(inputFieldName.text);
-
-        if (string.IsNullOrEmpty(sanitizedFileName))
-        {
-            LogWarningAndSetResult("Enter the image name");
-            SetMsjInfoUI("Enter the image name");
-            return false;
-        }
-
-        if (sanitizedFileName.Length > 30)
-        {
-            LogWarningAndSetResult("Nombre debe ser menor a 30 caracteres");
-            SetMsjInfoUI("Name must be less than 30 characters");
             return false;
         }
 
@@ -257,7 +228,6 @@ public class MenuCrud : MonoBehaviour
     private void ClearInputs()
     {
         menuImagePreview.sprite = null;
-        inputFieldName.text = "";
     }
 
     private void WaitForFirebase(bool isWaitFirebase)
@@ -333,11 +303,9 @@ public class MenuCrud : MonoBehaviour
     {
         if (uiApp == null) Debug.LogWarning("Coloca el script desde el UiApp (gameObject) el script MenuManagerApp en el Inspector");
         if (dialogMsj == null) Debug.LogWarning("Coloca el script DialogMsj desde el DialogMsj gameObject en MenuApp -> Canvas -> DialogMsj en el inspector");
-        if (inputFieldName == null) Debug.LogWarning("InputFieldName no asignado en el Inspector");
         if (menuImagePreview == null) Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
         if (receiverMessagesFromAndroid == null) Debug.LogWarning("Por favor coloca el script ReceiverMeesagesFromAndroid desde el Manager (gameObject) en el inspector");
         if (resultMsj == null) Debug.LogWarning("ResultMsj no está colocado en el inspector");
         if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
     }
-
 }

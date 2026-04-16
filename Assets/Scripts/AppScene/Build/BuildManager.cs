@@ -45,12 +45,14 @@ public class BuildManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 10f, buildLayer))
         {
             // Lógica de Snapping (Ajuste a la rejilla)
-            Vector3 spawnPos = hit.point + hit.normal;
+            Vector3 spawnPos = hit.point + hit.normal * 0.5f;
             spawnPos = new Vector3(Mathf.Round(spawnPos.x), Mathf.Round(spawnPos.y), Mathf.Round(spawnPos.z));
 
             GameObject newCube = Instantiate(cubePrefab, spawnPos, Quaternion.identity);
             newCube.GetComponent<MeshRenderer>().material.mainTexture = _currentTexture;
             newCube.name = _currentSlotId; // Guardamos el ID en el nombre para saber cuál es
+
+            newCube.GetComponent<Collider>().enabled = true;
 
             _instantiatedCubes.Add(newCube);
             Debug.Log("Cubo colocado en: " + spawnPos);

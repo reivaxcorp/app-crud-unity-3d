@@ -178,29 +178,14 @@ public class ManageItems : MonoBehaviour
 
                 Task task = Task.CompletedTask; // Inicializar una tarea completada
 
-                if (itemToUpdate.IsFieldsUpdated && itemToUpdate.IsImageUpdated)
+                
+                if (itemToUpdate.IsImageUpdated)
                 {
                     ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     DeleteOldImage(itemOld.ImageName);
-                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: true);
-                    itemsToSave.Add(itemLocalUptated);
-                }
-                else if (itemToUpdate.IsFieldsUpdated)
-                {
-                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
-                        .ItemRemoteToItemLocal();
-                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: true, isImageUpdate: false);
-                    itemsToSave.Add(itemLocalUptated);
-                }
-                else if (itemToUpdate.IsImageUpdated)
-                {
-                    ItemLocal itemLocalUptated = itemsRemoteList.Find(item => item.Id.Equals(itemToUpdate.Id))
-                        .ItemRemoteToItemLocal();
-                    ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
-                    DeleteOldImage(itemOld.ImageName);
-                    task = UpdateItemInScene(item: itemLocalUptated, isFieldUpdate: false, isImageUpdate: true);
+                    task = UpdateItemInScene(item: itemLocalUptated, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
@@ -276,18 +261,8 @@ public class ManageItems : MonoBehaviour
             {
                 GameObject itemToCreate = Instantiate(itemPrefab);
                 itemToCreate.transform.position = itemSceneConfig.transform.position;
-
-                TextMeshPro[] textMeshProChildren = itemToCreate.GetComponentsInChildren<TextMeshPro>();
-
-                if (textMeshProChildren.Length == 2 && textMeshProChildren[0] != null && textMeshProChildren[1] != null)
-                {
-                    textMeshProChildren[0].text = item.Name;
-                    textMeshProChildren[1].text = "Created:\n" + TimeUtils.ConvertTimeStampUnixToDate(item.CreationDate);
-                }
-
                 itemToCreate.name = item.Id;
                 await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
-
                 itemSceneConfig.SetItemGameObject(itemToCreate);
             }
         }
@@ -301,7 +276,6 @@ public class ManageItems : MonoBehaviour
 
     private async Task<bool> UpdateItemInScene(
         ItemLocal item,
-        bool isFieldUpdate,
         bool isImageUpdate
         )
     {
@@ -309,13 +283,9 @@ public class ManageItems : MonoBehaviour
 
         if (gameObjectExists != null)
         {
-            if (isFieldUpdate)
-            {
-                gameObjectExists.GetComponentInChildren<TextMeshPro>().text = item.Name;
-            }
-
             if (isImageUpdate)
             {
+                Debug.Log("Item a actualizar " + gameObjectExists.name);
                 await buildItem.AsignMaterialAsync(item.ImageName, gameObjectExists);
             }
         }

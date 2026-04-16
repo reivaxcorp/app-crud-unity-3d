@@ -7,7 +7,7 @@ public class BuildItem: MonoBehaviour
 {
     public ButtonBoxUiManager buttonBoxUiManager;
     
-    public async Task AsignMaterialAsync(string imageName, GameObject gameObject)
+    public async Task AsignMaterialAsync(string imageName, GameObject cubo)
     {
        
         Texture2D texture2D = GetSavedTexture(imageName);
@@ -29,16 +29,20 @@ public class BuildItem: MonoBehaviour
 
         try
         {
+
             Material newMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
             newMaterial.mainTexture = texture2D;
             newMaterial.SetTexture("_MainTex", texture2D);
+        
+            MeshRenderer meshRenderer = cubo.GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+            {
+                Material[] currentMaterials = meshRenderer.materials;
+                currentMaterials[0] = newMaterial;
+                meshRenderer.materials = currentMaterials;
+            }
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            Material[] currentMaterials = meshRenderer.materials;
-            currentMaterials[0] = newMaterial;
-            meshRenderer.materials = currentMaterials;
-
-            FillBoxUi(texture2D, gameObject.name);
+            FillBoxUi(texture2D, cubo.name);
         }
         catch (Exception ex)
         {

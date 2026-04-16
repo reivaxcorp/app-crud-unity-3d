@@ -64,7 +64,6 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
                 this.currentItemSelected = itemLocal;
                 FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
                 Texture2D texture2D = fileManager.LoadFileAsTexture2D(itemLocal.ImageName);
-                SetImageNameInInput(itemLocal.Name);
                 SetImagePreview(texture2D);
                 this.oldImageName = itemLocal.ImageName;
             }
@@ -158,9 +157,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
         // Ítem a actualizar
         ItemRemote itemRemote = new ItemRemote(
             id: currentItemSelected.Id,
-            name: inputFieldName.text,
-            imageName: isImageChanged ? generateImageName : oldImageName,
-            creationDate: currentItemSelected.CreationDate);
+            imageName: isImageChanged ? generateImageName : oldImageName);
 
         // actualizamos el documente de firebase realtimadatabase
         bool updateResult = await MyApplication.repository.UpdateItemRemote(itemRemote, resultUi: this);
@@ -186,7 +183,7 @@ public class MenuUpdateItem : MenuCrud, IResult, IResultDialogDelete
     /// <returns></returns>
     private bool IsSomeDatachanged()
     {
-        return isImageChanged || !inputFieldName.text.Equals(currentItemSelected.Name);
+        return isImageChanged;
     }
 
     public async void ConfirmDialogDelete(bool isDeleteConfirm)
