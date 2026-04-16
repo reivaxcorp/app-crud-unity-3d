@@ -1,35 +1,3 @@
-/*********************************************************************************
- * Nombre del Archivo:     ManageItems.cs
- * Descripción:            En primer lugar, cargamos los ítems locales del usuario guardados 
- *                         en su dispositivo (si los hay), luego verificamos si hay algún cambio en la base 
- *                         de datos de RealtimeDatabase remota, y si los hay, actualizamos y volvemos a 
- *                         guardar los datos actualizados en el dispositivo. A su vez también escuchamos
- *                         los cambios generados en tiempo real de la base de datos de Firebase RealtimeDatabase.
- *                         
- * Autor:                  Javier
- * Organización:           ReivaxCorp.
- *
- * Derechos de Autor (c) [2024] ReivaxCorp
- * 
- * Permiso es otorgado, sin cargo, para que cualquier persona obtenga una copia
- * de este software y de los archivos de documentación asociados (el "Software"),
- * para tratar en el Software sin restricción, incluyendo sin limitación los
- * derechos para usar, copiar, modificar, fusionar, publicar, distribuir,
- * sublicenciar, y/o vender copias del Software, y para permitir a las personas a
- * quienes pertenezca el Software, sujeto a las siguientes condiciones:
- *
- * El aviso de derechos de autor anterior y este aviso de permiso se incluirán en
- * todas las copias o partes sustanciales del Software.
- *
- * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
- * IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A LAS GARANTÍAS DE COMERCIABILIDAD,
- * IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
- * AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER
- * RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO
- * O DE OTRO MODO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS
- * TRATOS EN EL SOFTWARE.
- *********************************************************************************/
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,6 +16,7 @@ public class ManageItems : MonoBehaviour
     private GameObject loadingScreen;
     [SerializeField]
     private GameObject addItemBtn;
+    private BuildManager buildManager;
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
@@ -57,6 +26,7 @@ public class ManageItems : MonoBehaviour
     private void Awake()
     {
         buildItem = GetComponent<BuildItem>();
+        buildManager = GetComponent<BuildManager>();
         CheckReferences();
      }
 
@@ -86,12 +56,14 @@ public class ManageItems : MonoBehaviour
     private async void LoadLocalData()
     {
 
-        List<ItemLocal> itemsLocal = await MyApplication.repository.GetLocalItemsAsync();
+        List<ItemLocal> itemsLocal = 
+            await MyApplication.repository.GetLocalItemsAsync();
 
         this.itemsLocalList = itemsLocal;
 
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
+        Debug.Log("tamanio item local " + itemsLocalList.Count);
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
             Task task = CreateItemInScene(itemLocal);
@@ -257,49 +229,59 @@ public class ManageItems : MonoBehaviour
     {
         if (itemPrefab != null)
         {
+            // 1. CREAR EL MAIN ITEM (El original con luz tenue)
             if (itemSceneConfig.transform.Find(item.Id) == null)
             {
-                GameObject itemToCreate = Instantiate(itemPrefab);
-                itemToCreate.transform.position = itemSceneConfig.transform.position;
-                itemToCreate.name = item.Id;
-                await buildItem.AsignMaterialAsync(item.ImageName, itemToCreate);
-                itemSceneConfig.SetItemGameObject(itemToCreate);
+                GameObject mainItem = Instantiate(itemPrefab);
+                mainItem.transform.position = itemSceneConfig.transform.position;
+                mainItem.name = item.Id;
+
+                // AGREGAR LUZ AL MAIN (Para diferenciarlo)
+                Light mainLight = mainItem.AddComponent<Light>();
+                mainLight.range = 3f;
+                mainLight.intensity = 0.5f;
+                mainLight.color = Color.cyan;
+
+                await buildItem.AsignMaterialAsync(item.ImageName, mainItem);
+                itemSceneConfig.SetItemGameObject(mainItem);
+            }
+
+            // 2. CARGAR LAS COPIAS DESDE EL JSON (Solo si no están ya en escena)
+            // Esto se dispara una sola vez al inicio
+            if (!syncStarted)
+            {
+                buildManager.LoadWorld();
             }
         }
-        else
-        {
-            return false;
-        }
-
         return true;
     }
 
-    private async Task<bool> UpdateItemInScene(
-        ItemLocal item,
-        bool isImageUpdate
-        )
-    {
-        GameObject gameObjectExists = GameObject.Find(item.Id);
 
-        if (gameObjectExists != null)
+    private async Task<bool> UpdateItemInScene(ItemLocal item, bool isImageUpdate)
+    {
+        GameObject mainItem = GameObject.Find(item.Id);
+        if (mainItem != null && isImageUpdate)
         {
-            if (isImageUpdate)
-            {
-                Debug.Log("Item a actualizar " + gameObjectExists.name);
-                await buildItem.AsignMaterialAsync(item.ImageName, gameObjectExists);
-            }
+            // Actualizar el Main
+            await buildItem.AsignMaterialAsync(item.ImageName, mainItem);
+
+            // ACTUALIZAR TODAS LAS COPIAS (Gemini: Sincronización de clones)
+            await buildManager.UpdateAllClonesTexture(item.Id, item.ImageName);
         }
         return true;
     }
 
     private void DeleteItemInScene(ItemLocal item)
     {
-        GameObject gameObjectExists = GameObject.Find(item.Id);
+        // Si borramos el ítem de Firebase, es el fin de su existencia.
+        // Gemini: Borramos el original Y todas sus copias locales.
 
-        if (gameObjectExists != null)
-        {
-            Destroy(gameObjectExists);
-        }
+        // 1. Borrar Main
+        GameObject mainItem = GameObject.Find(item.Id);
+        if (mainItem != null) Destroy(mainItem);
+
+        // 2. Borrar todos los clones del mundo construido
+        buildManager.DeleteAllClonesOfId(item.Id);
     }
 
     private void SetLoadingMsj(bool isActive)
@@ -354,7 +336,8 @@ public class ManageItems : MonoBehaviour
 
         return
                   MyApplication.repository != null &&
-                  FirebaseSDK.GetInstance().isFirebaseReady;
+                  FirebaseSDK.GetInstance().isFirebaseReady &&
+                  FirebaseSDK.GetInstance().user != null;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.

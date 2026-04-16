@@ -62,7 +62,10 @@ public class LocalDb : IRepositoryLocal
     /// </summary>
     public async Task<List<ItemLocal>> GetLocalItemsAsync()
     {
-        if (!IsUserFolderNameUid()) return new List<ItemLocal>();
+        if (!IsUserFolderNameUid())
+        {
+            return new List<ItemLocal>();
+        }
 
 
         string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);

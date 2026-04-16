@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 public class BuildManager : MonoBehaviour
 {
@@ -15,7 +16,9 @@ public class BuildManager : MonoBehaviour
 
     // Lista local de cubos para el JSON
     private List<GameObject> _instantiatedCubes = new List<GameObject>();
-
+    // Cambiamos la lista a pública para que ManageItems la vea o creamos un método
+    public List<GameObject> GetInstantiatedCubes() => _instantiatedCubes;
+   
     public void PrepareCube(string slotId, Texture2D tex)
     {
         if (_previewCube != null) Destroy(_previewCube);
@@ -66,12 +69,49 @@ public class BuildManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 10f, buildLayer))
         {
-            // Si tocamos un cubo que no es el suelo
-            if (hit.collider.gameObject != null && hit.collider.gameObject.CompareTag("Player") == false)
+            GameObject target = hit.collider.gameObject;
+
+            // ¿Es un Main Item? (Tienen el Tag o están en itemSceneConfig)
+            if (target.transform.parent != null && target.transform.parent.name == "ItemSceneConfig")
             {
-                GameObject target = hit.collider.gameObject;
+                // Si es el Main, podrías abrir el menú de borrado de Firebase
+                Debug.Log("No puedes borrar el Main desde aquí, usa el menú.");
+            }
+            else
+            {
+                // Es una copia local
                 _instantiatedCubes.Remove(target);
                 Destroy(target);
+                SaveWorld(); // Guardamos el cambio en el JSON
+            }
+        }
+    }
+
+    // Función para borrar todos los clones de un ID específico
+    public void DeleteAllClonesOfId(string slotId)
+    {
+        // Buscamos de atrás para adelante para no romper el índice al borrar
+        for (int i = _instantiatedCubes.Count - 1; i >= 0; i--)
+        {
+            if (_instantiatedCubes[i].name == slotId)
+            {
+                GameObject toDestroy = _instantiatedCubes[i];
+                _instantiatedCubes.RemoveAt(i);
+                Destroy(toDestroy);
+            }
+        }
+        SaveWorld(); // Actualizamos el JSON local
+    }
+
+    // Función para actualizar la textura de todos los clones cuando el original cambia en Firebase
+    public async Task UpdateAllClonesTexture(string slotId, string imageName)
+    {
+        foreach (GameObject cube in _instantiatedCubes)
+        {
+            if (cube.name == slotId)
+            {
+                // Usamos el componente BuildItem que ya sabe manejar la descarga
+                await GetComponent<BuildItem>().AsignMaterialAsync(imageName, cube);
             }
         }
     }
@@ -122,6 +162,9 @@ public class BuildManager : MonoBehaviour
                 _instantiatedCubes.Add(newCube);
             }
             Debug.Log("Mundo cargado con éxito.");
+        } else
+        {
+            Debug.Log("No hay mundo previo.");
         }
 
     }

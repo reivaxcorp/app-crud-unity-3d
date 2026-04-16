@@ -42,6 +42,7 @@ public class BuildItem: MonoBehaviour
                 meshRenderer.materials = currentMaterials;
             }
 
+            // Solo se debera actualizar en el slot 1 vez
             FillBoxUi(texture2D, cubo.name);
         }
         catch (Exception ex)

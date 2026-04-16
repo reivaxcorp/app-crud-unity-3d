@@ -173,10 +173,9 @@ public class FirebaseSDK
             if (signedIn)
             {
                 Debug.Log("Signed in " + user.UserId);
+                InitUidUserToApp(); // podemos inicializar ahora los datos principales.
             }
         }
-
-        InitUidUserToApp(); // podemos inicializar ahora los datos principales.
     }
 
     public static FirebaseSDK GetInstance()
