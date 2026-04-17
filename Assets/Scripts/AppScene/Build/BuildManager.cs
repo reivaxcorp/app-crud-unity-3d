@@ -13,12 +13,17 @@ public class BuildManager : MonoBehaviour
     private GameObject _previewCube;
     private string _currentSlotId;
     private Texture2D _currentTexture;
+    private BuildItem _buildItem;
 
     // Lista local de cubos para el JSON
     private List<GameObject> _instantiatedCubes = new List<GameObject>();
     // Cambiamos la lista a pública para que ManageItems la vea o creamos un método
     public List<GameObject> GetInstantiatedCubes() => _instantiatedCubes;
-   
+
+    private void Start()
+    {
+        _buildItem = GetComponent<BuildItem>();
+    }
     public void PrepareCube(string slotId, Texture2D tex)
     {
         if (_previewCube != null) Destroy(_previewCube);
@@ -138,7 +143,7 @@ public class BuildManager : MonoBehaviour
         Debug.Log("Mundo guardado localmente en: " + path);
     }
 
-    public void LoadWorld()
+    public async Task<bool> LoadWorld()
     {
         string path = Path.Combine(Application.persistentDataPath, "world_save.json");
 
@@ -160,11 +165,15 @@ public class BuildManager : MonoBehaviour
 
                 // Re-aplicar textura (tendrías que llamar a tu lógica de BuildItem aquí)
                 _instantiatedCubes.Add(newCube);
+                string myslot = _buildItem.GetImageNameBySlot(cubeData.slotId.Split('_')[1]);
+                await _buildItem.AsignMaterialAsync(myslot, newCube);
             }
             Debug.Log("Mundo cargado con éxito.");
+            return true;
         } else
         {
             Debug.Log("No hay mundo previo.");
+            return false;
         }
 
     }

@@ -36,7 +36,6 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class FirebaseSDK
 {

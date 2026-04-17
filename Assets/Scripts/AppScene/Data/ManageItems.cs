@@ -72,6 +72,13 @@ public class ManageItems : MonoBehaviour
         await Task.WhenAll(tasks);
 
         itemSceneConfig.OrderAllItemPositionInScene();
+        // 2. CARGAR LAS COPIAS DESDE EL JSON
+        // (Solo si  ya en escena, los mains items, que se argaron en el for de arriba)
+        // Esto se dispara una sola vez al inicio
+        if (!syncStarted)
+        {
+           await buildManager.LoadWorld();
+        }
         SetLoadingMsj(false); // Ocultar Cargando..
         StartCoroutine(CheckInternetConection());
     }
@@ -198,7 +205,8 @@ public class ManageItems : MonoBehaviour
             await MyApplication.repository.SaveLocalItemsAsync(itemsLocalList);
         }
 
-        syncStarted = false;
+        syncStarted = false; // para que no se vuelva a pisar valores
+                             // si se cambia mientras se esta cargando
     }
 
     /// <summary>
@@ -244,13 +252,6 @@ public class ManageItems : MonoBehaviour
 
                 await buildItem.AsignMaterialAsync(item.ImageName, mainItem);
                 itemSceneConfig.SetItemGameObject(mainItem);
-            }
-
-            // 2. CARGAR LAS COPIAS DESDE EL JSON (Solo si no están ya en escena)
-            // Esto se dispara una sola vez al inicio
-            if (!syncStarted)
-            {
-                buildManager.LoadWorld();
             }
         }
         return true;
