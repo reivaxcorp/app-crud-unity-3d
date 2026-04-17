@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 public class BuildItem : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class BuildItem : MonoBehaviour
     public async Task AsignMaterialAsync(string imageName, GameObject cubo)
     {
         Texture2D texture2D = GetSavedTexture(imageName);
-        Debug.Log("Image name " + imageName);
+        //Debug.Log("Image name " + imageName);
         if (texture2D == null)
         {
             texture2D = await MyApplication.repository.DowloadImageStorage(imageName);
@@ -50,23 +51,47 @@ public class BuildItem : MonoBehaviour
                 meshRenderer.material = newMaterial;
             }
 
-            // --- LÓGICA DE OPTIMIZACIÓN DE UI ---
-            string slotId = cubo.name;
-
-            // Solo actualizamos la UI si es la primera vez o si la imagen cambió
-            if (!_slotImageMap.ContainsKey(slotId) || _slotImageMap[slotId] != imageName)
-            {
-                // Actualizamos el mapa con el nuevo nombre
-                _slotImageMap[slotId] = imageName;
-
-                // Refrescamos el slot de la UI
-                FillBoxUi(texture2D, slotId);
-                Debug.Log($"UI Actualizada: Slot {slotId} ahora tiene {imageName}");
-            }
+            BuildItemUi(imageName, cubo.name, texture2D);
         }
         catch (Exception ex)
         {
             Debug.LogWarning("Error al aplicar la textura " + ex.Message);
+        }
+    }
+
+    /// <param name="imageName">Nombre del archivo de imagen (ej: "foto1.jpg")</param>
+    /// <param name="mainItemId">El ID que viene del nombre del objeto (debe ser "1" al "10")</param>
+    /// <param name="texture2D">La textura ya cargada en memoria</param>
+    private void BuildItemUi(string imageName, string mainItemId, Texture2D texture2D)
+    {
+        // --- LÓGICA DE OPTIMIZACIÓN DE UI (ESTRICTA) ---
+
+        // 1. Validamos que el string sea EXACTAMENTE un número y nada más.
+        // int.TryParse fallará si el string contiene "slot_" o cualquier letra.
+        if (int.TryParse(mainItemId, out int slotNumber))
+        {
+            // 2. Verificamos que esté en el rango de tus 10 slots base
+            if (slotNumber >= 1 && slotNumber <= 10)
+            {
+                // Solo llegamos aquí si mainItemId es exactamente "1", "2", etc.
+
+                // 3. Comprobamos si la imagen cambió para no estresar la UI
+                if (!_slotImageMap.ContainsKey(mainItemId) || _slotImageMap[mainItemId] != imageName)
+                {
+                    // Actualizamos el mapa de memoria
+                    _slotImageMap[mainItemId] = imageName;
+
+                    // Refrescamos el componente Image de la UI
+                    FillBoxUi(texture2D, mainItemId);
+
+                    Debug.Log($"<color=green>SISTEMA:</color> UI Slot {mainItemId} actualizado con {imageName}");
+                }
+            }
+        }
+        else
+        {
+            // Esto se ejecutará para "slot_1", "copy_1", "Suelo", etc.
+            // Debug.Log($"Ignorado para UI: {mainItemId}"); 
         }
     }
 

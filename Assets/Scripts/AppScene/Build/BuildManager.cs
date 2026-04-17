@@ -9,11 +9,12 @@ public class BuildManager : MonoBehaviour
     public GameObject cubePrefab; // El prefab genérico del cubo
     public Transform spawnPoint;  // El punto arriba del PJ
     public LayerMask buildLayer;  // Capa de los cubos y suelo
-
+    public GameObject parentLocalItemWorld;
     private GameObject _previewCube;
     private string _currentSlotId;
     private Texture2D _currentTexture;
     private BuildItem _buildItem;
+    private ManageItems _manageItems;
 
     // Lista local de cubos para el JSON
     private List<GameObject> _instantiatedCubes = new List<GameObject>();
@@ -23,6 +24,8 @@ public class BuildManager : MonoBehaviour
     private void Start()
     {
         _buildItem = GetComponent<BuildItem>();
+        _manageItems = GetComponent<ManageItems>();
+        if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
     }
     public void PrepareCube(string slotId, Texture2D tex)
     {
@@ -98,7 +101,7 @@ public class BuildManager : MonoBehaviour
         // Buscamos de atrás para adelante para no romper el índice al borrar
         for (int i = _instantiatedCubes.Count - 1; i >= 0; i--)
         {
-            if (_instantiatedCubes[i].name == slotId)
+            if (_instantiatedCubes[i].name == "copy_slot_"+slotId)
             {
                 GameObject toDestroy = _instantiatedCubes[i];
                 _instantiatedCubes.RemoveAt(i);
@@ -109,11 +112,13 @@ public class BuildManager : MonoBehaviour
     }
 
     // Función para actualizar la textura de todos los clones cuando el original cambia en Firebase
-    public async Task UpdateAllClonesTexture(string slotId, string imageName)
+    public async Task UpdateAllClonesTexture(string itemId, string imageName)
     {
         foreach (GameObject cube in _instantiatedCubes)
         {
-            if (cube.name == slotId)
+            // item id se repeta el 1, 2. 3, ...
+            // item copia posee slot_1, slot_2, slot_..
+            if (cube.name == "copy_slot_"+ itemId)
             {
                 // Usamos el componente BuildItem que ya sabe manejar la descarga
                 await GetComponent<BuildItem>().AsignMaterialAsync(imageName, cube);
@@ -143,7 +148,7 @@ public class BuildManager : MonoBehaviour
         Debug.Log("Mundo guardado localmente en: " + path);
     }
 
-    public async Task<bool> LoadWorld()
+    public async Task<bool> LoadLocalWorld()
     {
         string path = Path.Combine(Application.persistentDataPath, "world_save.json");
 
@@ -161,13 +166,16 @@ public class BuildManager : MonoBehaviour
                 // Aquí necesitarías una referencia a tus texturas descargadas
                 // para volver a aplicarlas según el slotId
                 GameObject newCube = Instantiate(cubePrefab, cubeData.position, cubeData.rotation);
-                newCube.name = cubeData.slotId;
+                newCube.name = "copy_"+cubeData.slotId;
 
                 // Re-aplicar textura (tendrías que llamar a tu lógica de BuildItem aquí)
                 _instantiatedCubes.Add(newCube);
-                string myslot = _buildItem.GetImageNameBySlot(cubeData.slotId.Split('_')[1]);
-                await _buildItem.AsignMaterialAsync(myslot, newCube);
+                string imageName = _buildItem.GetImageNameBySlot(cubeData.slotId.Split('_')[1]);
+                await _buildItem.AsignMaterialAsync(imageName, newCube);
+                newCube.transform.SetParent(parentLocalItemWorld.transform);
+                _manageItems.getItemConfig.EnablePhysicsItem(newCube);
             }
+
             Debug.Log("Mundo cargado con éxito.");
             return true;
         } else

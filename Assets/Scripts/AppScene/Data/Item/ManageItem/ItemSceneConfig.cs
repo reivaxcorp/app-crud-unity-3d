@@ -49,10 +49,11 @@ public class ItemSceneConfig : MonoBehaviour
     } 
 
     /// <summary>
-    /// Cuando leemos los datos de la base de datos local, debemos ordenar los ítems
+    /// Cuando leemos los datos de la base de datos local, 
+    /// debemos ordenar los ítems principales, los orignales no las copias,
     /// en la escena.
     /// </summary>
-    public void OrderAllItemPositionInScene()
+    public void OrderItemMainPositionInScene()
     {
         float nextPositionX = this.transform.position.x;
 
@@ -184,7 +185,7 @@ public class ItemSceneConfig : MonoBehaviour
         itemInScene.transform.SetParent(this.transform);
     }
 
-    private void EnablePhysicsItem(GameObject itemInScene)
+    public void EnablePhysicsItem(GameObject itemInScene)
     {
         ItemScript itemScript = itemInScene.GetComponent<ItemScript>();
         if (itemScript != null)

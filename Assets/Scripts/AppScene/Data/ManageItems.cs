@@ -23,6 +23,11 @@ public class ManageItems : MonoBehaviour
     private bool syncStarted;
     private List<ItemLocal> itemsLocalList;
 
+    public ItemSceneConfig getItemConfig
+    {
+         get { return itemSceneConfig; }
+    }
+
     private void Awake()
     {
         buildItem = GetComponent<BuildItem>();
@@ -71,14 +76,16 @@ public class ManageItems : MonoBehaviour
         }
         await Task.WhenAll(tasks);
 
-        itemSceneConfig.OrderAllItemPositionInScene();
+       
         // 2. CARGAR LAS COPIAS DESDE EL JSON
         // (Solo si  ya en escena, los mains items, que se argaron en el for de arriba)
         // Esto se dispara una sola vez al inicio
         if (!syncStarted)
         {
-           await buildManager.LoadWorld();
+           await buildManager.LoadLocalWorld();
         }
+
+        itemSceneConfig.OrderItemMainPositionInScene();
         SetLoadingMsj(false); // Ocultar Cargando..
         StartCoroutine(CheckInternetConection());
     }
@@ -164,7 +171,7 @@ public class ManageItems : MonoBehaviour
                         .ItemRemoteToItemLocal();
                     ItemLocal itemOld = itemsLocalList.Find(item => item.Id.Equals(itemToUpdate.Id));
                     DeleteOldImage(itemOld.ImageName);
-                    task = UpdateItemInScene(item: itemLocalUptated, isImageUpdate: true);
+                    task = UpdateItemsInScene(item: itemLocalUptated, isImageUpdate: true);
                     itemsToSave.Add(itemLocalUptated);
                 }
                 else if (itemToUpdate.IsRemove)
@@ -219,7 +226,7 @@ public class ManageItems : MonoBehaviour
         // Si borramos los datos o si abrimos la app en otro dispositivo
         if (itemsLocalList.Count == 0)
         {
-            itemSceneConfig.OrderAllItemPositionInScene();
+            itemSceneConfig.OrderItemMainPositionInScene();
         }
         else
         {
@@ -247,7 +254,7 @@ public class ManageItems : MonoBehaviour
                 // AGREGAR LUZ AL MAIN (Para diferenciarlo)
                 Light mainLight = mainItem.AddComponent<Light>();
                 mainLight.range = 3f;
-                mainLight.intensity = 0.5f;
+                mainLight.intensity = 5.0f;
                 mainLight.color = Color.cyan;
 
                 await buildItem.AsignMaterialAsync(item.ImageName, mainItem);
@@ -258,7 +265,7 @@ public class ManageItems : MonoBehaviour
     }
 
 
-    private async Task<bool> UpdateItemInScene(ItemLocal item, bool isImageUpdate)
+    private async Task<bool> UpdateItemsInScene(ItemLocal item, bool isImageUpdate)
     {
         GameObject mainItem = GameObject.Find(item.Id);
         if (mainItem != null && isImageUpdate)
