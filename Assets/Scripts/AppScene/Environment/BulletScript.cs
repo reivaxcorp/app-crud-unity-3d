@@ -48,16 +48,22 @@ public class BulletScript : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-
         if (collision.gameObject.layer == LayerMask.NameToLayer("Item"))
         {
-            if (menuManagerApp != null)
+            if (int.TryParse(collision.gameObject.name, out int slotNumber))
             {
-                menuManagerApp.ShowMenuUpdateItem(collision.gameObject.name);
-            }
-            else
-            {
-                Debug.LogWarning("MenuManagerApp, no se ha colocado desde PlayerShoot");
+                // 2. Verificamos que esté en el rango de los 10 ids base
+                if (slotNumber >= 1 && slotNumber <= 10)
+                {
+                    if (menuManagerApp != null)
+                    {
+                        menuManagerApp.ShowMenuUpdateItem(collision.gameObject.name);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("MenuManagerApp, no se ha colocado desde PlayerShoot");
+                    }
+                }
             }
         }
     }
