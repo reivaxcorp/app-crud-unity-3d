@@ -1,10 +1,13 @@
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public class BuildManager : MonoBehaviour
 {
+    [SerializeField] MenuDialogConfirm menuDialog;
+
     [Header("Configuración")]
     public GameObject cubePrefab; // El prefab genérico del cubo
     public Transform spawnPoint;  // El punto arriba del PJ
@@ -26,7 +29,9 @@ public class BuildManager : MonoBehaviour
         _buildItem = GetComponent<BuildItem>();
         _manageItems = GetComponent<ManageItems>();
         if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
+        if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
     }
+
     public void PrepareCube(string slotId, Texture2D tex)
     {
         if (_previewCube != null) Destroy(_previewCube);
@@ -90,12 +95,17 @@ public class BuildManager : MonoBehaviour
                 // Es una copia local
                 _instantiatedCubes.Remove(target);
                 Destroy(target);
-                SaveWorld(); // Guardamos el cambio en el JSON
+
+                // podria ir SaveWorld() 
+                // pero para optimizar agregamos un boton
+                // SaveWorld(); // Guardamos el cambio en el JSON
             }
         }
     }
 
     // Función para borrar todos los clones de un ID específico
+    // podria ir SaveWorld() al final, pero para optimizar agregamos un boton
+    // save world
     public void DeleteAllClonesOfId(string slotId)
     {
         // Buscamos de atrás para adelante para no romper el índice al borrar
@@ -108,7 +118,7 @@ public class BuildManager : MonoBehaviour
                 Destroy(toDestroy);
             }
         }
-        SaveWorld(); // Actualizamos el JSON local
+        // SaveWorld();
     }
 
     // Función para actualizar la textura de todos los clones cuando el original cambia en Firebase
@@ -126,16 +136,27 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    // Al cerrar o guardar, generaríamos el JSON recorriendo _instantiatedCubes
-    public void SaveWorld()
+    public void StartSaveWorld()
     {
-        WorldSaveData data = new WorldSaveData();
+        StartCoroutine(SaveWorldCoroutine());
+    }
 
+    // Al cerrar o guardar, generaríamos el JSON recorriendo _instantiatedCubes
+    private IEnumerator SaveWorldCoroutine()
+    {
+        // 1. Mostramos el mensaje inicial
+        menuDialog.SendMessage("Guardando mundo...");
+
+        // 2. Esperamos al final del frame para que Unity dibuje el texto en pantalla
+        yield return new WaitForEndOfFrame();
+
+        // 3. Procesamos los datos
+        WorldSaveData data = new WorldSaveData();
         foreach (GameObject cube in _instantiatedCubes)
         {
             data.placedCubes.Add(new CubeData
             {
-                slotId = cube.name, // El nombre que le pusimos al instanciarlo
+                slotId = cube.name,
                 position = cube.transform.position,
                 rotation = cube.transform.rotation
             });
@@ -143,9 +164,14 @@ public class BuildManager : MonoBehaviour
 
         string json = JsonUtility.ToJson(data, true);
         string path = Path.Combine(Application.persistentDataPath, "world_save.json");
+
+        // 4. Escribimos el archivo
         File.WriteAllText(path, json);
 
-        Debug.Log("Mundo guardado localmente en: " + path);
+        Debug.Log("Mundo guardado en: " + path);
+
+        // 5. Mostramos el mensaje final
+        menuDialog.SendMessage("Mundo guardado");
     }
 
     public async Task<bool> LoadLocalWorld()
