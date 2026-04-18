@@ -28,10 +28,20 @@
 
 using UnityEngine;
 
+
+public interface IItemManager
+{
+    public void OnDelete(GameObject itemToDelete);
+}
+
 public class ItemScript : MonoBehaviour
 {
+    [Header("Efectos")]
+    public GameObject explosionPrefab; // Arrastra tu Prefab de explosión aquí en el Inspector
+
     private BoxCollider boxCollider;
     private Rigidbody rb;
+    private IItemManager _itemBuildManager;
 
     private void Awake()
     {
@@ -43,6 +53,15 @@ public class ItemScript : MonoBehaviour
             boxCollider.enabled = false;
             rb.useGravity = false;
         }
+    }
+
+    private void Start()
+    {
+    }
+
+    public void SetReferenceManager(IItemManager itemManager)
+    {
+        _itemBuildManager = itemManager;
     }
 
     /// <summary>
@@ -71,6 +90,27 @@ public class ItemScript : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet"))
+        {
+            // solo eliminamos las copias
+            if(gameObject.name.StartsWith("slot_"))
+            {
+                // 1. Verificamos que tengamos un efecto asignado
+                if (explosionPrefab != null)
+                {
+                    // 2. Instanciamos la explosión en la posición del cubo
+                    // Usamos Quaternion.identity para que la rotación sea neutra
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                }
+
+                Debug.LogWarning("Bullet en " + gameObject.name);
+                _itemBuildManager.OnDelete(gameObject);
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)

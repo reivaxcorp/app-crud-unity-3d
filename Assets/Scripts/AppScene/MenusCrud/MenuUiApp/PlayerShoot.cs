@@ -35,7 +35,7 @@ public class PlayerShoot : MonoBehaviour
 {
     [SerializeField] GameObject gunPlayer;
     [SerializeField] GameObject bulletPrefb; // Prefab del objeto que quieres lanzar
-    [SerializeField] private float powerBullet = 2000f;
+    [SerializeField] private float powerBullet = 1500f;
 
     void Update()
     {

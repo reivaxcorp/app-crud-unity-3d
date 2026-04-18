@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class BuildManager : MonoBehaviour
+public class BuildManager : MonoBehaviour, IItemManager
 {
     [SerializeField] MenuDialogConfirm menuDialog;
     [Header("Configuración")]
@@ -110,6 +110,7 @@ public class BuildManager : MonoBehaviour
         Vector3 finalPos = _ghostPreview.transform.position;
 
         GameObject newCube = Instantiate(cubePrefab, finalPos, Quaternion.identity);
+        newCube.GetComponent<ItemScript>().SetReferenceManager(this);
 
         // Aplicamos la textura real
         Material mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
@@ -143,15 +144,21 @@ public class BuildManager : MonoBehaviour
             }
             else
             {
-                // Es una copia local
-                _instantiatedCubes.Remove(target);
-                Destroy(target);
+                RemoveCubeCopy(target);
 
                 // podria ir SaveWorld() 
                 // pero para optimizar agregamos un boton
                 // SaveWorld(); // Guardamos el cambio en el JSON
             }
         }
+    }
+
+    // Es una copia local
+    private void RemoveCubeCopy(GameObject cube)
+    {
+        // Es una copia local
+        _instantiatedCubes.Remove(cube);
+        Destroy(cube);
     }
 
     // Función para borrar todos los clones de un ID específico
@@ -246,6 +253,7 @@ public class BuildManager : MonoBehaviour
                 newCube.name = cubeData.slotId;
                 newCube.GetComponent<Rigidbody>().isKinematic = true;
                 newCube.GetComponent<BoxCollider>().enabled = true;
+                newCube.GetComponent<ItemScript>().SetReferenceManager(this);
 
                 // Re-aplicar textura (tendrías que llamar a tu lógica de BuildItem aquí)
                 _instantiatedCubes.Add(newCube);
@@ -263,5 +271,10 @@ public class BuildManager : MonoBehaviour
             return false;
         }
 
+    }
+
+    public void OnDelete(GameObject itemToDelete)
+    {
+        RemoveCubeCopy(itemToDelete);
     }
 }
