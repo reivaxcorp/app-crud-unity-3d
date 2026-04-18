@@ -162,7 +162,7 @@ public class BuildManager : MonoBehaviour
         // Buscamos de atrás para adelante para no romper el índice al borrar
         for (int i = _instantiatedCubes.Count - 1; i >= 0; i--)
         {
-            if (_instantiatedCubes[i].name == "copy_slot_"+slotId)
+            if (_instantiatedCubes[i].name == "slot_"+slotId)
             {
                 GameObject toDestroy = _instantiatedCubes[i];
                 _instantiatedCubes.RemoveAt(i);
@@ -179,7 +179,7 @@ public class BuildManager : MonoBehaviour
         {
             // item id se repeta el 1, 2. 3, ...
             // item copia posee slot_1, slot_2, slot_..
-            if (cube.name == "copy_slot_"+ itemId)
+            if (cube.name == "slot_"+ itemId)
             {
                 // Usamos el componente BuildItem que ya sabe manejar la descarga
                 await GetComponent<BuildItem>().AsignMaterialAsync(imageName, cube);
