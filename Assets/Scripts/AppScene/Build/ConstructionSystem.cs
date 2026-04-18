@@ -3,7 +3,7 @@ using UnityEngine;
 public class ConstructionSystem : MonoBehaviour
 {
     [Header("Configuración")]
-    public float buildDistance = 10f;
+    public float buildDistance = 20f;
     public LayerMask buildableLayers; // Incluye el suelo y los propios cubos
     public GameObject cubePrefab;
 

@@ -48,6 +48,8 @@ public class BuildManager : MonoBehaviour
 
         // Deshabilitamos colisiones del preview para que no empuje al PJ
         _previewCube.GetComponent<Collider>().enabled = false;
+        _previewCube.GetComponent<Rigidbody>().isKinematic = true;
+
     }
 
     public void ActionPlace()
@@ -67,10 +69,12 @@ public class BuildManager : MonoBehaviour
             GameObject newCube = Instantiate(cubePrefab, spawnPos, Quaternion.identity);
             newCube.GetComponent<MeshRenderer>().material.mainTexture = _currentTexture;
             newCube.name = _currentSlotId; // Guardamos el ID en el nombre para saber cuál es
-
+           
+            newCube.GetComponent<Rigidbody>().isKinematic = true;
             newCube.GetComponent<Collider>().enabled = true;
-
             _instantiatedCubes.Add(newCube);
+           
+            newCube.transform.SetParent(parentLocalItemWorld.transform);
             Debug.Log("Cubo colocado en: " + spawnPos);
         }
     }
@@ -145,7 +149,7 @@ public class BuildManager : MonoBehaviour
     private IEnumerator SaveWorldCoroutine()
     {
         // 1. Mostramos el mensaje inicial
-        menuDialog.SendMessage("Guardando mundo...");
+        menuDialog.ShowDialog("Save World", "Save world...");
 
         // 2. Esperamos al final del frame para que Unity dibuje el texto en pantalla
         yield return new WaitForEndOfFrame();
@@ -171,7 +175,7 @@ public class BuildManager : MonoBehaviour
         Debug.Log("Mundo guardado en: " + path);
 
         // 5. Mostramos el mensaje final
-        menuDialog.SendMessage("Mundo guardado");
+        menuDialog.SetBodyText("World saved");
     }
 
     public async Task<bool> LoadLocalWorld()
@@ -192,14 +196,15 @@ public class BuildManager : MonoBehaviour
                 // Aquí necesitarías una referencia a tus texturas descargadas
                 // para volver a aplicarlas según el slotId
                 GameObject newCube = Instantiate(cubePrefab, cubeData.position, cubeData.rotation);
-                newCube.name = "copy_"+cubeData.slotId;
+                newCube.name = cubeData.slotId;
+                newCube.GetComponent<Rigidbody>().isKinematic = true;
 
                 // Re-aplicar textura (tendrías que llamar a tu lógica de BuildItem aquí)
                 _instantiatedCubes.Add(newCube);
                 string imageName = _buildItem.GetImageNameBySlot(cubeData.slotId.Split('_')[1]);
                 await _buildItem.AsignMaterialAsync(imageName, newCube);
                 newCube.transform.SetParent(parentLocalItemWorld.transform);
-                _manageItems.getItemConfig.EnablePhysicsItem(newCube);
+              //  _manageItems.getItemConfig.EnablePhysicsItem(newCube);
             }
 
             Debug.Log("Mundo cargado con éxito.");
