@@ -9,13 +9,14 @@ public class BuildManager : MonoBehaviour
     [SerializeField] MenuDialogConfirm menuDialog;
     [Header("Configuración")]
     public GameObject cubePrefab; // El prefab genérico del cubo
-    public Transform spawnPoint;  // El punto arriba del PJ
     public LayerMask buildLayer;  // Capa de los cubos y suelo
     public GameObject parentLocalItemWorld;
     private GameObject _previewCube;
     private string _currentSlotId;
     private Texture2D _currentTexture;
     private BuildItem _buildItem;
+
+    private GameObject _ghostPreview;    // El cubo verde que sigue el puntero
 
     // Lista local de cubos para el JSON
     private List<GameObject> _instantiatedCubes = new List<GameObject>();
@@ -29,59 +30,99 @@ public class BuildManager : MonoBehaviour
         if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
     }
 
+    private void Update()
+    {
+        if (_ghostPreview != null)
+        {
+            UpdateGhostPreview();
+        }
+    }
+
     public void PrepareCube(string slotId, Texture2D tex)
     {
-        if (_previewCube != null && slotId == _currentSlotId)
+        // Si tocamos el mismo slot, construimos
+        if (_ghostPreview != null && slotId == _currentSlotId)
         {
             ActionPlace();
-        } else
+        }
+        else
         {
-
-            if(_previewCube != null) 
-                Destroy(_previewCube);
+            // Limpiamos previos si existen
+            if (_ghostPreview != null) Destroy(_ghostPreview);
 
             _currentSlotId = slotId;
             _currentTexture = tex;
 
-            // Creamos la "vista previa" arriba del PJ
-            _previewCube = Instantiate(cubePrefab, spawnPoint.position, Quaternion.identity);
-            _previewCube.transform.SetParent(spawnPoint);
+            // 2. Creador del Ghost Preview (El verde transparente)
+            _ghostPreview = Instantiate(cubePrefab);
+            ApplyPreviewSettings(_ghostPreview, tex, 0.4f); // Transparente
 
-            // Aplicamos la textura al preview
-            _previewCube.GetComponent<MeshRenderer>().material.mainTexture = tex;
+            // Le ponemos un color verde suave
+            _ghostPreview.GetComponent<MeshRenderer>().material.color = new Color(0, 1, 0, 0.4f);
+            
+            // IMPORTANTE: Asegurarnos que empiece desactivado hasta que el Raycast toque algo
+            _ghostPreview.SetActive(false);
+        }
+    }
 
-            // Deshabilitamos colisiones del preview para que no empuje al PJ
-            _previewCube.GetComponent<Collider>().enabled = false;
-            _previewCube.GetComponent<Rigidbody>().isKinematic = true;
+    private void ApplyPreviewSettings(GameObject obj, Texture2D tex, float alpha)
+    {
+        obj.GetComponent<Collider>().enabled = false;
+        if (obj.GetComponent<Rigidbody>()) obj.GetComponent<Rigidbody>().isKinematic = true;
 
+        Material mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+        mat.mainTexture = tex;
+        // Si el shader soporta transparencia, seteamos el alpha
+        if (alpha < 1.0f)
+        {
+            mat.SetInt("_Surface", 1); // 1 es Transparent en URP Unlit
+            mat.renderQueue = 3000;
+        }
+        obj.GetComponent<MeshRenderer>().material = mat;
+    }
+
+    private void UpdateGhostPreview()
+    {
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 12f, buildLayer))
+        {
+            if (!_ghostPreview.activeSelf) _ghostPreview.SetActive(true);
+
+            // Lógica de Snapping
+            Vector3 spawnPos = hit.point + hit.normal * 0.5f;
+            spawnPos = new Vector3(Mathf.Round(spawnPos.x), Mathf.Round(spawnPos.y), Mathf.Round(spawnPos.z));
+
+            _ghostPreview.transform.position = spawnPos;
+        }
+        else
+        {
+            // Si no apuntamos a nada construible, ocultamos el fantasma
+            _ghostPreview.SetActive(false);
         }
     }
 
     public void ActionPlace()
     {
-        if (_previewCube == null) return;
+        if (_ghostPreview == null || !_ghostPreview.activeSelf) return;
 
-        // Lanzamos Raycast desde el centro de la cámara
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
+        // Usamos la posición exacta donde ya está el Ghost Preview
+        Vector3 finalPos = _ghostPreview.transform.position;
 
-        if (Physics.Raycast(ray, out hit, 10f, buildLayer))
-        {
-            // Lógica de Snapping (Ajuste a la rejilla)
-            Vector3 spawnPos = hit.point + hit.normal * 0.5f;
-            spawnPos = new Vector3(Mathf.Round(spawnPos.x), Mathf.Round(spawnPos.y), Mathf.Round(spawnPos.z));
+        GameObject newCube = Instantiate(cubePrefab, finalPos, Quaternion.identity);
 
-            GameObject newCube = Instantiate(cubePrefab, spawnPos, Quaternion.identity);
-            newCube.GetComponent<MeshRenderer>().material.mainTexture = _currentTexture;
-            newCube.name = _currentSlotId; // Guardamos el ID en el nombre para saber cuál es
-           
-            newCube.GetComponent<Rigidbody>().isKinematic = true;
-            newCube.GetComponent<Collider>().enabled = true;
-            _instantiatedCubes.Add(newCube);
-           
-            newCube.transform.SetParent(parentLocalItemWorld.transform);
-            Debug.Log("Cubo colocado en: " + spawnPos);
-        }
+        // Aplicamos la textura real
+        Material mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+        mat.mainTexture = _currentTexture;
+        newCube.GetComponent<MeshRenderer>().material = mat;
+
+        newCube.name = _currentSlotId;
+        newCube.GetComponent<Rigidbody>().isKinematic = true;
+        newCube.GetComponent<Collider>().enabled = true;
+
+        newCube.transform.SetParent(parentLocalItemWorld.transform);
+        _instantiatedCubes.Add(newCube);
     }
 
     public void ActionDelete()
