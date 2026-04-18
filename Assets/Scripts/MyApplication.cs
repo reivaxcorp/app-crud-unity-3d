@@ -55,14 +55,15 @@ public class MyApplication : MonoBehaviour
     {
         RemoteDb remoteDb = new RemoteDb();
         LocalDb localDb = new LocalDb();
-        repository = new MyRepository(localDb, remoteDb);
-
+     
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
         // FIRST wait to initialize Sdk Firebase
         IsFirebaseReady = await firebaseSdk.InicializeFirebase();
 
+
         if (IsFirebaseReady)
         {
+            repository = new MyRepository(localDb, remoteDb);
             Debug.Log("SISTEMA: Firebase y Repositorio listos.");
             return repository;
         }
