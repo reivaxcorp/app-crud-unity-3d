@@ -7,7 +7,6 @@ using UnityEngine;
 public class BuildManager : MonoBehaviour
 {
     [SerializeField] MenuDialogConfirm menuDialog;
-
     [Header("Configuración")]
     public GameObject cubePrefab; // El prefab genérico del cubo
     public Transform spawnPoint;  // El punto arriba del PJ
@@ -17,7 +16,6 @@ public class BuildManager : MonoBehaviour
     private string _currentSlotId;
     private Texture2D _currentTexture;
     private BuildItem _buildItem;
-    private ManageItems _manageItems;
 
     // Lista local de cubos para el JSON
     private List<GameObject> _instantiatedCubes = new List<GameObject>();
@@ -27,29 +25,36 @@ public class BuildManager : MonoBehaviour
     private void Start()
     {
         _buildItem = GetComponent<BuildItem>();
-        _manageItems = GetComponent<ManageItems>();
         if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
         if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
     }
 
     public void PrepareCube(string slotId, Texture2D tex)
     {
-        if (_previewCube != null) Destroy(_previewCube);
+        if (_previewCube != null && slotId == _currentSlotId)
+        {
+            ActionPlace();
+        } else
+        {
 
-        _currentSlotId = slotId;
-        _currentTexture = tex;
+            if(_previewCube != null) 
+                Destroy(_previewCube);
 
-        // Creamos la "vista previa" arriba del PJ
-        _previewCube = Instantiate(cubePrefab, spawnPoint.position, Quaternion.identity);
-        _previewCube.transform.SetParent(spawnPoint);
+            _currentSlotId = slotId;
+            _currentTexture = tex;
 
-        // Aplicamos la textura al preview
-        _previewCube.GetComponent<MeshRenderer>().material.mainTexture = tex;
+            // Creamos la "vista previa" arriba del PJ
+            _previewCube = Instantiate(cubePrefab, spawnPoint.position, Quaternion.identity);
+            _previewCube.transform.SetParent(spawnPoint);
 
-        // Deshabilitamos colisiones del preview para que no empuje al PJ
-        _previewCube.GetComponent<Collider>().enabled = false;
-        _previewCube.GetComponent<Rigidbody>().isKinematic = true;
+            // Aplicamos la textura al preview
+            _previewCube.GetComponent<MeshRenderer>().material.mainTexture = tex;
 
+            // Deshabilitamos colisiones del preview para que no empuje al PJ
+            _previewCube.GetComponent<Collider>().enabled = false;
+            _previewCube.GetComponent<Rigidbody>().isKinematic = true;
+
+        }
     }
 
     public void ActionPlace()
@@ -88,11 +93,13 @@ public class BuildManager : MonoBehaviour
         {
             GameObject target = hit.collider.gameObject;
 
+            // no eliminemos el terreno 
+            if (target.GetComponent<Terrain>() != null) return;
+
             // ¿Es un Main Item? (Tienen el Tag o están en itemSceneConfig)
             if (target.transform.parent != null && target.transform.parent.name == "ItemSceneConfig")
             {
-                // Si es el Main, podrías abrir el menú de borrado de Firebase
-                Debug.Log("No puedes borrar el Main desde aquí, usa el menú.");
+                menuDialog.ShowDialog("Shoot to Edit", "You can’t delete the original—shoot it to remove it.");
             }
             else
             {
@@ -198,6 +205,7 @@ public class BuildManager : MonoBehaviour
                 GameObject newCube = Instantiate(cubePrefab, cubeData.position, cubeData.rotation);
                 newCube.name = cubeData.slotId;
                 newCube.GetComponent<Rigidbody>().isKinematic = true;
+                newCube.GetComponent<BoxCollider>().enabled = true;
 
                 // Re-aplicar textura (tendrías que llamar a tu lógica de BuildItem aquí)
                 _instantiatedCubes.Add(newCube);
