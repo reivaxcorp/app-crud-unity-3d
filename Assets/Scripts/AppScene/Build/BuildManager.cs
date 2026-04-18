@@ -11,7 +11,6 @@ public class BuildManager : MonoBehaviour
     public GameObject cubePrefab; // El prefab genérico del cubo
     public LayerMask buildLayer;  // Capa de los cubos y suelo
     public GameObject parentLocalItemWorld;
-    private GameObject _previewCube;
     private string _currentSlotId;
     private Texture2D _currentTexture;
     private BuildItem _buildItem;

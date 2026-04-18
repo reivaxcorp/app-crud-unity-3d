@@ -30,7 +30,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuManagerApp : MonoBehaviour
+public class MenuManagerApp : MonoBehaviour, ICallBackActions
 {
 
     [Header("Menu CRUD")]
@@ -41,6 +41,8 @@ public class MenuManagerApp : MonoBehaviour
     [SerializeField] GameObject addItemBtn;
     [SerializeField] GameObject menuCompanyBtn;
     [SerializeField] GameObject backBtn;
+    [SerializeField] GameObject saveWorld;
+    [SerializeField] MenuDialogConfirm dialogUi;
 
     [Header("APP info")]
     [SerializeField] GameObject menuCompany;
@@ -48,6 +50,11 @@ public class MenuManagerApp : MonoBehaviour
     [SerializeField] GameObject tutorialInfo;
 
     private MenuCrud menu;
+
+    private void Start()
+    {
+        if (dialogUi == null) Debug.LogWarning("Coloca la referencia de dialog");
+    }
 
     public void ShowMenuAddItem()
     {
@@ -112,6 +119,7 @@ public class MenuManagerApp : MonoBehaviour
         backBtn.SetActive(!isActive);
         menuCompanyBtn.SetActive(!isActive);
         tutorialInfo.SetActive(!isActive);
+        saveWorld.SetActive(!isActive);
     }
 
     public void MenuSetActive(bool isActive)
@@ -128,16 +136,8 @@ public class MenuManagerApp : MonoBehaviour
 
     public void GoBack()
     {
-        //int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        //SceneManager.LoadScene(currentSceneIndex - 1);
-        // Si ya estás en la primera escena, cierra la app en Android
-        Debug.Log("SISTEMA: Saliendo de la aplicación...");
-        Application.Quit();
-
-        // Esto es solo para que veas que funciona mientras estás en el Editor
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
+        dialogUi.SetCallBack(this);
+        dialogUi.ShowDialog("Exit", "Are you sure you want to exit?");
     }
 
 
@@ -154,5 +154,20 @@ public class MenuManagerApp : MonoBehaviour
         if (backBtn == null) { Debug.LogWarning("Por favor, por el gameobject BackBtn en el inspector"); }
         if(menuCompanyBtn == null) { Debug.LogWarning("Por favor, por el gameobject MenuCompanyBtn en el inspector"); }
         if(tutorialInfo == null) { Debug.LogWarning("Por favor, por el gameObject TutorialInfo en el inspector"); }
+        if (saveWorld == null) { Debug.LogWarning("Por favor, por el boton saveworld en el inspector"); }
+    }
+
+    public void OnConfirmButton()
+    {
+        //int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        //SceneManager.LoadScene(currentSceneIndex - 1);
+        // Si ya estás en la primera escena, cierra la app en Android
+        Debug.Log("SISTEMA: Saliendo de la aplicación...");
+        Application.Quit();
+
+        // Esto es solo para que veas que funciona mientras estás en el Editor
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }

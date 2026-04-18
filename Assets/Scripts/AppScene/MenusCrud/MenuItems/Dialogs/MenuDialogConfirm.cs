@@ -3,15 +3,23 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+
 public class MenuDialogConfirm : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textTitle;
     [SerializeField] TextMeshProUGUI textBody;
     [SerializeField] MenuManagerApp menuManager;
 
+    private ICallBackActions _actionsCallback;
+
     private void Awake()
     {
         CheckReferences();
+    }
+
+    public void SetCallBack(ICallBackActions actions)
+    {
+        _actionsCallback = actions;
     }
 
     public void ShowDialog(string title, string message)
@@ -29,7 +37,14 @@ public class MenuDialogConfirm : MonoBehaviour
 
     public void OnAccept()
     {
-        HideDialog();
+        if(_actionsCallback != null)
+        {
+            _actionsCallback.OnConfirmButton();
+            _actionsCallback = null;
+        }else
+        {
+            HideDialog();
+        }
     }
 
     public void ShowDialog()
