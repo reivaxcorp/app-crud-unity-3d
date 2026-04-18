@@ -5,12 +5,14 @@ using System.Linq; // Para buscar fácil en la lista
 public class ButtonBoxUiManager : MonoBehaviour
 {
     [SerializeField] private BuildManager buildManager;
+
     public void OnClickBox(string slotName, Texture2D selectedTexture)
     {
         Debug.Log("Slot seleccionado: " + slotName);
 
         if (buildManager != null)
         {
+            buildManager.SetActionDeleteEnable(false);
             // Le decimos al BuildManager que prepare el cubo con esta textura
             // slotName será "1", "2", etc., según el nombre del objeto UI
             buildManager.PrepareCube(slotName, selectedTexture);

@@ -12,6 +12,7 @@ public class BuildManager : MonoBehaviour, IItemManager
     public LayerMask buildLayer;  // Capa de los cubos y suelo
     public GameObject parentLocalItemWorld;
     private string _currentSlotId;
+    private bool _actionDeleteEnable;
     private Texture2D _currentTexture;
     private BuildItem _buildItem;
 
@@ -24,6 +25,7 @@ public class BuildManager : MonoBehaviour, IItemManager
 
     private void Start()
     {
+        _actionDeleteEnable = false;
         _buildItem = GetComponent<BuildItem>();
         if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
         if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
@@ -82,6 +84,8 @@ public class BuildManager : MonoBehaviour, IItemManager
 
     private void UpdateGhostPreview()
     {
+        if (_actionDeleteEnable) return;
+
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
@@ -125,8 +129,16 @@ public class BuildManager : MonoBehaviour, IItemManager
         _instantiatedCubes.Add(newCube);
     }
 
+    public void SetActionDeleteEnable(bool enable)
+    {
+        _actionDeleteEnable = enable;
+    }
+
     public void ActionDelete()
     {
+        SetActionDeleteEnable(true);
+        _ghostPreview.SetActive(false);
+
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
