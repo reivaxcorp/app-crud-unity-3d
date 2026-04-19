@@ -30,11 +30,11 @@
  *********************************************************************************/
 
 using System.IO;
+using System.Runtime.InteropServices;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class MenuCrud : MonoBehaviour
 {
     
@@ -270,9 +270,47 @@ public class MenuCrud : MonoBehaviour
         {
             OpenFileEditor();
         }
+        // Agregamos la condición para Windows compilado
+        else if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            WindowsFileBrowser wfb = GetComponent<WindowsFileBrowser>();
+            if (wfb != null)
+            {
+                // Modifica tu WindowsFileBrowser para que devuelva la ruta o 
+                // llama directamente a ProcessSelectedImage desde allí.
+                wfb.OpenExplorer((path) => ProcessSelectedImage(path));
+            }
+        }
         else
         {
             Debug.LogWarning("Plataforma no soportada");
+        }
+    }
+
+    private void ProcessSelectedImage(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return;
+
+        // 1. Obtener el nombre del archivo
+        string fileName = Path.GetFileNameWithoutExtension(path);
+
+        // 2. Leer los bytes (Funciona igual en Editor y Windows Player)
+        byte[] fileData = File.ReadAllBytes(path);
+
+        // 3. Crear la textura y cargarla
+        Texture2D texture = new Texture2D(2, 2);
+        if (texture.LoadImage(fileData))
+        {
+            // 4. Aplicar toda tu lógica de UI y Archivos
+            SetImagePreview(texture);
+            SetImageChange(true);
+
+            // Gestión de archivos local (Firebase/Local Storage)
+            fileManager.DeletePreviousCopyImage();
+            fileManager.SetCurrentImageName(fileName);
+            fileManager.SaveFileInternalExtorage(texture, fileName);
+
+            Debug.Log("Imagen cargada exitosamente desde: " + path);
         }
     }
 
@@ -282,19 +320,7 @@ public class MenuCrud : MonoBehaviour
         string path = EditorUtility.OpenFilePanel("Select Image", "", "png,jpg,jpeg,gif,bmp");
         if (!string.IsNullOrEmpty(path))
         {
-
-            string fileName = Path.GetFileNameWithoutExtension(path);
-
-            byte[] fileData = File.ReadAllBytes(path);
-            Texture2D texture = new Texture2D(2, 2);
-            // Esta línea convierte los datos de la imagen en la textura
-            texture.LoadImage(fileData); 
-            SetImagePreview(texture);
-            SetImageChange(true);
-            // borramos la imagén anterior seleccionada
-            fileManager.DeletePreviousCopyImage();
-            fileManager.SetCurrentImageName(fileName);
-            fileManager.SaveFileInternalExtorage(texture, fileName); // salvamos una copia la imagén que selecciono
+            ProcessSelectedImage(path);
         }
 #endif
     }
