@@ -6,6 +6,11 @@ using UnityEngine;
 
 public class BuildManager : MonoBehaviour, IItemManager
 {
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip buildSound;
+
     [SerializeField] MenuDialogConfirm menuDialog;
     [SerializeField] GameObject buttonDelete;
     [Header("Configuración")]
@@ -129,6 +134,19 @@ public class BuildManager : MonoBehaviour, IItemManager
 
         newCube.transform.SetParent(parentLocalItemWorld.transform);
         _instantiatedCubes.Add(newCube);
+     
+        PlaySoundPutBox();
+    }
+
+    private void PlaySoundPutBox()
+    {
+        // EFECTO ADICTIVO DE SONIDO
+        if (audioSource != null && buildSound != null)
+        {
+            // Variamos el pitch entre 0.9 y 1.1 (un 10% arriba o abajo)
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(buildSound);
+        }
     }
 
     public void SetActionDeleteEnable(bool enable)

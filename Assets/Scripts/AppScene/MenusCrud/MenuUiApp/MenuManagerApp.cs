@@ -43,6 +43,7 @@ public class MenuManagerApp : MonoBehaviour, ICallBackActions
     [SerializeField] GameObject backBtn;
     [SerializeField] GameObject saveWorld;
     [SerializeField] MenuDialogConfirm dialogUi;
+    [SerializeField] GameObject itemBoxes;
 
     [Header("APP info")]
     [SerializeField] GameObject menuCompany;
@@ -120,6 +121,7 @@ public class MenuManagerApp : MonoBehaviour, ICallBackActions
         menuCompanyBtn.SetActive(!isActive);
         tutorialInfo.SetActive(!isActive);
         saveWorld.SetActive(!isActive);
+        itemBoxes.SetActive(!isActive);
     }
 
     public void MenuSetActive(bool isActive)

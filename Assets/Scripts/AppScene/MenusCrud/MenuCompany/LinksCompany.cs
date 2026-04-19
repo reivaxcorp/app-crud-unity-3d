@@ -33,7 +33,7 @@ public class LinksCompany : MonoBehaviour
     private const string YOUTUBE_TUTORIALS =
                                             "https://www.youtube.com/playlist?list=PLsvltDspdJcfiiWy2baA2MCNzBm32USjv";
     private const string GIT_HUB =
-                                "https://github.com/reivaxcorp/AppCrudTutorial_Youtube_ReivaxCorp.";
+                                "https://github.com/reivaxcorp/app-crud-unity-3d";
 
     public void OpenYoutubeTutorial()
     {
