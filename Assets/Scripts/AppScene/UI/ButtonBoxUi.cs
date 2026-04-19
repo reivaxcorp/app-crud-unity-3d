@@ -101,7 +101,7 @@ public class ButtonBoxUi : MonoBehaviour
 
             // 3. Enviamos el nombre y la textura al Manager
             GetComponentInParent<ButtonBoxUiManager>()
-                 .OnClickBox(this.gameObject.name, texture2d);
+                 .OnClickBox(this.gameObject, texture2d);
         }
         else
         {

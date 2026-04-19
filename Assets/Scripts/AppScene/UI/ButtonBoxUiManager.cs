@@ -6,17 +6,51 @@ public class ButtonBoxUiManager : MonoBehaviour
 {
     [SerializeField] private BuildManager buildManager;
 
-    public void OnClickBox(string slotName, Texture2D selectedTexture)
+    public void OnClickBox(GameObject slotGO, Texture2D selectedTexture)
     {
-        Debug.Log("Slot seleccionado: " + slotName);
+        Debug.Log("Slot seleccionado: " + slotGO.name);
 
         if (buildManager != null)
         {
+            EnableHighlight(slotGO);
             buildManager.SetActionDeleteEnable(false);
             // Le decimos al BuildManager que prepare el cubo con esta textura
             // slotName será "1", "2", etc., según el nombre del objeto UI
-            buildManager.PrepareCube(slotName, selectedTexture);
+            buildManager.PrepareCube(slotGO.name, selectedTexture);
         }
+    }
+
+    public void EnableHighlight(GameObject slotGO)
+    {
+        // 2. Ahora aplicamos el "verdecito" al seleccionado.
+      
+        if(slotGO.transform.GetChild(0) != null)
+        {
+            Image currentImage = slotGO.transform.GetChild(0).GetComponent<Image>();
+            if (currentImage != null)
+            {
+                currentImage.enabled = true;
+            }
+        }
+        Transform parent = slotGO.transform.parent;
+        for (int child = 0; child < parent.childCount; child ++)
+        {
+            Transform currentChild = parent.GetChild(child);
+
+            if (currentChild.gameObject.name == slotGO.name) continue;
+
+            
+            if(currentChild.childCount > 0)
+            {
+                if (currentChild.GetChild(0) != null)
+                {
+                    if (currentChild.GetChild(0).GetComponent<Image>() != null)
+                        currentChild.GetChild(0).GetComponent<Image>().enabled = false;
+                }
+            }
+                
+        }
+
     }
 
     public void FillBoxUi(Texture2D textureSlot, string slotNumber)

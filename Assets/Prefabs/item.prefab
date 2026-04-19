@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dc6944812ccf3f4687fe3dea0d67492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemScript
+  explosionPrefab: {fileID: 2719367541989484860, guid: 41857e8159a45b140ab86495af597e59, type: 3}
 --- !u!54 &2151238887277112946
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -107,7 +107,7 @@ public class ItemScript : MonoBehaviour
                     Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 }
 
-                Debug.LogWarning("Bullet en " + gameObject.name);
+               // Debug.LogWarning("Bullet en " + gameObject.name);
                 _itemBuildManager.OnDelete(gameObject);
             }
         }

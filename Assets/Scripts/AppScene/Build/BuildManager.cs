@@ -7,6 +7,7 @@ using UnityEngine;
 public class BuildManager : MonoBehaviour, IItemManager
 {
     [SerializeField] MenuDialogConfirm menuDialog;
+    [SerializeField] GameObject buttonDelete;
     [Header("Configuración")]
     public GameObject cubePrefab; // El prefab genérico del cubo
     public LayerMask buildLayer;  // Capa de los cubos y suelo
@@ -29,6 +30,7 @@ public class BuildManager : MonoBehaviour, IItemManager
         _buildItem = GetComponent<BuildItem>();
         if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
         if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
+        if (buttonDelete == null) Debug.LogWarning("Coloca la referencia del boton borrar, para borrar los items caja");
     }
 
     private void Update()
@@ -137,7 +139,10 @@ public class BuildManager : MonoBehaviour, IItemManager
     public void ActionDelete()
     {
         SetActionDeleteEnable(true);
-        _ghostPreview.SetActive(false);
+        _buildItem.buttonBoxUiManager.EnableHighlight(buttonDelete);
+
+        if (_ghostPreview != null)
+            _ghostPreview.SetActive(false);
 
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
