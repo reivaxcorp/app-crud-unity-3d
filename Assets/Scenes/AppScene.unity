@@ -9005,7 +9005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildManager
   audioSource: {fileID: 2087222454}
-  buildSound: {fileID: 8300000, guid: 2e6a142e5d9c8444281dea5633749ad1, type: 3}
+  buildSound: {fileID: 8300000, guid: 6c86b2b4489951245978f009cc8bfba6, type: 3}
   menuDialog: {fileID: 1499459709}
   buttonDelete: {fileID: 1790937339}
   cubePrefab: {fileID: 6157080808779015527, guid: 5f1190899dc1f544e9b5f540253355e8, type: 3}
@@ -9818,6 +9818,7 @@ MonoBehaviour:
   backBtn: {fileID: 588652969}
   saveWorld: {fileID: 816730956}
   dialogUi: {fileID: 1499459709}
+  itemBoxes: {fileID: 488787890}
   menuCompany: {fileID: 138912542}
   myItemsOrdened: {fileID: 275777492}
   tutorialInfo: {fileID: 363119804}
@@ -10920,7 +10921,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 2e6a142e5d9c8444281dea5633749ad1, type: 3}
+  m_Resource: {fileID: 8300000, guid: 6c86b2b4489951245978f009cc8bfba6, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -14925,7 +14926,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7943114606933274763
 Transform:
   m_ObjectHideFlags: 0
