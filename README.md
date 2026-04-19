@@ -30,14 +30,26 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 
 ```json
 {
-"rules": {      
-     "users": {
+"rules": {
+    "users": {
       "$userUid": {
-       	"items": {
-           ".read": "auth != null && $userUid === auth.uid && auth.token.email_verified == true",
-           ".write": "auth != null && $userUid === auth.uid && auth.token.email_verified == true",
-            "name": {".validate": "newData.isString() && newData.val().length <= 30"}
-      	}
+        // El usuario puede borrar su nodo raíz si está autenticado y es su propio UID
+        ".write": "auth != null && $userUid === auth.uid",
+        
+        "items": {
+          // Permitimos leer y escribir si:
+          // 1. Está autenticado y es su propio nodo.
+          // 2. ADEMÁS: o bien es anónimo, o bien tiene el email verificado.
+          ".read": "auth != null && $userUid === auth.uid && (auth.token.firebase.sign_in_provider === 'anonymous' || auth.token.email_verified === true)",
+          ".write": "auth != null && $userUid === auth.uid && (auth.token.firebase.sign_in_provider === 'anonymous' || auth.token.email_verified === true)",
+          
+          "$itemid": {
+           ".validate": "$itemid == '1' || $itemid == '2' || $itemid == '3' || $itemid == '4' || $itemid == '5' || $itemid == '6' || $itemid == '7' || $itemid == '8' || $itemid == '9' || $itemid == '10'",
+        	// "name": {
+            //  ".validate": "newData.isString() && newData.val().length <= 30"
+           // }
+          }
+        }
       }
     }
   }
@@ -55,31 +67,43 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 ```markdown
 rules_version = '2';
 
+
 service firebase.storage {
   match /b/{bucket}/o {
+  
+    // Función auxiliar para verificar si es un usuario válido (Mail verificado O Anónimo)
+    function isVerifiedOrAnonymous() {
+      return request.auth.token.email_verified == true || 
+             request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    // Imágenes de los items
     match /users/{uidFolder}/imageItems/{fileName} {
-      allow write: if request.auth.uid != null
-      						 && request.auth.uid == uidFolder
-                   && request.auth.token.email_verified == true
+      
+      // Permitir escritura: Debe ser su propia carpeta, estar validado y pesar menos de 5MB
+      allow write: if request.auth != null 
+                   && request.auth.uid == uidFolder 
+                   && isVerifiedOrAnonymous()
                    && request.resource.size < 5 * 1024 * 1024;
-      allow read: if request.auth.uid != null
-      						&& request.auth.uid == uidFolder
-                  && request.auth.token.email_verified == true;
-      allow delete:  if request.auth.uid != null
-      						&& request.auth.uid == uidFolder
-                  && request.auth.token.email_verified == true;
-                   
+      
+      // Permitir lectura y borrado
+      allow read, delete: if request.auth != null 
+                          && request.auth.uid == uidFolder 
+                          && isVerifiedOrAnonymous();
+    }
+    
+    // El usuario borra su carpeta raíz (útil para limpieza de cuenta)
+    match /users/{uidFolder} {
+      allow delete: if request.auth != null 
+                    && request.auth.uid == uidFolder;
     }
   }
 }
 ```
 ## Configura la autenticación:
 
-- En la barra lateral, en Compilación, selecciona "Authentication", habilita el método de acceso con “Correo electrónico/contraseña”.
+- En la barra lateral, en Compilación, selecciona "Authentication", habilita el método de acceso con “Acceso anónimo”.
 - Luego selecciona "Comenzar"
-- Despúes en "Agrega tu primer método de acceso y comienza a utilizar Firebase Auth", selecciona "Correo electrónico/contraseña"
-- En Proveedores de acceso, habilita la opcion Correo electrónico/contraseña, y selecciona "guardar"
-- El siguiente paso, en la pestaña "Plantillas" personaliza las plantillas de confirmación de email, que se enviara a los usuarios, cuando inicien sesión.
 - Selecciona editar plantilla, y en nombre de remitente puedes poner el nombre de tu aplicación, y si quieres cambias el idioma. Luego selecciona guardar.
 
 ## Descargar la configuración:
