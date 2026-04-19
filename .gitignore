@@ -26,6 +26,10 @@ Assets/Firebase/m2repository/
 Assets/Firebase/Editor/
 FirebaseConfig.xml
 
+# Firebase Android Auto-generated resources
+Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml
+Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml.meta
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
