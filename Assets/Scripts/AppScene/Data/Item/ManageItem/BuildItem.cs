@@ -8,8 +8,10 @@ public class BuildItem : MonoBehaviour
 {
     public ButtonBoxUiManager buttonBoxUiManager;
 
-    // Diccionario para persistencia en memoria: Key = slotId, Value = imageName
+    // --- NUEVOS DICCIONARIOS PARA CACHÉ ---
     private Dictionary<string, string> _slotImageMap = new Dictionary<string, string>();
+    private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
+    private Dictionary<string, Material> _materialCache = new Dictionary<string, Material>();
 
     // Get y Set para acceder desde otras clases (ManageItems, etc.)
     public Dictionary<string, string> SlotImageMap
@@ -20,43 +22,71 @@ public class BuildItem : MonoBehaviour
 
     public async Task AsignMaterialAsync(string imageName, GameObject cubo)
     {
-        Texture2D texture2D = GetSavedTexture(imageName);
-        //Debug.Log("Image name " + imageName);
-        if (texture2D == null)
+        // 1. Intentamos obtener la textura desde nuestra RAM (Caché)
+        if (!_textureCache.TryGetValue(imageName, out Texture2D texture2D))
         {
-            texture2D = await MyApplication.repository.DowloadImageStorage(imageName);
+            // Si no está en RAM, probamos cargarla desde el disco (FileManager)
+            texture2D = GetSavedTexture(imageName);
 
+            // Si no está en disco, la bajamos de Firebase
+            if (texture2D == null)
+            {
+                texture2D = await MyApplication.repository.DowloadImageStorage(imageName);
+
+                if (texture2D != null)
+                {
+                    FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+                    fileManager.SaveFileInternalExtorage(texture2D, imageName);
+                }
+            }
+
+            // Si logramos conseguirla, la guardamos en el diccionario para la próxima
             if (texture2D != null)
             {
-                FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-                fileManager.SaveFileInternalExtorage(texture2D, imageName);
+                _textureCache[imageName] = texture2D;
             }
             else
             {
-                Debug.LogWarning("Error al bajar la imagen de Firebase Storage");
+                Debug.LogWarning("No se pudo obtener la imagen: " + imageName);
                 return;
             }
         }
 
+        // 2. Intentamos obtener el MATERIAL desde el caché
+        // Esto es clave: todos los cubos con la misma imagen compartirán el MISMO material
+        if (!_materialCache.TryGetValue(imageName, out Material cubeMaterial))
+        {
+            cubeMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            cubeMaterial.mainTexture = texture2D;
+            cubeMaterial.SetTexture("_BaseMap", texture2D);
+
+            _materialCache[imageName] = cubeMaterial;
+            Debug.Log($"<color=yellow>CACHÉ:</color> Nuevo material creado para {imageName}");
+        }
+
+        // 3. Aplicar al cubo (operación muy liviana ahora)
         try
         {
-            // Aplicar al cubo 3D siempre (por si es una instancia nueva)
-            Material newMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            newMaterial.mainTexture = texture2D;
-            newMaterial.SetTexture("_BaseMap", texture2D); // URP estándar
-
             MeshRenderer meshRenderer = cubo.GetComponent<MeshRenderer>();
             if (meshRenderer != null)
             {
-                meshRenderer.material = newMaterial;
+                // Al asignar el mismo material, Unity usa GPU Instancing automáticamente
+                meshRenderer.sharedMaterial = cubeMaterial;
             }
 
             BuildItemUi(imageName, cubo.name, texture2D);
         }
         catch (Exception ex)
         {
-            Debug.LogWarning("Error al aplicar la textura " + ex.Message);
+            Debug.LogWarning("Error al aplicar la textura: " + ex.Message);
         }
+    }
+
+    // Limpia el caché si cambias de escena o quieres liberar RAM
+    public void ClearCache()
+    {
+        _textureCache.Clear();
+        _materialCache.Clear();
     }
 
     /// <param name="imageName">Nombre del archivo de imagen (ej: "foto1.jpg")</param>

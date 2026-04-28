@@ -217,16 +217,32 @@ public class BuildManager : MonoBehaviour, IItemManager
     // Función para actualizar la textura de todos los clones cuando el original cambia en Firebase
     public async Task UpdateAllClonesTexture(string itemId, string imageName)
     {
+        int count = 0;
+        int batchSize = 5; // Procesamos de a 5 cubos por vez
+        int delayMs = 30;  // Pausa de 30ms para dejar que el celular respire
+
+        // Filtramos primero los cubos que coinciden para no iterar de más adentro del loop
+        string targetName = "slot_" + itemId;
+
         foreach (GameObject cube in _instantiatedCubes)
         {
-            // item id se repeta el 1, 2. 3, ...
-            // item copia posee slot_1, slot_2, slot_..
-            if (cube.name == "slot_"+ itemId)
+            if (cube != null && cube.name == targetName)
             {
-                // Usamos el componente BuildItem que ya sabe manejar la descarga
+                // Usamos el componente BuildItem
                 await GetComponent<BuildItem>().AsignMaterialAsync(imageName, cube);
+
+                count++;
+
+                // Cada vez que procesamos un lote (batchSize), hacemos una pausa
+                if (count % batchSize == 0)
+                {
+                    // Task.Delay no bloquea el hilo principal, permite que el juego siga corriendo
+                    await Task.Delay(delayMs);
+                }
             }
         }
+
+        Debug.Log($"<color=cyan>Update:</color> Se actualizaron {count} clones de {itemId} con pausas.");
     }
 
     public void StartSaveWorld()

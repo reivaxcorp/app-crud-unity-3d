@@ -96,7 +96,6 @@ public class MenuManagerApp : MonoBehaviour, ICallBackActions
         }
     }
 
-
     public void SetCurrentMenu(MenuCrud menu)
     {
         this.menu = menu;
