@@ -30,9 +30,8 @@
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using Firebase.Extensions;
 using Firebase.Storage;
-using System;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -140,7 +139,7 @@ public class FirebaseSDK
             _user = result.User;
 
             Debug.Log($"Login Anónimo OK. User ID: {result.User.UserId}");
-            SceneManager.LoadScene("AppScene");
+           
             return true;
         }
         catch (System.Exception e)
@@ -204,11 +203,30 @@ public class FirebaseSDK
         {
             MyApplication.repository.GetRemoteDb().SetUserUid(user.UserId);
             MyApplication.repository.GetLocalDb().SetUserUidFolder(user.UserId);
+            SaveLocalUserData(user.UserId);
         } else
         {
             MyApplication.repository.GetRemoteDb().SetUserUid(null);
             MyApplication.repository.GetLocalDb().SetUserUidFolder(null);
             Debug.Log("Usuario inexistente por ahora..");
+        }
+    }
+
+    private void SaveLocalUserData(string uidUser)
+    {
+        if(!string.IsNullOrEmpty(uidUser))
+        {
+            UserLocalData userData = new UserLocalData();
+            userData.localUserUi = uidUser;
+
+            string json = JsonUtility.ToJson(userData, true);
+
+            string path = Path.Combine(UnityEngine.Application.persistentDataPath, "data_user.json");
+
+            // 4. Escribimos el archivo
+            File.WriteAllText(path, json);
+
+            Debug.Log("Datos locales de usuario guardados: " + path);
         }
     }
 

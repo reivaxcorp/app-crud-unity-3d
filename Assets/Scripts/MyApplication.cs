@@ -44,18 +44,16 @@ public class MyApplication : MonoBehaviour
 
     private async void Start()
     {
-       if(repository == null)
-        {
-            await CreateRepositoryAsync();
-        }
-        //Debug.Log(Application.persistentDataPath);
+        await CreateRepositoryAsync();
     }
 
-    private async Task<MyRepository> CreateRepositoryAsync()
+    private async Task CreateRepositoryAsync()
     {
         RemoteDb remoteDb = new RemoteDb();
         LocalDb localDb = new LocalDb();
-     
+
+        repository = new MyRepository(localDb, remoteDb);
+
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
         // FIRST wait to initialize Sdk Firebase
         IsFirebaseReady = await firebaseSdk.InicializeFirebase();
@@ -63,14 +61,13 @@ public class MyApplication : MonoBehaviour
 
         if (IsFirebaseReady)
         {
-            repository = new MyRepository(localDb, remoteDb);
+          
             Debug.Log("SISTEMA: Firebase y Repositorio listos.");
-            return repository;
+            await FirebaseSDK.GetInstance().DoLogin();
         }
         else
         {
             Debug.LogError("SISTEMA: Falló la inicialización crítica de Firebase.");
-            return null;
         }
     }
 }

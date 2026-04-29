@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -20,7 +21,7 @@ public class ManageItems : MonoBehaviour
     private BuildItem buildItem;
     private bool waitToFirebaseInitialized;
     private NetworkManager networkManager;
-    private bool syncStarted;
+    private bool syncStartedRemote;
     private List<ItemLocal> itemsLocalList;
 
     public ItemSceneConfig getItemConfig
@@ -39,7 +40,7 @@ public class ManageItems : MonoBehaviour
     void Start()
     {
         this.itemsLocalList = new List<ItemLocal>();
-        this.syncStarted = false;
+        this.syncStartedRemote = false;
         waitToFirebaseInitialized = true;
         SetLoadingMsj(true);
     }
@@ -60,6 +61,14 @@ public class ManageItems : MonoBehaviour
     // cargamos la base de datos local primero, y si hay internet luego la remota
     private async void LoadLocalData()
     {
+        UserLocalData userLocalData =
+          loadLocalUserData();
+        if (userLocalData != null)
+        {
+            MyApplication.repository.GetRemoteDb().SetUserUid(userLocalData.localUserUi);
+            MyApplication.repository.GetLocalDb().SetUserUidFolder(userLocalData.localUserUi);
+            Debug.Log("datos de data_user.json cargados " + userLocalData.localUserUi);
+        }
 
         List<ItemLocal> itemsLocal = 
             await MyApplication.repository.GetLocalItemsAsync();
@@ -69,6 +78,8 @@ public class ManageItems : MonoBehaviour
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         Debug.Log("tamanio item local " + itemsLocalList.Count);
+       
+
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
             Task task = CreateItemInScene(itemLocal);
@@ -76,18 +87,30 @@ public class ManageItems : MonoBehaviour
         }
         await Task.WhenAll(tasks);
 
-       
         // 2. CARGAR LAS COPIAS DESDE EL JSON
         // (Solo si  ya en escena, los mains items, que se argaron en el for de arriba)
         // Esto se dispara una sola vez al inicio
-        if (!syncStarted)
-        {
+        // if (!syncStartedRemote)
+        //{
            await buildManager.LoadLocalWorld();
-        }
+       // }
 
         itemSceneConfig.OrderItemMainPositionInScene();
         SetLoadingMsj(false); // Ocultar Cargando..
         StartCoroutine(CheckInternetConection());
+    }
+
+    private UserLocalData loadLocalUserData()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "data_user.json");
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            UserLocalData data = JsonUtility.FromJson<UserLocalData>(json);
+            return data;
+        }
+        return null;
     }
 
     /// <summary>
@@ -140,9 +163,9 @@ public class ManageItems : MonoBehaviour
     /// <param name="itemsRemoteList">La lista con el que se realizará la operación. Puede ser null.</param>
     private async void SyncronizeData(List<ItemRemote> itemsRemoteList)
     {
-        if (syncStarted) return;
+        if (syncStartedRemote) return;
 
-        syncStarted = true;
+        syncStartedRemote = true;
 
         //  List<ItemLocal> itemsLocalList = await MyApplication.repository.GetLocalItemsAsync();
         List<ItemLocal> itemsToSave = new List<ItemLocal>();
@@ -212,7 +235,7 @@ public class ManageItems : MonoBehaviour
             await MyApplication.repository.SaveLocalItemsAsync(itemsLocalList);
         }
 
-        syncStarted = false; // para que no se vuelva a pisar valores
+        syncStartedRemote = false; // para que no se vuelva a pisar valores
                              // si se cambia mientras se esta cargando
     }
 
@@ -339,13 +362,14 @@ public class ManageItems : MonoBehaviour
     private bool CheckDependenciesInitialize()
     {
         Debug.Log(" MyApplication.repository " + MyApplication.repository != null);
-        Debug.Log(" irebaseSDK.GetInstance().isFirebaseReady " + FirebaseSDK.GetInstance().isFirebaseReady);
-       //Debug.Log("FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous " + FirebaseSDK.GetInstance().user.IsAnonymous);
+     //   Debug.Log(" irebaseSDK.GetInstance().isFirebaseReady " + FirebaseSDK.GetInstance().isFirebaseReady);
+        //Debug.Log("FirebaseSDK.GetInstance().auth.CurrentUser.IsAnonymous " + FirebaseSDK.GetInstance().user.IsAnonymous);
 
         return
-                  MyApplication.repository != null &&
-                  FirebaseSDK.GetInstance().isFirebaseReady &&
-                  FirebaseSDK.GetInstance().user != null;
+                  MyApplication.repository != null;
+                //  && // no esperamos que este firebase disponible, lo cargamos ingame
+                //  FirebaseSDK.GetInstance().isFirebaseReady &&
+                //  FirebaseSDK.GetInstance().user != null;
     }
 
     // Cuando no tenemos conexion a internet, no podemos añadir items.
