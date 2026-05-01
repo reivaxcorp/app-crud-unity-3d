@@ -42,7 +42,7 @@ public class ManageItems : MonoBehaviour
         this.itemsLocalList = new List<ItemLocal>();
         this.syncStartedRemote = false;
         waitToFirebaseInitialized = true;
-        SetLoadingMsj(true);
+      //  SetLoadingMsj(true);
     }
 
     // Update is called once per frame
@@ -96,7 +96,7 @@ public class ManageItems : MonoBehaviour
        // }
 
         itemSceneConfig.OrderItemMainPositionInScene();
-        SetLoadingMsj(false); // Ocultar Cargando..
+       // SetLoadingMsj(false); // Ocultar Cargando..
         StartCoroutine(CheckInternetConection());
     }
 

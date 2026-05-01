@@ -127,7 +127,8 @@ public class BuildItem : MonoBehaviour
 
     private Texture2D GetSavedTexture(string imageName)
     {
-        FileManager fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+        
+        FileManager fileManager = new FileManager(MyApplication.repository.GetLocalDb().FolderNameUser);
         return fileManager.LoadFileAsTexture2D(imageName);
     }
 

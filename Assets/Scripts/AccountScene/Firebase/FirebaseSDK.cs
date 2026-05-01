@@ -34,7 +34,6 @@ using Firebase.Storage;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class FirebaseSDK
 {
@@ -206,8 +205,6 @@ public class FirebaseSDK
             SaveLocalUserData(user.UserId);
         } else
         {
-            MyApplication.repository.GetRemoteDb().SetUserUid(null);
-            MyApplication.repository.GetLocalDb().SetUserUidFolder(null);
             Debug.Log("Usuario inexistente por ahora..");
         }
     }

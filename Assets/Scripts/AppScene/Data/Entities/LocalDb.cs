@@ -37,11 +37,13 @@ using UnityEngine;
 public class LocalDb : IRepositoryLocal
 {
     private const string SAVE_FILE_NAME = "items.crud";
-    private string folderNameUser;
+    private string _folderNameUser = "offline";
+
+    public string FolderNameUser { get => _folderNameUser; private set => _folderNameUser = value; }
 
     public void SetUserUidFolder(string folderNameUser)
     {
-        this.folderNameUser = folderNameUser;
+        this.FolderNameUser = folderNameUser;
     }
 
     public async Task<ItemLocal> GetLocalItemById(string id)
@@ -68,7 +70,7 @@ public class LocalDb : IRepositoryLocal
         }
 
 
-        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
+        string folderPath = Path.Combine(Application.persistentDataPath, FolderNameUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
         // Verificar si la carpeta existe, si no, crearla
@@ -97,7 +99,7 @@ public class LocalDb : IRepositoryLocal
     {
         if (!IsUserFolderNameUid()) return;
 
-        string folderPath = Path.Combine(Application.persistentDataPath, folderNameUser);
+        string folderPath = Path.Combine(Application.persistentDataPath, FolderNameUser);
         string filePath = Path.Combine(folderPath, SAVE_FILE_NAME);
 
         // Verificar si la carpeta existe, si no, crearla
@@ -119,7 +121,7 @@ public class LocalDb : IRepositoryLocal
 
     private bool IsUserFolderNameUid()
     {
-        if (folderNameUser == null)
+        if (FolderNameUser == null)
         {
             Debug.LogWarning("No hay un userUid para nombre de la carpeta de usuario!!!");
             return false;
