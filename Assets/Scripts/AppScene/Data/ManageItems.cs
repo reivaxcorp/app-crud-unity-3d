@@ -78,7 +78,6 @@ public class ManageItems : MonoBehaviour
         List<Task> tasks = new List<Task>(); // Lista para almacenar tareas asíncronas
 
         Debug.Log("tamanio item local " + itemsLocalList.Count);
-       
 
         foreach (ItemLocal itemLocal in itemsLocalList)
         {
@@ -90,10 +89,7 @@ public class ManageItems : MonoBehaviour
         // 2. CARGAR LAS COPIAS DESDE EL JSON
         // (Solo si  ya en escena, los mains items, que se argaron en el for de arriba)
         // Esto se dispara una sola vez al inicio
-        // if (!syncStartedRemote)
-        //{
-           await buildManager.LoadLocalWorld();
-       // }
+        await buildManager.LoadLocalWorld();
 
         itemSceneConfig.OrderItemMainPositionInScene();
        // SetLoadingMsj(false); // Ocultar Cargando..

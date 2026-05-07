@@ -42,6 +42,16 @@ public class NetworkManager : MonoBehaviour
         startListeningInternet = false;
     }
 
+    // --- NUEVA FUNCIÓN DE CONSULTA INMEDIATA ---
+    /// <summary>
+    /// Consulta si hay internet en este preciso momento.
+    /// </summary>
+    /// <returns>True si hay conexión (Wifi o Datos), False si no hay.</returns>
+    public bool HasInternet()
+    {
+        return Application.internetReachability != NetworkReachability.NotReachable;
+    }
+
     public void ListeningInternetAvariable()
     {
         startListeningInternet = true;
@@ -78,12 +88,12 @@ public class NetworkManager : MonoBehaviour
         {
             case NetworkReachability.NotReachable:
                 // Debug.Log("No hay conexión a Internet.");
-                handleInternetAvariableResult?.Invoke(false);
+                handleInternetAvariableResult?.Invoke(HasInternet());
                 break;
             case NetworkReachability.ReachableViaCarrierDataNetwork:
             case NetworkReachability.ReachableViaLocalAreaNetwork:
                 // Debug.Log("Conexión a Internet disponible.");
-                handleInternetAvariableResult?.Invoke(true);
+                handleInternetAvariableResult?.Invoke(HasInternet());
                 break;
         }
     }

@@ -32,6 +32,7 @@ using UnityEngine;
 public class MenuAddItem : MenuCrud, IResult
 {
     private string generateImageName;
+    public NetworkManager network;
 
     public void SetResultCrudUi(string title, string msj)
     {
@@ -46,6 +47,12 @@ public class MenuAddItem : MenuCrud, IResult
     /// </summary>
     public async void CreateDocumentRemote()
     {
+        if(network.HasInternet() == false)
+        {
+            OpenDialog("No Conneccion", "You need internet connection");
+            return;
+        }
+
         if(AppConfig.IsItemAvariableToPut())
         {
             if (IsDataSetted())
@@ -86,8 +93,8 @@ public class MenuAddItem : MenuCrud, IResult
             ItemRemote itemRemote = new ItemRemote( imageName: imageName);
             bool saveResult = await MyApplication.repository.SaveItemRemote(itemRemote, resultUi: this);
            
-            if(saveResult) { 
-                Invoke("ShowInterstitialAd", AppConfig.timeInterstitialAd);
+            if(saveResult) {
+                Debug.Log("Documento escrito en firebase");
             }
         }
         else
