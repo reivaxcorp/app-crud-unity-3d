@@ -35,11 +35,11 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class MenuCrud : MonoBehaviour
 {
     
     [SerializeField] MenuDialogConfirm dialogMsj;
-    [SerializeField] AndroidPermission androidPermission;
     [SerializeField] ReceiverMessagesFromAndroid receiverMessagesFromAndroid;
     [SerializeField] ManageItems manageItems;
     [SerializeField] protected MenuManagerApp uiApp;
@@ -171,36 +171,20 @@ public class MenuCrud : MonoBehaviour
 
     private void OpenImageAndroid()
     {
-        androidPermission.OnPermissionResult -= HandlePermissionResult; // Limpiamos por las dudas
-        androidPermission.OnPermissionResult += HandlePermissionResult; // Suscribimos una sola vez
-        androidPermission.RequestStoragePermission();
-    }  
-
-    private void HandlePermissionResult(PermissionStatus status)
-    {
-        switch (status)
+        // 1. Llamamos directamente a la función sin asignar a ninguna variable
+        NativeGallery.GetImageFromGallery((path) =>
         {
-            case PermissionStatus.Granted:
-                Debug.Log("¡Permiso concedido!");
-                SetMsjInfoUI("Permission granted!");
-                fileManager.CreateIntentFileAndroid();
-                break;
-            case PermissionStatus.Denied:
-                Debug.LogWarning("Permiso denegado por el usuario.");
-                SetMsjInfoUI("Permission denied by the user.");
-                break;
-        }
+            if (path != null)
+            {
+                // Tu lógica de procesamiento
+                ProcessSelectedImage(path);
+            }
+        }, "Selecciona una imagen", "image/*");
+
+        // Borra la línea del Debug.Log que usaba la variable 'permission' 
+        // porque ya no existe.
     }
 
-    // Desuscribirse para evitar pérdida de memoria
-    private void DesuscribeEvent()
-    {
-        if (androidPermission != null)
-        {
-            // Desuscribir el evento OnPermissionResult
-            androidPermission.OnPermissionResult -= HandlePermissionResult;
-        }
-    }
      
     private void OnEnable()
     {
@@ -211,12 +195,6 @@ public class MenuCrud : MonoBehaviour
     private void OnDisable()
     {
         ResetMenu();
-        DesuscribeEvent();
-    }
-
-    private void OnDestroy()
-    {
-        DesuscribeEvent();
     }
 
     private void SetCurrentMenu(MenuCrud menu)
@@ -332,6 +310,5 @@ public class MenuCrud : MonoBehaviour
         if (menuImagePreview == null) Debug.LogWarning("MenuImagePreview no asignado en el Inspector");
         if (receiverMessagesFromAndroid == null) Debug.LogWarning("Por favor coloca el script ReceiverMeesagesFromAndroid desde el Manager (gameObject) en el inspector");
         if (resultMsj == null) Debug.LogWarning("ResultMsj no está colocado en el inspector");
-        if (androidPermission == null) Debug.LogWarning("Por favor coloca el script AndroidPermission desde el Manager (gameObject) en el inspector");
     }
 }

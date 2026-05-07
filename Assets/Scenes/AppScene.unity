@@ -1881,7 +1881,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogMsj: {fileID: 1499459709}
-  androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
   manageItems: {fileID: 1651622796}
   uiApp: {fileID: 1889203354}
@@ -7397,7 +7396,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogMsj: {fileID: 1499459709}
-  androidPermission: {fileID: 1651622792}
   receiverMessagesFromAndroid: {fileID: 1651622794}
   manageItems: {fileID: 1651622796}
   uiApp: {fileID: 1889203354}
@@ -8900,7 +8898,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1651622793}
-  - component: {fileID: 1651622792}
   - component: {fileID: 1651622794}
   - component: {fileID: 1651622795}
   - component: {fileID: 1651622796}
@@ -8914,18 +8911,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1651622792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1651622791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb64c8b7ac8fd61459b42be0fbd72d9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1651622793
 Transform:
   m_ObjectHideFlags: 0
