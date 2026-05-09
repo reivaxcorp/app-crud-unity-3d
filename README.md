@@ -30,18 +30,18 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 
 ```json
 {
-"rules": {
+  "rules": {
     "users": {
       "$userUid": {
-        // El usuario puede borrar su nodo raíz si está autenticado y es su propio UID
+       // Permitimos la escritura en el nodo raíz del usuario para borrar o inicializar datos
+        // siempre que el UID coincida con el usuario autenticado.
         ".write": "auth != null && $userUid === auth.uid",
         
         "items": {
-          // Permitimos leer y escribir si:
-          // 1. Está autenticado y es su propio nodo.
-          // 2. ADEMÁS: o bien es anónimo, o bien tiene el email verificado.
-          ".read": "auth != null && $userUid === auth.uid && (auth.token.firebase.sign_in_provider === 'anonymous' || auth.token.email_verified === true)",
-          ".write": "auth != null && $userUid === auth.uid && (auth.token.firebase.sign_in_provider === 'anonymous' || auth.token.email_verified === true)",
+         // Simplificamos: Si el usuario está autenticado vía Google Play Games, 
+          // el provider ya no será 'anonymous'. Google ya valida la identidad.
+          ".read": "auth != null && $userUid === auth.uid",
+          ".write": "auth != null && $userUid === auth.uid",
           
           "$itemid": {
            ".validate": "$itemid == '1' || $itemid == '2' || $itemid == '3' || $itemid == '4' || $itemid == '5' || $itemid == '6' || $itemid == '7' || $itemid == '8' || $itemid == '9' || $itemid == '10'",
