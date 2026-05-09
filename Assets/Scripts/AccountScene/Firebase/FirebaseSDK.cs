@@ -130,23 +130,6 @@ public class FirebaseSDK
         }
     }
 
-    public async Task<bool> DoLogin()
-    {
-        try
-        {
-            var result = await auth.SignInAnonymouslyAsync();
-            _user = result.User;
-
-            Debug.Log($"Login Anónimo OK. User ID: {result.User.UserId}");
-           
-            return true;
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError("Error en login anónimo: " + e.Message);
-            return false;
-        }
-    }
 
     /// <summary>
     ///   La primera vez que entre el usuario, sera null.

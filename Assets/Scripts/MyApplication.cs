@@ -40,7 +40,7 @@ public class MyApplication : MonoBehaviour
     private static MyRepository _repository;
 
     // Propiedad para que el Manager de Auth sepa cuándo arrancar
-    public static bool IsFirebaseReady { get; private set; } = false;
+    public bool IsFirebaseReady { get; private set; } = false;
 
     private async void Start()
     {
@@ -56,7 +56,7 @@ public class MyApplication : MonoBehaviour
 
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
         // FIRST wait to initialize Sdk Firebase
-      //  IsFirebaseReady = await firebaseSdk.InicializeFirebase();
+        IsFirebaseReady = await firebaseSdk.InicializeFirebase();
 
 
         if (IsFirebaseReady)
