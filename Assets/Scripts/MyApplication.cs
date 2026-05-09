@@ -56,14 +56,14 @@ public class MyApplication : MonoBehaviour
 
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
         // FIRST wait to initialize Sdk Firebase
-        IsFirebaseReady = await firebaseSdk.InicializeFirebase();
+      //  IsFirebaseReady = await firebaseSdk.InicializeFirebase();
 
 
         if (IsFirebaseReady)
         {
           
             Debug.Log("SISTEMA: Firebase y Repositorio listos.");
-            await FirebaseSDK.GetInstance().DoLogin();
+        //    await FirebaseSDK.GetInstance().DoLogin();
         }
         else
         {

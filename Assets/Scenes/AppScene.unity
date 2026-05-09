@@ -8904,6 +8904,7 @@ GameObject:
   - component: {fileID: 1651622797}
   - component: {fileID: 1651622798}
   - component: {fileID: 1651622799}
+  - component: {fileID: 1651622800}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -9012,6 +9013,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 384
   parentLocalItemWorld: {fileID: 14230277}
+--- !u!114 &1651622800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651622791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79163c52ef193fe43ba62a34fa318ed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayGamesManager
 --- !u!1 &1661300945
 GameObject:
   m_ObjectHideFlags: 0
