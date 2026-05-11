@@ -20,7 +20,7 @@ public class PlayGamesManager : MonoBehaviour
 
     private void Update()
     {
-        if(!isFirebaseAvariable && myApplication.IsFirebaseReady)
+        if(!isFirebaseAvariable && MyApplication.IsFirebaseReady)
         {
             isFirebaseAvariable = true;
             PlayGamesPlatform.Activate();

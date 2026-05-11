@@ -146,9 +146,10 @@ public class ManageItems : MonoBehaviour
     }
 
     // Escuchamos los cambios en la base de datos remota, al suscribirnos a los cambios
-    private async void ListeningDbRemote()
+    public async void ListeningDbRemote()
     {
         RemoteDb remoteDbRef = MyApplication.repository.GetRemoteDb();
+        remoteDbRef.handleValueResult -= SyncronizeData;
         remoteDbRef.handleValueResult += SyncronizeData;
         await remoteDbRef.FirebaseValueChanged();
     }

@@ -57,11 +57,7 @@ public class FirebaseSDK
         private set { _user = value; }
         get { return _user; }
     }
-    public bool isFirebaseReady
-    {
-        private set { _isFirebaseReady = value; }
-        get { return _isFirebaseReady; }
-    }
+   
     public FirebaseApp app
     {
         private set { _app = value; }
@@ -75,12 +71,19 @@ public class FirebaseSDK
     private FirebaseAuth _auth;
     private FirebaseUser _user;
     private bool _isFirebaseReady;
-
+    private ISyncData _IfirebaseSyncData;
 
     /// <summary>
     /// Initialize firebase dependencies. 
     /// </summary>
     /// <returns></returns>
+    /// 
+
+    public void SetSyncCallBack(ISyncData syncData)
+    {
+        _IfirebaseSyncData = syncData;
+    }
+
     public async Task<bool> InicializeFirebase()
     {
         try
@@ -97,29 +100,27 @@ public class FirebaseSDK
             };
 
             // 2. Intentamos crear la App con estas opciones
-            Firebase.FirebaseApp.Create(options) ;
+            Firebase.FirebaseApp.Create(options);
 
             // 3. Verificamos dependencias como siempre
             var dependencyStatus = await Firebase.FirebaseApp.CheckAndFixDependenciesAsync();
-            
+
 
             if (dependencyStatus == Firebase.DependencyStatus.Available)
             {
                 Debug.Log("SISTEMA: Firebase cargado manualmente con éxito.");
-               
+
                 this.auth = FirebaseAuth.DefaultInstance;
                 this.auth.StateChanged += AuthStateChanged;
                 this.firebaseStorage = FirebaseStorage.DefaultInstance;
                 this.defaultInstance = FirebaseDatabase.DefaultInstance;
                 this._app = FirebaseApp.DefaultInstance;
 
-                isFirebaseReady = true;
                 return true;
             }
             else
             {
                 Debug.LogError($"SISTEMA: Dependencias no disponibles: {dependencyStatus}");
-                isFirebaseReady = false;
                 return false;
             }
         }
@@ -138,24 +139,9 @@ public class FirebaseSDK
     /// </summary>
     void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
-        if (auth.CurrentUser != user)
-        {
-            bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null
-                && auth.CurrentUser.IsValid();
-
-            if (!signedIn && user != null)
-            {
-                Debug.Log("Signed out " + user.UserId);
-            }
-
-            user = auth.CurrentUser;
-
-            if (signedIn)
-            {
-                Debug.Log("Signed in " + user.UserId);
-                InitUidUserToApp(); // podemos inicializar ahora los datos principales.
-            }
-        }
+        user = auth.CurrentUser;
+        Debug.Log("Signed in " + user.UserId);
+        InitUidUserToApp(); // podemos inicializar ahora los datos principales.
     }
 
     public static FirebaseSDK GetInstance()
@@ -186,7 +172,10 @@ public class FirebaseSDK
             MyApplication.repository.GetRemoteDb().SetUserUid(user.UserId);
             MyApplication.repository.GetLocalDb().SetUserUidFolder(user.UserId);
             SaveLocalUserData(user.UserId);
-        } else
+            Debug.Log("userUid despues de InitUidUserToApp: " +user.UserId);
+            _IfirebaseSyncData.SincronizeDataAfterFirstLogin();
+        }
+        else
         {
             Debug.Log("Usuario inexistente por ahora..");
         }
@@ -194,7 +183,7 @@ public class FirebaseSDK
 
     private void SaveLocalUserData(string uidUser)
     {
-        if(!string.IsNullOrEmpty(uidUser))
+        if (!string.IsNullOrEmpty(uidUser))
         {
             UserLocalData userData = new UserLocalData();
             userData.localUserUi = uidUser;

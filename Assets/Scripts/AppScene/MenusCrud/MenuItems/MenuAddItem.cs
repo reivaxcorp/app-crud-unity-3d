@@ -58,22 +58,35 @@ public class MenuAddItem : MenuCrud, IResult
             if (IsDataSetted())
             {
                 StartAnimationTextMenu(true, "Creating");
-                // Obtenemos los bytes de la imagén temporal seleccionada
-                byte[] fileBytes = fileManager.GetBytesImageSelected();
-                // Generar nombre de imagén aleatorea
-                generateImageName = Guid.NewGuid().ToString();
-                // subir nueva imagén
-                bool uploadResult = await MyApplication.repository.UploadFileFirebaseStorage(generateImageName, fileManager.folderNameUser, fileBytes);
-                
-                if (uploadResult)
+
+                if(fileManager != null)
                 {
-                    fileManager.ChangeNameImageCopySelected(generateImageName);
-                    WriteDocumentRemote(generateImageName);
+                    // Obtenemos los bytes de la imagén temporal seleccionada
+                    byte[] fileBytes = fileManager.GetBytesImageSelected();
+                    // Generar nombre de imagén aleatorea
+                    generateImageName = Guid.NewGuid().ToString();
+                    // subir nueva imagén
+
+                    Debug.LogWarning("Intentando subir imagen:" + generateImageName);
+
+                    bool uploadResult = await MyApplication.repository.UploadFileFirebaseStorage(generateImageName, fileManager.folderNameUser, fileBytes);
+
+                    if (uploadResult)
+                    {
+                        fileManager.ChangeNameImageCopySelected(generateImageName);
+                        WriteDocumentRemote(generateImageName);
+                    }
+                    else
+                    {
+                        SetResultCrudUi("Error", "Error uploading the document");
+                    }
                 }
                 else
                 {
-                    SetResultCrudUi("Error", "Error uploading the document");
+                    SetResultCrudUi("Error", "Image error, try again.");
+                    Debug.LogWarning("FileManager es null");
                 }
+                 
             }
         }
         else
@@ -88,6 +101,7 @@ public class MenuAddItem : MenuCrud, IResult
     /// <param name="imageName"></param>
     private async void WriteDocumentRemote(string imageName)
     {
+        Debug.LogWarning("El nombre de la imagen a subir es: " + imageName);
         if (MyApplication.repository != null)
         {
             ItemRemote itemRemote = new ItemRemote( imageName: imageName);

@@ -30,8 +30,30 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class MyApplication : MonoBehaviour
+public interface ISyncData
 {
+    // la primera vez que logea ( o dispositivo nuevo)
+    // y ya tenia items en la db remota, 
+    // debemos esperar que se inicialize el uid del usuario (google play games) 
+    // ya que la primera vez escuchara cambios pero pasara por alto al no 
+    // haber uid, y no mostrara nada
+    void SincronizeDataAfterFirstLogin();
+}
+
+public class MyApplication : MonoBehaviour, ISyncData
+{
+    private ManageItems manageItems;
+
+    private void Awake()
+    {
+        manageItems = GetComponent<ManageItems>();
+    }
+
+    public void SincronizeDataAfterFirstLogin()
+    {
+        manageItems.ListeningDbRemote();
+    }
+
     public static MyRepository repository
     {
         private set { _repository = value; }
@@ -40,7 +62,7 @@ public class MyApplication : MonoBehaviour
     private static MyRepository _repository;
 
     // Propiedad para que el Manager de Auth sepa cuándo arrancar
-    public bool IsFirebaseReady { get; private set; } = false;
+    public static bool IsFirebaseReady { get; private set; } = false;
 
     private async void Start()
     {
@@ -55,15 +77,14 @@ public class MyApplication : MonoBehaviour
         repository = new MyRepository(localDb, remoteDb);
 
         FirebaseSDK firebaseSdk = FirebaseSDK.GetInstance();
+        firebaseSdk.SetSyncCallBack(this);
         // FIRST wait to initialize Sdk Firebase
         IsFirebaseReady = await firebaseSdk.InicializeFirebase();
-
 
         if (IsFirebaseReady)
         {
           
             Debug.Log("SISTEMA: Firebase y Repositorio listos.");
-        //    await FirebaseSDK.GetInstance().DoLogin();
         }
         else
         {

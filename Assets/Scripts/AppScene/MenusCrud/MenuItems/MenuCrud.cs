@@ -158,7 +158,6 @@ public class MenuCrud : MonoBehaviour
     public void ResetMenu()
     {
         ClearInputs();
-        WaitForFirebase(true);
         SetImageChange(false);
         ClearResultCrud();
         SetCurrentMenu(null);
@@ -208,11 +207,6 @@ public class MenuCrud : MonoBehaviour
         menuImagePreview.sprite = null;
     }
 
-    private void WaitForFirebase(bool isWaitFirebase)
-    {
-        waitForFirebaseSdk = isWaitFirebase;
-    }
-
     private void Awake()
     {
         progressText = gameObject.AddComponent<ProgressText>();
@@ -221,19 +215,22 @@ public class MenuCrud : MonoBehaviour
 
     private void Start()
     {
-        WaitForFirebase(true);
-        fileManager = new FileManager(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
+        waitForFirebaseSdk = true;
     }
 
     private void Update()
     {
         if (waitForFirebaseSdk)
         {
-            if (FirebaseSDK.GetInstance().isFirebaseReady &&
+            if (MyApplication.IsFirebaseReady &&
                 FirebaseSDK.GetInstance().auth.CurrentUser != null)
             {
-                fileManager.SetFolderUidName(FirebaseSDK.GetInstance().auth.CurrentUser.UserId);
-                WaitForFirebase(false);
+                string uid = FirebaseSDK.GetInstance().auth.CurrentUser.UserId;
+                fileManager = new FileManager(uid);
+
+                fileManager.SetFolderUidName(uid);
+                waitForFirebaseSdk = false;
+                Debug.Log("<color=green>FileManager inicializado con éxito para el usuario: </color>" + uid);
             }
         }
     }

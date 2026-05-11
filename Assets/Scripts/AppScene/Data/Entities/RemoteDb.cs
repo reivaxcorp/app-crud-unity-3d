@@ -26,7 +26,11 @@ public class RemoteDb : IRepositoryRemote
 
     public async Task FirebaseValueChanged()
     {
-        if (!IsUserUid()) return;
+        if (!IsUserUid())
+        {
+            Debug.LogWarning("No hay user uid");
+            return;
+        }
 
         FirebaseSDK.GetInstance().defaultInstance
             .GetReference("users")

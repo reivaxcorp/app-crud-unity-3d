@@ -7,12 +7,9 @@ using UnityEngine;
 public class BuildManager : MonoBehaviour, IItemManager
 {
 
-    [Header("Audio")]
-    public AudioSource audioSource;
-    public AudioClip buildSound;
-
     [SerializeField] MenuDialogConfirm menuDialog;
     [SerializeField] GameObject buttonDelete;
+    [SerializeField] SoundManager soundManager;
     [Header("Configuración")]
     public GameObject cubePrefab; // El prefab genérico del cubo
     public LayerMask buildLayer;  // Capa de los cubos y suelo
@@ -36,6 +33,8 @@ public class BuildManager : MonoBehaviour, IItemManager
         if (parentLocalItemWorld == null) Debug.LogWarning("Coloca la referencia de los items copia del mundo");
         if (menuDialog == null) Debug.LogWarning("Coloca la referencia del dialogo");
         if (buttonDelete == null) Debug.LogWarning("Coloca la referencia del boton borrar, para borrar los items caja");
+        if (soundManager == null) Debug.LogWarning("Coloca la referencia Sound para SoundManager");
+
     }
 
     private void Update()
@@ -134,21 +133,11 @@ public class BuildManager : MonoBehaviour, IItemManager
 
         newCube.transform.SetParent(parentLocalItemWorld.transform);
         _instantiatedCubes.Add(newCube);
-     
-        PlaySoundPutBox();
+
+        soundManager.PlayBoxPutEffect();
     }
 
-    private void PlaySoundPutBox()
-    {
-        // EFECTO ADICTIVO DE SONIDO
-        if (audioSource != null && buildSound != null)
-        {
-            // Variamos el pitch entre 0.9 y 1.1 (un 10% arriba o abajo)
-            audioSource.pitch = Random.Range(0.9f, 1.1f);
-            audioSource.PlayOneShot(buildSound);
-        }
-    }
-
+    
     public void SetActionDeleteEnable(bool enable)
     {
         _actionDeleteEnable = enable;
@@ -180,10 +169,6 @@ public class BuildManager : MonoBehaviour, IItemManager
             else
             {
                 RemoveCubeCopy(target);
-
-                // podria ir SaveWorld() 
-                // pero para optimizar agregamos un boton
-                // SaveWorld(); // Guardamos el cambio en el JSON
             }
         }
     }
