@@ -67,32 +67,27 @@ La serie de tutoriales consta de varios videos, cada uno cubriendo un aspecto es
 ```markdown
 rules_version = '2';
 
-
 service firebase.storage {
   match /b/{bucket}/o {
-  
-    // Función auxiliar para verificar si es un usuario válido (Mail verificado O Anónimo)
-    function isVerifiedOrAnonymous() {
-      return request.auth.token.email_verified == true || 
-             request.auth.token.firebase.sign_in_provider == 'anonymous';
-    }
 
-    // Imágenes de los items
+    // Imágenes de los items (Texturas de los cubos)
     match /users/{uidFolder}/imageItems/{fileName} {
       
-      // Permitir escritura: Debe ser su propia carpeta, estar validado y pesar menos de 5MB
+      // Permitir escritura: 
+      // 1. Debe estar autenticado.
+      // 2. Solo puede escribir en su propia carpeta (UID coincide).
+      // 3. El archivo debe ser una imagen y pesar menos de 5MB.
       allow write: if request.auth != null 
                    && request.auth.uid == uidFolder 
-                   && isVerifiedOrAnonymous()
-                   && request.resource.size < 5 * 1024 * 1024;
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
       
-      // Permitir lectura y borrado
+      // Permitir lectura y borrado: Solo el dueño de la cuenta.
       allow read, delete: if request.auth != null 
-                          && request.auth.uid == uidFolder 
-                          && isVerifiedOrAnonymous();
+                          && request.auth.uid == uidFolder;
     }
     
-    // El usuario borra su carpeta raíz (útil para limpieza de cuenta)
+    // El usuario borra su carpeta raíz (Limpieza de cuenta desde la App)
     match /users/{uidFolder} {
       allow delete: if request.auth != null 
                     && request.auth.uid == uidFolder;
